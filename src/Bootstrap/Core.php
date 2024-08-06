@@ -17,14 +17,13 @@ class Core
     try {
       Environment::setup();
       Routes::setup();
-      Response::jsonResponse();
       Request::setup();
-
       Router::setup();
-
+      
       Response::appendResponse("status", http_response_code(), true);
-
-      Response::answer();
+      
+      Response::setJson();
+      echo Response::answer();
     } catch (\Throwable $th) {
       http_response_code(500);
       self::handleException($th);
