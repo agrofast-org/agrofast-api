@@ -3,8 +3,8 @@
 namespace Ilias\Choir\Bootstrap;
 
 use Ilias\Dotenv\Environment;
-use Ilias\Opherator\Request\Request;
-use Ilias\Opherator\Request\Response;
+use Ilias\Opherator\Request;
+use Ilias\Opherator\Response;
 use Ilias\Rhetoric\Exceptions\MiddlewareException;
 use Ilias\Rhetoric\Exceptions\RouteNotFoundException;
 use Ilias\Rhetoric\Router\Router;
@@ -17,13 +17,12 @@ class Core
     try {
       Environment::setup();
       Request::setup();
-      Response::setJson();
 
       Router::setup();
 
       Response::appendResponse("status", http_response_code(), true);
 
-      echo Response::answer();
+      Response::answer();
     } catch (RouteNotFoundException $notFoundEx) {
       self::handleRouteException($notFoundEx);
     } catch (MiddlewareException $midEx) {

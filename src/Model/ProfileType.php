@@ -1,0 +1,16 @@
+<?php
+
+namespace Ilias\Choir\Model;
+
+use Ilias\Choir\Database\Schemas\Hr;
+use Ilias\Maestro\Abstract\Table;
+use Ilias\Maestro\Types\Serial;
+
+final class ProfileType extends Table
+{
+  public Hr $schema;
+  /** @primary */
+  public Serial $id;
+  /** @unique */
+  public string $label;
+}
