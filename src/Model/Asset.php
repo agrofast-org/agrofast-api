@@ -2,8 +2,8 @@
 
 namespace Ilias\Choir\Model;
 
-use Ilias\Opherator\Request\Response;
 use Ilias\Choir\Utilities\FileReader;
+use Ilias\Opherator\Response;
 use RuntimeException;
 
 class Asset

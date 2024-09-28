@@ -1,12 +1,12 @@
 <?php
 
-namespace Ilias\Choir\Model;
+namespace Ilias\Choir\Model\Hr;
 
 use Ilias\Choir\Database\Schemas\Hr;
-use Ilias\Maestro\Abstract\Table;
+use Ilias\Maestro\Abstract\TrackableTable;
 use Ilias\Maestro\Types\Serial;
 
-final class Profile extends Table
+final class Profile extends TrackableTable
 {
   public Hr $schema;
   /** @primary */
@@ -14,5 +14,6 @@ final class Profile extends Table
   public Serial $id;
   /** @not_nuable */
   public User $userId;
+  /** @not_nuable */
   public ProfileType $profileType;
 }

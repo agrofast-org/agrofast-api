@@ -2,16 +2,14 @@
 
 namespace Ilias\Choir\Controller;
 
-use Ilias\Opherator\Request\Response;
+use Ilias\Opherator\Response;
 use Ilias\Choir\Model\Asset;
-use Ilias\Choir\Model\Greed;
 
 class IndexController
 {
   public static function handleApiIndex()
   {
-    $greedModel = new Greed();
-    Response::appendResponse("message", $greedModel->greed());
+    Response::appendResponse("message", 'Welcome to the Agrofast API');
   }
 
   public static function favicon()

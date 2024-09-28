@@ -3,8 +3,8 @@
 namespace Ilias\Choir\Controller;
 
 use Ilias\Choir\Bootstrap\Core;
-use Ilias\Opherator\Request\Request;
-use Ilias\Opherator\Request\Response;
+use Ilias\Opherator\Request;
+use Ilias\Opherator\Response;
 use Ilias\Choir\Utilities\DirectoryReader;
 use Ilias\Choir\Utilities\FileReader;
 use Ilias\Rhetoric\Router\Router;

@@ -1,20 +1,21 @@
 <?php
 
-namespace Ilias\Choir\Model;
+namespace Ilias\Choir\Model\Hr;
 
 use Ilias\Choir\Database\Schemas\Hr;
 use Ilias\Maestro\Abstract\Table;
 use Ilias\Maestro\Types\Serial;
 
-final class DocumentType extends Table
+final class ContactType extends Table
 {
   public Hr $schema;
   /** @primary */
   public Serial $id;
-  /** @unique */
+  /** @not_nuable 
+   * @unique */
   public string $label;
 
-  public function __construct(string $label) {
-    $this->label = $label;
+  public function __construct()
+  {
   }
 }

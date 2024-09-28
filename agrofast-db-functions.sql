@@ -1,0 +1,6 @@
+CREATE OR REPLACE FUNCTION generate_four_digit_auth_code()
+RETURNS TEXT AS $$
+BEGIN
+    RETURN CAST(FLOOR(1000 + RANDOM() * 9000) AS TEXT);
+END;
+$$ LANGUAGE plpgsql;
