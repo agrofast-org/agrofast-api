@@ -8,3 +8,4 @@ $coreDatabase = new Manager();
 $agrofastDB = new AgrofastDB();
 
 print implode("\n", $coreDatabase->createDatabase($agrofastDB, false)) . "\n";
+  

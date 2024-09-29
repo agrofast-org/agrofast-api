@@ -4,6 +4,7 @@ namespace Ilias\Choir\Model\Hr;
 
 use Ilias\Choir\Database\Schemas\Hr;
 use Ilias\Maestro\Abstract\TrackableTable;
+use Ilias\Maestro\Database\Expression;
 use Ilias\Maestro\Types\Serial;
 
 final class AuthCode extends TrackableTable
@@ -13,7 +14,7 @@ final class AuthCode extends TrackableTable
   public Serial $id;
   /** @not_nuable */
   public User $userId;
-  public string $code;
+  public string|Expression $code = 'generate_four_digit_auth_code()';
 
   public function __construct(string $code)
   {

@@ -2,7 +2,7 @@
 
 namespace Ilias\Choir\Controller;
 
-use Ilias\Opherator\Request\Response;
+use Ilias\Opherator\Response;
 use Ilias\Rhetoric\Router\Router;
 
 class AssetController

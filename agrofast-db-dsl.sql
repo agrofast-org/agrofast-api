@@ -3,7 +3,7 @@ CREATE SCHEMA IF NOT EXISTS "transport";
 CREATE TABLE IF NOT EXISTS "hr"."auth_code" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
 	"user_id" INTEGER NOT NULL,
-	"code" TEXT NOT NULL,
+	"code" TEXT NOT NULL DEFAULT generate_four_digit_auth_code(),
 	"active" BOOLEAN NULL DEFAULT TRUE,
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 	"updated_in" TIMESTAMP NULL,
@@ -123,3 +123,4 @@ ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_request_id FOREIGN KEY (
 ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_carrier_id FOREIGN KEY ("carrier_id") REFERENCES "transport"."carrier"("id");
 ALTER TABLE "transport"."request" ADD CONSTRAINT fk_request_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "transport"."carrier" ADD CONSTRAINT fk_carrier_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
+CREATE OR REPLACE FUNCTION generate_four_digit_auth_code() RETURNS TEXT AS $$ BEGIN RETURN CAST(FLOOR(1000 + RANDOM() * 9000) AS TEXT); END; $$ LANGUAGE plpgsql;
