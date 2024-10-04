@@ -13,7 +13,6 @@ use Ilias\Rhetoric\Router\Router;
 
 class Core
 {
-
   public static function handle(array $params = [])
   {
     try {
