@@ -8,7 +8,7 @@ RUN apt clean
 RUN rm -rf /var/lib/apt/lists/*
 
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
-RUN mkdir -p /var/www/html/agrofast
-COPY ./* /var/www/html/agrofast
+RUN mkdir -p /var/www/html/app
+COPY ./* /var/www/html/app
 
 CMD ["nginx", "-g", "daemon off;"]
