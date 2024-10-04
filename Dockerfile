@@ -3,7 +3,7 @@ FROM nginx:1.27.1
 EXPOSE 80
 
 RUN apt update
-RUN apt install -y php-fpm php-pdo php-curl php-pgsql php-pdo-pgsql
+RUN apt install -y php php-fpm php-pdo php-curl php-pgsql php-pdo-pgsql
 RUN apt clean 
 RUN rm -rf /var/lib/apt/lists/*
 
