@@ -1,9 +1,7 @@
 services:
   nginx:
     container_name: nginx
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: nginx:1.27.1
     ports:
       - "80:80"
     volumes:
