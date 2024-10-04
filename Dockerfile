@@ -1,6 +1,6 @@
 FROM nginx:1.27.1
 
-EXPOSE 8070
+EXPOSE 80
 
 RUN apt update
 RUN apt install -y php-fpm php-pdo php-curl php-pgsql php-pdo-pgsql
