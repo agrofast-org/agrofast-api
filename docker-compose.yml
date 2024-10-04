@@ -17,6 +17,8 @@ services:
   php-fpm:
     container_name: php-fpm
     image: php:8.2-fpm
+    ports:
+      - "9000:9000"
     volumes:
       - .:/var/www/html/app
     networks:
