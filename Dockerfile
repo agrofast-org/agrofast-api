@@ -6,7 +6,7 @@ RUN apt update
 RUN apt install -y php-pdo
 RUN apt install -y php-curl
 RUN apt install -y php-pgsql
-RUN apt install -y php-pdo_pgsql
+RUN apt install -y php-pdo-pgsql
 RUN apt clean 
 RUN rm -rf /var/lib/apt/lists/*
 
