@@ -10,7 +10,7 @@ class EnvironmentMiddleware implements IMiddleware
 {
   public static function handle()
   {
-    if (Helper::env("ENVIRONMENT") !== "test") {
+    if (in_array(Helper::env("ENVIRONMENT"), ["test", "development"])) {
       throw new MiddlewareException("Cannot access this route out of the test environment.");
     }
   }
