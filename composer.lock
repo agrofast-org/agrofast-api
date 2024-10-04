@@ -1,0 +1,202 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "154949bcde0fd38461098e45fb3e824a",
+    "packages": [
+        {
+            "name": "ilias/dotenv",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/iloElias/dotenv.git",
+                "reference": "510bb0c5764a071555c82864edf6036b0489a09b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/iloElias/dotenv/zipball/510bb0c5764a071555c82864edf6036b0489a09b",
+                "reference": "510bb0c5764a071555c82864edf6036b0489a09b",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.4@dev"
+            },
+            "type": "project",
+            "autoload": {
+                "psr-4": {
+                    "Ilias\\Dotenv\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "authors": [
+                {
+                    "name": "Murilo Elias",
+                    "email": "murilo7456@gmail.com"
+                }
+            ],
+            "description": "A PHP dotenv reader",
+            "support": {
+                "issues": "https://github.com/iloElias/dotenv/issues",
+                "source": "https://github.com/iloElias/dotenv/tree/1.0.3"
+            },
+            "time": "2024-09-29T17:04:17+00:00"
+        },
+        {
+            "name": "ilias/maestro",
+            "version": "1.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/iloElias/maestro.git",
+                "reference": "eaa4772dc5b62629183f84b740baca959b4b3918"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/iloElias/maestro/zipball/eaa4772dc5b62629183f84b740baca959b4b3918",
+                "reference": "eaa4772dc5b62629183f84b740baca959b4b3918",
+                "shasum": ""
+            },
+            "require": {
+                "ilias/dotenv": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ilias\\Maestro\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Murilo Elias",
+                    "email": "murilo7456@gmail.com"
+                },
+                {
+                    "name": "Divino Henrique",
+                    "email": "dhenriquearantes@gmail.com"
+                }
+            ],
+            "description": "A PHP object-oriented postgres database manager",
+            "homepage": "https://github.com/iloElias/maestro",
+            "keywords": [
+                "orm",
+                "pgsql",
+                "postgres"
+            ],
+            "support": {
+                "issues": "https://github.com/iloElias/maestro/issues",
+                "source": "https://github.com/iloElias/maestro/tree/1.2.2"
+            },
+            "time": "2024-09-29T06:32:45+00:00"
+        },
+        {
+            "name": "ilias/opherator",
+            "version": "1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/iloElias/opherator.git",
+                "reference": "d6a78aa97bc996ca02e098b717fd7907a724090f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/iloElias/opherator/zipball/d6a78aa97bc996ca02e098b717fd7907a724090f",
+                "reference": "d6a78aa97bc996ca02e098b717fd7907a724090f",
+                "shasum": ""
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ilias\\Opherator\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Murilo Elias",
+                    "email": "murilo7456@gmail.com"
+                }
+            ],
+            "description": "Package to handle requests",
+            "homepage": "https://github.com/iloElias/opherator",
+            "keywords": [
+                "http",
+                "request"
+            ],
+            "support": {
+                "issues": "https://github.com/iloElias/opherator/issues",
+                "source": "https://github.com/iloElias/opherator/tree/1.0.4"
+            },
+            "time": "2024-09-24T13:00:25+00:00"
+        },
+        {
+            "name": "ilias/rhetoric",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/iloElias/rhetoric.git",
+                "reference": "02ac4b37c89544d9d4e9385651124a46fbff8b7d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/iloElias/rhetoric/zipball/02ac4b37c89544d9d4e9385651124a46fbff8b7d",
+                "reference": "02ac4b37c89544d9d4e9385651124a46fbff8b7d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^11.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Ilias\\Rhetoric\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Murilo Elias",
+                    "email": "murilo7456@gmail.com"
+                }
+            ],
+            "description": "Package addressed to handling routes with PHP",
+            "homepage": "https://github.com/iloElias/rhetoric",
+            "keywords": [
+                "route",
+                "routes"
+            ],
+            "support": {
+                "issues": "https://github.com/iloElias/rhetoric/issues",
+                "source": "https://github.com/iloElias/rhetoric/tree/1.0.1"
+            },
+            "time": "2024-08-06T23:27:11+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
+}
