@@ -1,6 +1,5 @@
 .vscode
 
 vendor/
-composer.lock
 
 .env
