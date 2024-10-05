@@ -17,7 +17,7 @@ class Core
   public static function handle(array $params = [])
   {
     try {
-      Environment::setup();
+      Environment::setup(null, Environment::SUPPRESS_EXCEPTION);
       Request::setup();
 
       $metaData = new MetaData();

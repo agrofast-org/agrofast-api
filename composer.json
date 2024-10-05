@@ -21,7 +21,7 @@
   "require": {
     "ilias/rhetoric": "^1.0",
     "ilias/opherator": "^1.0",
-    "ilias/maestro": "^1.0",
+    "ilias/maestro": "^1.2",
     "ilias/dotenv": "^1.0"
   },
   "minimum-stability": "stable"
