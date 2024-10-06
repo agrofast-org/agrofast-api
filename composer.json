@@ -1,0 +1,29 @@
+{
+  "name": "ilias/choir",
+  "description": "A PHP http requests handler template",
+  "type": "project",
+  "autoload": {
+    "psr-4": {
+      "Ilias\\Choir\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "authors": [
+    {
+      "name": "Murilo Elias",
+      "email": "murilo7456@gmail.com"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "ilias/rhetoric": "^1.0",
+    "ilias/opherator": "^1.0",
+    "ilias/maestro": "^1.2",
+    "ilias/dotenv": "^1.0"
+  },
+  "minimum-stability": "stable"
+}
