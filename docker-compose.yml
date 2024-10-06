@@ -18,7 +18,7 @@ services:
     container_name: php-fpm
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     ports:
       - "9000:9000"
     volumes:
