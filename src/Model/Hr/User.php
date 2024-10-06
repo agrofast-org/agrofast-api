@@ -14,9 +14,7 @@ final class User extends TrackableTable
   /** @primary */
   public Serial $id;
   /** @not_nuable */
-  public string $firstName;
-  /** @not_nuable */
-  public string $lastName;
+  public string $name;
   /** @unique */
   public string $number;
   public string $password;

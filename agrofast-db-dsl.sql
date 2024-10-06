@@ -1,5 +1,7 @@
+CREATE OR REPLACE FUNCTION generate_four_digit_auth_code() RETURNS TEXT AS $$ BEGIN RETURN CAST(FLOOR(1000 + RANDOM() * 9000) AS TEXT); END; $$ LANGUAGE plpgsql;
 CREATE SCHEMA IF NOT EXISTS "hr";
 CREATE SCHEMA IF NOT EXISTS "transport";
+CREATE SCHEMA IF NOT EXISTS "chat";
 CREATE TABLE IF NOT EXISTS "hr"."auth_code" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
 	"user_id" INTEGER NOT NULL,
@@ -51,8 +53,7 @@ CREATE TABLE IF NOT EXISTS "hr"."session" (
 );
 CREATE TABLE IF NOT EXISTS "hr"."user" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
-	"first_name" TEXT NOT NULL,
-	"last_name" TEXT NOT NULL,
+	"name" TEXT NOT NULL,
 	"number" TEXT NOT NULL UNIQUE,
 	"password" TEXT NOT NULL,
 	"active" BOOLEAN NOT NULL DEFAULT TRUE,
@@ -110,6 +111,17 @@ CREATE TABLE IF NOT EXISTS "transport"."carrier" (
 	"updated_in" TIMESTAMP NULL,
 	"inactivated_in" TIMESTAMP NULL
 );
+CREATE TABLE IF NOT EXISTS "chat"."message" (
+	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
+	"from_user_id" INTEGER NOT NULL,
+	"to_user_id" INTEGER NOT NULL,
+	"answer_to" INTEGER NULL,
+	"message" TEXT NOT NULL,
+	"active" BOOLEAN NULL DEFAULT TRUE,
+	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+	"updated_in" TIMESTAMP NULL,
+	"inactivated_in" TIMESTAMP NULL
+);
 ALTER TABLE "hr"."auth_code" ADD CONSTRAINT fk_auth_code_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_document_type FOREIGN KEY ("document_type") REFERENCES "hr"."document_type"("id");
@@ -123,4 +135,6 @@ ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_request_id FOREIGN KEY (
 ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_carrier_id FOREIGN KEY ("carrier_id") REFERENCES "transport"."carrier"("id");
 ALTER TABLE "transport"."request" ADD CONSTRAINT fk_request_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "transport"."carrier" ADD CONSTRAINT fk_carrier_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-CREATE OR REPLACE FUNCTION generate_four_digit_auth_code() RETURNS TEXT AS $$ BEGIN RETURN CAST(FLOOR(1000 + RANDOM() * 9000) AS TEXT); END; $$ LANGUAGE plpgsql;
+ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_from_user_id FOREIGN KEY ("from_user_id") REFERENCES "hr"."user"("id");
+ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_to_user_id FOREIGN KEY ("to_user_id") REFERENCES "hr"."user"("id");
+ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_answer_to FOREIGN KEY ("answer_to") REFERENCES "chat"."message"("id");

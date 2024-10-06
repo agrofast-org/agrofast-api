@@ -2,6 +2,7 @@
 
 use Ilias\Choir\Controller\DebugController;
 use Ilias\Choir\Controller\IndexController;
+use Ilias\Choir\Controller\UserController;
 use Ilias\Choir\Middleware\EnvironmentMiddleware;
 use Ilias\Rhetoric\Router\Router;
 
@@ -18,3 +19,7 @@ Router::group("/debug", function ($router) {
   $router->get("/file", DebugController::class . "@getFileContent");
   $router->post("/body", DebugController::class . "@showBody");
 }, [new EnvironmentMiddleware()]);
+
+Router::group("/user", function ($router) {
+  $router->get("/", UserController::class ."@getUser");
+}, []);

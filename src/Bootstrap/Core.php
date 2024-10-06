@@ -11,6 +11,7 @@ use Ilias\Opherator\Response;
 use Ilias\Rhetoric\Exceptions\MiddlewareException;
 use Ilias\Rhetoric\Exceptions\RouteNotFoundException;
 use Ilias\Rhetoric\Router\Router;
+use Ilias\Rhetoric\Router\Routes;
 
 class Core
 {
@@ -22,9 +23,11 @@ class Core
 
       $metaData = new MetaData();
       Response::setHeader($metaData->getContentType(MetaData::CONTENT_TYPE_JSON), true);
-      Router::setup();
+      $response = Router::handle();
 
-      Response::appendResponse("status", http_response_code(), true);
+      if (!empty($response)) {
+        Response::setResponse($response);
+      }
 
       Response::answer();
     } catch (EnvironmentNotFound $environmentNotFoundEx) {

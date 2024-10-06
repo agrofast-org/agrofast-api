@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "ilias/dotenv",
-            "version": "1.0.3",
+            "version": "1.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/iloElias/dotenv.git",
-                "reference": "510bb0c5764a071555c82864edf6036b0489a09b"
+                "reference": "d208f1470584e60ce2d9ceef4e040ce4dd0b6d28"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/iloElias/dotenv/zipball/510bb0c5764a071555c82864edf6036b0489a09b",
-                "reference": "510bb0c5764a071555c82864edf6036b0489a09b",
+                "url": "https://api.github.com/repos/iloElias/dotenv/zipball/d208f1470584e60ce2d9ceef4e040ce4dd0b6d28",
+                "reference": "d208f1470584e60ce2d9ceef4e040ce4dd0b6d28",
                 "shasum": ""
             },
             "require-dev": {
@@ -39,22 +39,22 @@
             "description": "A PHP dotenv reader",
             "support": {
                 "issues": "https://github.com/iloElias/dotenv/issues",
-                "source": "https://github.com/iloElias/dotenv/tree/1.0.3"
+                "source": "https://github.com/iloElias/dotenv/tree/1.0.4"
             },
-            "time": "2024-09-29T17:04:17+00:00"
+            "time": "2024-10-05T17:08:13+00:00"
         },
         {
             "name": "ilias/maestro",
-            "version": "1.2.2",
+            "version": "1.2.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/iloElias/maestro.git",
-                "reference": "eaa4772dc5b62629183f84b740baca959b4b3918"
+                "reference": "7867127b89e3f08b4a2b78426d1947709566728f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/iloElias/maestro/zipball/eaa4772dc5b62629183f84b740baca959b4b3918",
-                "reference": "eaa4772dc5b62629183f84b740baca959b4b3918",
+                "url": "https://api.github.com/repos/iloElias/maestro/zipball/7867127b89e3f08b4a2b78426d1947709566728f",
+                "reference": "7867127b89e3f08b4a2b78426d1947709566728f",
                 "shasum": ""
             },
             "require": {
@@ -92,22 +92,22 @@
             ],
             "support": {
                 "issues": "https://github.com/iloElias/maestro/issues",
-                "source": "https://github.com/iloElias/maestro/tree/1.2.2"
+                "source": "https://github.com/iloElias/maestro/tree/1.2.5"
             },
-            "time": "2024-09-29T06:32:45+00:00"
+            "time": "2024-10-05T20:01:19+00:00"
         },
         {
             "name": "ilias/opherator",
-            "version": "1.0.4",
+            "version": "1.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/iloElias/opherator.git",
-                "reference": "d6a78aa97bc996ca02e098b717fd7907a724090f"
+                "reference": "dc68b3a01d40a7a9a373680ed71aa9736c1662d8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/iloElias/opherator/zipball/d6a78aa97bc996ca02e098b717fd7907a724090f",
-                "reference": "d6a78aa97bc996ca02e098b717fd7907a724090f",
+                "url": "https://api.github.com/repos/iloElias/opherator/zipball/dc68b3a01d40a7a9a373680ed71aa9736c1662d8",
+                "reference": "dc68b3a01d40a7a9a373680ed71aa9736c1662d8",
                 "shasum": ""
             },
             "require-dev": {
@@ -137,26 +137,26 @@
             ],
             "support": {
                 "issues": "https://github.com/iloElias/opherator/issues",
-                "source": "https://github.com/iloElias/opherator/tree/1.0.4"
+                "source": "https://github.com/iloElias/opherator/tree/1.0.5"
             },
-            "time": "2024-09-24T13:00:25+00:00"
+            "time": "2024-10-05T18:19:10+00:00"
         },
         {
             "name": "ilias/rhetoric",
-            "version": "1.0.1",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/iloElias/rhetoric.git",
-                "reference": "02ac4b37c89544d9d4e9385651124a46fbff8b7d"
+                "reference": "2b94c03447bdbbeaec201c25c6db443bc4c316ba"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/iloElias/rhetoric/zipball/02ac4b37c89544d9d4e9385651124a46fbff8b7d",
-                "reference": "02ac4b37c89544d9d4e9385651124a46fbff8b7d",
+                "url": "https://api.github.com/repos/iloElias/rhetoric/zipball/2b94c03447bdbbeaec201c25c6db443bc4c316ba",
+                "reference": "2b94c03447bdbbeaec201c25c6db443bc4c316ba",
                 "shasum": ""
             },
             "require": {
-                "php": ">=8.0.0"
+                "ilias/opherator": "^1.0"
             },
             "require-dev": {
                 "phpunit/phpunit": "^11.2"
@@ -185,9 +185,9 @@
             ],
             "support": {
                 "issues": "https://github.com/iloElias/rhetoric/issues",
-                "source": "https://github.com/iloElias/rhetoric/tree/1.0.1"
+                "source": "https://github.com/iloElias/rhetoric/tree/1.1.1"
             },
-            "time": "2024-08-06T23:27:11+00:00"
+            "time": "2024-10-05T19:03:27+00:00"
         }
     ],
     "packages-dev": [],

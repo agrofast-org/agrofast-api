@@ -19,7 +19,6 @@ final class Offer extends TrackableTable
     public Request $requestId,
     public Carrier $carrierId,
     public float $price,
-  )
-  {
+  ) {
   }
 }
