@@ -2,14 +2,19 @@
 
 namespace Ilias\Choir\Controller;
 
+use Ilias\Opherator\JsonResponse;
 use Ilias\Opherator\Response;
 use Ilias\Choir\Model\Asset;
+use Ilias\Opherator\Request\StatusCode;
 
 class IndexController
 {
   public static function handleApiIndex()
   {
-    Response::appendResponse("message", 'Welcome to the Agrofast API');
+    $response = new JsonResponse(StatusCode::OK, [
+      "message" => 'Welcome to the Agrofast API',
+    ]);
+    return $response;
   }
 
   public static function favicon()
