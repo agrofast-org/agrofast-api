@@ -20,7 +20,7 @@ final class ErrorLog extends Table
   {
     $this->json = $json;
     if (empty($createdIn)) {
-      $createdIn = new Timestamp('new');
+      $createdIn = new Timestamp('now');
     }
     $this->createdIn = $createdIn;
   }
