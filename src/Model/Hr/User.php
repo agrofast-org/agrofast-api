@@ -18,6 +18,7 @@ final class User extends TrackableTable
   /** @unique */
   public string $number;
   public string $password;
+  public bool $authenticated = false;
 
   public function __construct(
     string $name,

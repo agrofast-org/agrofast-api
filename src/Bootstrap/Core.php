@@ -4,6 +4,7 @@ namespace Ilias\Choir\Bootstrap;
 
 use Ilias\Dotenv\Environment;
 use Ilias\Dotenv\Exceptions\EnvironmentNotFound;
+use Ilias\Opherator\Exceptions\InvalidResponseException;
 use Ilias\Opherator\MetaData;
 use Ilias\Opherator\Request;
 use Ilias\Opherator\Request\StatusCode;
@@ -41,7 +42,10 @@ class Core
     }
   }
 
-  public static function handleEnvironmentException(EnvironmentNotFound $environmentNotFoundEx)
+    /**
+     * @throws InvalidResponseException
+     */
+    public static function handleEnvironmentException(EnvironmentNotFound $environmentNotFoundEx): void
   {
     http_response_code(StatusCode::NOT_FOUND);
     Response::appendResponse("message", empty($environmentNotFoundEx->getMessage()) ? 'No environment file found' : $environmentNotFoundEx->getMessage());
@@ -49,7 +53,10 @@ class Core
     Response::answer();
   }
 
-  public static function handleRouteException(RouteNotFoundException $notFoundEx)
+    /**
+     * @throws InvalidResponseException
+     */
+    public static function handleRouteException(RouteNotFoundException $notFoundEx): void
   {
     http_response_code(StatusCode::NOT_FOUND);
     Response::appendResponse("message", empty($notFoundEx->getMessage()) ? 'Route not found' : $notFoundEx->getMessage());
@@ -57,7 +64,10 @@ class Core
     Response::answer();
   }
 
-  public static function handleMiddlewareException(MiddlewareException $midEx)
+    /**
+     * @throws InvalidResponseException
+     */
+    public static function handleMiddlewareException(MiddlewareException $midEx): void
   {
     http_response_code(StatusCode::UNAUTHORIZED);
     Response::appendResponse("message", empty($midEx->getMessage()) ? 'Route middleware terms not met' : $midEx->getMessage());
@@ -65,7 +75,10 @@ class Core
     Response::answer();
   }
 
-  public static function handleException(\Throwable $th)
+    /**
+     * @throws InvalidResponseException
+     */
+    public static function handleException(\Throwable $th): void
   {
     http_response_code(StatusCode::INTERNAL_SERVER_ERROR);
     Response::appendResponse("message", empty($th->getMessage()) ? 'No error message provided' : $th->getMessage());
