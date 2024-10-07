@@ -2,6 +2,7 @@ CREATE OR REPLACE FUNCTION generate_four_digit_auth_code() RETURNS TEXT AS $$ BE
 CREATE SCHEMA IF NOT EXISTS "hr";
 CREATE SCHEMA IF NOT EXISTS "transport";
 CREATE SCHEMA IF NOT EXISTS "chat";
+CREATE SCHEMA IF NOT EXISTS "system";
 CREATE TABLE IF NOT EXISTS "hr"."auth_code" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
 	"user_id" INTEGER NOT NULL,
@@ -122,6 +123,11 @@ CREATE TABLE IF NOT EXISTS "chat"."message" (
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 	"updated_in" TIMESTAMP NULL,
 	"inactivated_in" TIMESTAMP NULL
+);
+CREATE TABLE IF NOT EXISTS "system"."error_log" (
+	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
+	"json" TEXT NOT NULL,
+	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
 );
 ALTER TABLE "hr"."auth_code" ADD CONSTRAINT fk_auth_code_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");

@@ -12,7 +12,7 @@ require_once("./vendor/autoload.php");
 $coreDatabase = new Manager();
 $agrofastDB = new AgrofastDB();
 
-print implode("\n", $coreDatabase->createDatabase($agrofastDB, true)) . "\n";
+print implode("\n", $coreDatabase->createDatabase($agrofastDB, false)) . "\n";
 // print $coreDatabase->createTable(User::class) . "\n";
 
 // $user = new User('name', 'number','password',true, new Timestamp());

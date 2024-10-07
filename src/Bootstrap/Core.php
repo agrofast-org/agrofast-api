@@ -6,6 +6,7 @@ use Ilias\Choir\Model\System\ErrorLog;
 use Ilias\Dotenv\Environment;
 use Ilias\Dotenv\Exceptions\EnvironmentNotFound;
 use Ilias\Maestro\Database\Insert;
+use Ilias\Maestro\Types\Timestamp;
 use Ilias\Opherator\JsonResponse;
 use Ilias\Opherator\Opherator;
 use Ilias\Opherator\Request;

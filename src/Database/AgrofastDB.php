@@ -4,6 +4,7 @@ namespace Ilias\Choir\Database;
 
 use Ilias\Choir\Database\Schemas\Chat;
 use Ilias\Choir\Database\Schemas\Hr;
+use Ilias\Choir\Database\Schemas\System;
 use Ilias\Choir\Database\Schemas\Transport;
 use Ilias\Maestro\Abstract\Database;
 use Ilias\Maestro\Types\Postgres;
@@ -13,6 +14,7 @@ final class AgrofastDB extends Database
   public Hr $Hr;
   public Transport $Transport;
   public Chat $Chat;
+  public System $System;
 
   public function __construct()
   {

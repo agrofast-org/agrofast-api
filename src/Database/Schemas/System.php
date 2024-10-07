@@ -1,6 +1,6 @@
 <?php
 
-namespace Ilias\Database\Schemas;
+namespace Ilias\Choir\Database\Schemas;
 
 use Ilias\Choir\Model\System\ErrorLog;
 use Ilias\Maestro\Abstract\Schema;
