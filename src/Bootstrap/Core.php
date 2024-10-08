@@ -55,7 +55,11 @@ class Core
   {
     Response::answer();
     if (!empty(self::$errors)) {
-      $error = new ErrorLog(json_encode(self::$errors));
+      $error = new ErrorLog(
+        json_encode(self::$errors),
+        json_encode(['query' => Request::getQuery(), 'body' => Request::getBody()]),
+        new Timestamp()
+      );
       $insert = new Insert();
       $insert->into($error::class)
         ->values($error)

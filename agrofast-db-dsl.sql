@@ -127,6 +127,7 @@ CREATE TABLE IF NOT EXISTS "chat"."message" (
 CREATE TABLE IF NOT EXISTS "system"."error_log" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
 	"json" TEXT NOT NULL,
+	"params" TEXT NOT NULL,
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
 );
 ALTER TABLE "hr"."auth_code" ADD CONSTRAINT fk_auth_code_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");

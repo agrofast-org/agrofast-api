@@ -14,11 +14,13 @@ final class ErrorLog extends Table
   /** @primary */
   public Serial $id;
   public string $json;
+  public string $params;
   public Timestamp | Expression | string $createdIn = Expression::CURRENT_TIMESTAMP;
 
-  public function __construct($json, $createdIn = null)
+  public function __construct($json, $params, $createdIn = null)
   {
     $this->json = $json;
+    $this->params = $params;
     if (empty($createdIn)) {
       $createdIn = new Timestamp('now');
     }
