@@ -6,6 +6,7 @@ use Ilias\Choir\Database\Schemas\Hr;
 use Ilias\Maestro\Abstract\Query;
 use Ilias\Maestro\Abstract\TrackableTable;
 use Ilias\Maestro\Database\Expression;
+use Ilias\Maestro\Database\Insert;
 use Ilias\Maestro\Database\PDOConnection;
 use Ilias\Maestro\Database\Select;
 use Ilias\Maestro\Types\Serial;

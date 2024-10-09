@@ -4,6 +4,7 @@ use Ilias\Choir\Controller\DebugController;
 use Ilias\Choir\Controller\IndexController;
 use Ilias\Choir\Controller\UserController;
 use Ilias\Choir\Middleware\EnvironmentMiddleware;
+use Ilias\Choir\Middleware\JwtMiddleware;
 use Ilias\Rhetoric\Router\Router;
 
 Router::get("/", IndexController::class . "@handleApiIndex");
@@ -23,4 +24,5 @@ Router::group("/debug", function ($router) {
 Router::group("/user", function ($router) {
   $router->get("/", UserController::class ."@getUser");
   $router->post("/", UserController::class ."@createUser");
+  $router->post("/", UserController::class ."@authenticateUser", [new JwtMiddleware()]);
 }, []);

@@ -2,20 +2,20 @@
 
 namespace Ilias\Choir\Controller;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Ilias\Choir\Model\Hr\AuthCode;
+use Ilias\Choir\Model\Hr\Session;
 use Ilias\Choir\Model\Hr\User;
 use Ilias\Maestro\Abstract\Query;
-use Ilias\Maestro\Core\Maestro;
-use Ilias\Maestro\Database\Expression;
 use Ilias\Maestro\Database\Insert;
-use Ilias\Maestro\Database\PDOConnection;
 use Ilias\Maestro\Database\Select;
 use Ilias\Maestro\Database\Transaction;
+use Ilias\Maestro\Database\Update;
 use Ilias\Maestro\Types\Timestamp;
 use Ilias\Opherator\JsonResponse;
 use Ilias\Opherator\Request;
 use Ilias\Opherator\Request\StatusCode;
-use Ilias\Opherator\Response;
 use Throwable;
 
 class UserController
@@ -57,15 +57,22 @@ class UserController
     $user = User::fetchRow(['number' => $params['number']]);
 
     if ($user) {
+      if ($user['authenticated'] == 'true') {
+        return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User already authenticated']);
+      }
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User already exists']);
     }
     try {
+      if (empty($params['name']) || empty($params['number']) || empty($params['password'])) {
+        return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Name, number, and password are required']);
+      }
+
       $user = new User($params['name'], $params['number'], $params['password'], true, new Timestamp());
       $user->authenticated = false;
       $insert = new Insert();
       $insert->into(User::class)
         ->values($user)
-        ->returning(['*']);
+        ->returning(['id', 'name', 'number']);
 
       $transaction = new Transaction();
       $transaction->begin();
@@ -76,20 +83,62 @@ class UserController
         $insert->into(AuthCode::class)
           ->values(['user_id' => $result['id']])
           ->returning(['id']);
-        $authCodeId = $insert->execute()[0]['id'];
+        $insert->execute()[0]['id'];
         $transaction->commit();
-        return new JsonResponse(new StatusCode(StatusCode::CREATED), ['message' => 'Auth code sent']);
+        $jwt = JWT::encode($result, getenv('APP_JWT_SECRET'), 'HS256');
+        return new JsonResponse(new StatusCode(StatusCode::CREATED), ['message' => 'User created and auth code sent', 'token' => $jwt]);
       }
       $transaction->rollback();
-      return new JsonResponse(new StatusCode(StatusCode::CREATED), ['message' => 'Could not create user', 'data' => $result]);
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Could not create user']);
     } catch (Throwable $t) {
       $transaction->rollback();
-      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Failed to create user', 'error' => $t->getMessage(), 'code' => $params]);
+      error_log($t->getMessage());
+      return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to create user']);
     }
   }
 
   public static function authenticateUser()
   {
-    $params = Request::getBody();
+    $query = Request::getQuery();
+    $headers = Request::getHeaders();
+    if (empty($query['code'])) {
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'No code provided']);
+    }
+    $token = str_replace('Bearer ', '', $headers['Authorization']);
+    $user = JWT::decode($token, new Key(getenv('APP_JWT_SECRET'), 'HS256'));
+
+    $transaction = new Transaction();
+    $transaction->begin();
+
+    try {
+      $authCode = AuthCode::fetchRow(['user_id' => $user->id, 'code' => $query['code']]);
+      if ($authCode) {
+        $updateUser = new Update();
+        $updateUser->table(User::class)
+          ->set(['authenticated' => true])
+          ->where(['id' => $user->id]);
+        $updateAuthCode = new Update();
+        $updateAuthCode->table(AuthCode::class)
+          ->set(['active' => false])
+          ->where(['user_id' => $user->id]);
+
+        $insertSession = new Insert();
+        $insertSession->into(Session::class)
+          ->values(['user_id' => $user->id, 'token' => ''])
+          ->returning(['id']);
+
+        $updateUser->execute();
+        $updateAuthCode->execute();
+
+        $transaction->commit();
+        return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User authenticated']);
+      }
+      $transaction->rollback();
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'No matching code found']);
+    } catch (Throwable $th) {
+      $transaction->rollback();
+      error_log($th->getMessage());
+      return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to authenticate user']);
+    }
   }
 }
