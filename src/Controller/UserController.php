@@ -92,7 +92,6 @@ class UserController
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Could not create user']);
     } catch (Throwable $t) {
       $transaction->rollback();
-      error_log($t->getMessage());
       return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to create user']);
     }
   }
@@ -129,15 +128,16 @@ class UserController
 
         $updateUser->execute();
         $updateAuthCode->execute();
+        $user->session_id = $insertSession->execute()[0]['id'];
+        $token = JWT::encode((array)$user, getenv('APP_JWT_SECRET'), 'HS256');
 
         $transaction->commit();
-        return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User authenticated']);
+        return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User authenticated', 'token' => $token, 'data' => $user]);
       }
       $transaction->rollback();
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'No matching code found']);
     } catch (Throwable $th) {
       $transaction->rollback();
-      error_log($th->getMessage());
       return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to authenticate user']);
     }
   }

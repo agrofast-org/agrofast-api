@@ -24,5 +24,5 @@ Router::group("/debug", function ($router) {
 Router::group("/user", function ($router) {
   $router->get("/", UserController::class ."@getUser");
   $router->post("/", UserController::class ."@createUser");
-  $router->post("/", UserController::class ."@authenticateUser", [new JwtMiddleware()]);
+  $router->post("/auth", UserController::class ."@authenticateUser", [new JwtMiddleware()]);
 }, []);
