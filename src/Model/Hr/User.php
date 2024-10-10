@@ -2,11 +2,16 @@
 
 namespace Ilias\Choir\Model\Hr;
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use Ilias\Choir\Database\Schemas\Hr;
+use Ilias\Choir\Exceptions\AuthorizationNotProvidedException;
+use Ilias\Choir\Exceptions\UserNotFoundException;
 use Ilias\Maestro\Abstract\TrackableTable;
 use Ilias\Maestro\Types\Serial;
 use Ilias\Maestro\Types\Timestamp;
 use Ilias\Maestro\Types\Unique;
+use Ilias\Opherator\Request;
 
 final class User extends TrackableTable
 {
@@ -19,6 +24,8 @@ final class User extends TrackableTable
   public string $number;
   public string $password;
   public bool $authenticated = false;
+
+  private static ?\stdClass $user = null;
 
   public function __construct(string $name, string $number, string $password, bool $active = true, $createdIn = new Timestamp())
   {
@@ -41,5 +48,24 @@ final class User extends TrackableTable
     $this->password = $password;
     $this->active = $active;
     $this->createdIn = $createdIn;
+  }
+
+  public static function getAuthenticatedUser()
+  {
+    if (empty(self::$user)) {
+      $headers = Request::getHeaders();
+      if (empty($headers['Authorization'])) {
+        throw new AuthorizationNotProvidedException();
+      }
+      $token = str_replace('Bearer ', '', $headers['Authorization']);
+      $user = JWT::decode($token, new Key(getenv('APP_JWT_SECRET'), 'HS256'));
+      $fetchedUser = self::fetchRow(['id' => $user->id]);
+      if ($fetchedUser) {
+        self::$user = $fetchedUser;
+        return self::$user;
+      }
+      throw new UserNotFoundException();
+    }
+    return self::$user;
   }
 }

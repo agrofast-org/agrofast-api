@@ -127,17 +127,19 @@ class UserController
         $insertSession = new Insert();
         $insertSession->into(Session::class)
           ->values(['user_id' => $user->id, 'token' => ''])
-          ->returning(['id']);
+          ->returning(['id', 'created_in']);
 
         $updateUser->execute();
         $updateAuthCode->execute();
-        $user->session_id = $insertSession->execute()[0]['id'];
+        $session = $insertSession->execute()[0];
+        $user->session_id = $session['id']; 
 
         $jwtData = [
           'id' => $user->id,
           'name' => $user->name,
           'number' => $user->number,
-          'session_id' => $user->session_id
+          'session_id' => $user->session_id,
+          'session_ts' => $session['created_in'],
         ];
         $token = JWT::encode($jwtData, getenv('APP_JWT_SECRET'), 'HS256');
 
