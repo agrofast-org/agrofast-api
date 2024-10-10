@@ -6,7 +6,7 @@ class DirectoryReader
 {
   private string $rootPath;
 
-  public function __construct(string $rootPath)
+  public function compose(string $rootPath)
   {
     $this->rootPath = rtrim($rootPath, DIRECTORY_SEPARATOR);
     if (!is_dir($this->rootPath) || !is_readable($this->rootPath)) {

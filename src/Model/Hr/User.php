@@ -20,7 +20,16 @@ final class User extends TrackableTable
   public string $password;
   public bool $authenticated = false;
 
-  public function __construct(
+  public function __construct(string $name, string $number, string $password, bool $active = true, $createdIn = new Timestamp())
+  {
+    $this->name = $name;
+    $this->number = $number;
+    $this->password = $password;
+    $this->active = $active;
+    $this->createdIn = $createdIn;
+  }
+
+  public function compose(
     string $name,
     string $number,
     string $password,

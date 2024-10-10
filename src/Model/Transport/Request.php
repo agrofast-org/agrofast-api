@@ -15,11 +15,14 @@ final class Request extends TrackableTable
   public Serial $id;
   /** @not_nuable */
   public User $userId;
+  /** @not_nuable */
+  public string $origin;
+  /** @not_nuable */
+  public string $destination;
+  /** @not_nuable */
+  public Timestamp $desiredDate;
 
-  public function __construct(
-    public string $origin,
-    public string $destination,
-    public Timestamp $desiredDate,
-  ) {
+  public function compose()
+  {
   }
 }

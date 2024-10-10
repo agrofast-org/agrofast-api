@@ -18,7 +18,7 @@ final class Document extends TrackableTable
   /** @unique */
   public string $document;
 
-  public function __construct(string $document)
+  public function compose(string $document)
   {
     $this->document = $document;
   }

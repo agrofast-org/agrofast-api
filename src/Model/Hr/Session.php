@@ -13,11 +13,10 @@ final class Session extends TrackableTable
   public Serial $id;
   /** @not_nuable */
   public User $userId;
-  /** @not_nuable
-   * @unique */
+  /** @not_nuable */
   public string $token;
 
-  public function __construct()
+  public function compose()
   {
   }
 }

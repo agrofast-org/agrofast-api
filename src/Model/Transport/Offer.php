@@ -14,11 +14,14 @@ final class Offer extends TrackableTable
   public Serial $id;
   /** @not_nuable */
   public User $userId;
+  /** @not_nuable */
+  public Request $requestId;
+  /** @not_nuable */
+  public Carrier $carrierId;
+  /** @not_nuable */
+  public float $price;
 
-  public function __construct(
-    public Request $requestId,
-    public Carrier $carrierId,
-    public float $price,
-  ) {
+  public function compose()
+  {
   }
 }

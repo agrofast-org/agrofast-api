@@ -8,6 +8,7 @@ use Ilias\Choir\Model\Hr\AuthCode;
 use Ilias\Choir\Model\Hr\Session;
 use Ilias\Choir\Model\Hr\User;
 use Ilias\Maestro\Abstract\Query;
+use Ilias\Maestro\Database\Expression;
 use Ilias\Maestro\Database\Insert;
 use Ilias\Maestro\Database\Select;
 use Ilias\Maestro\Database\Transaction;
@@ -16,7 +17,6 @@ use Ilias\Maestro\Types\Timestamp;
 use Ilias\Opherator\JsonResponse;
 use Ilias\Opherator\Request;
 use Ilias\Opherator\Request\StatusCode;
-use Throwable;
 
 class UserController
 {
@@ -57,7 +57,7 @@ class UserController
     $user = User::fetchRow(['number' => $params['number']]);
 
     if ($user) {
-      if ($user['authenticated'] == 'true') {
+      if ($user->authenticated == 'true') {
         return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User already authenticated']);
       }
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User already exists']);
@@ -69,6 +69,7 @@ class UserController
 
       $user = new User($params['name'], $params['number'], $params['password'], true, new Timestamp());
       $user->authenticated = false;
+      $user->password = md5($user->password);
       $insert = new Insert();
       $insert->into(User::class)
         ->values($user)
@@ -82,17 +83,19 @@ class UserController
         $insert = new Insert();
         $insert->into(AuthCode::class)
           ->values(['user_id' => $result['id']])
-          ->returning(['id']);
-        $insert->execute()[0]['id'];
+          ->returning(['id', 'created_in']);
+        $authCode = $insert->execute()[0];
+        $result['created_in'] = $authCode['created_in'];
+
         $transaction->commit();
         $jwt = JWT::encode($result, getenv('APP_JWT_SECRET'), 'HS256');
         return new JsonResponse(new StatusCode(StatusCode::CREATED), ['message' => 'User created and auth code sent', 'token' => $jwt]);
       }
       $transaction->rollback();
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Could not create user']);
-    } catch (Throwable $t) {
+    } catch (\Throwable $t) {
       $transaction->rollback();
-      return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to create user']);
+      return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to create user', 'error' => $t->getMessage()]);
     }
   }
 
@@ -110,7 +113,7 @@ class UserController
     $transaction->begin();
 
     try {
-      $authCode = AuthCode::fetchRow(['user_id' => $user->id, 'code' => $query['code']]);
+      $authCode = AuthCode::fetchRow(['user_id' => $user->id, 'code' => $query['code'], 'active' => true]);
       if ($authCode) {
         $updateUser = new Update();
         $updateUser->table(User::class)
@@ -129,16 +132,71 @@ class UserController
         $updateUser->execute();
         $updateAuthCode->execute();
         $user->session_id = $insertSession->execute()[0]['id'];
-        $token = JWT::encode((array)$user, getenv('APP_JWT_SECRET'), 'HS256');
+
+        $jwtData = [
+          'id' => $user->id,
+          'name' => $user->name,
+          'number' => $user->number,
+          'session_id' => $user->session_id
+        ];
+        $token = JWT::encode($jwtData, getenv('APP_JWT_SECRET'), 'HS256');
 
         $transaction->commit();
         return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User authenticated', 'token' => $token, 'data' => $user]);
       }
       $transaction->rollback();
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'No matching code found']);
-    } catch (Throwable $th) {
+    } catch (\Throwable $th) {
       $transaction->rollback();
-      return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to authenticate user']);
+      return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to authenticate user', 'error' => $th->getMessage()]);
     }
+  }
+
+  public static function userLogin()
+  {
+    $params = Request::getBody();
+    if (empty($params['number']) || empty($params['password'])) {
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Number and password are required']);
+    }
+    $user = User::fetchRow(['number' => $params['number'], 'password' => md5($params['password'])]);
+    $transaction = new Transaction();
+    $transaction->begin();
+    if ($user) {
+      $select = new Select();
+      $select->from(['a' => AuthCode::class], ['created_in'])
+        ->where(['a.user_id' => $user->id], compaction: Query::EQUALS)
+        ->where(['a.created_in' => new Timestamp(strtotime('-3 minutes'))], compaction: Query::LESS_THAN_OR_EQUAL)
+        ->where(['a.active' => true], compaction: Query::EQUALS)
+        ->order('a.created_in', Select::DESC);
+      $authCode = $select->execute()[0];
+
+      if ($authCode) {
+        return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Auth code already sent', 'data' => $authCode]);
+      }
+
+      $updateUserAuthCodes = new Update();
+      $updateUserAuthCodes->table(AuthCode::class)
+        ->set(['active' => false])
+        ->where(['user_id' => $user->id]);
+      $updateUserAuthCodes->execute();
+
+      $insertAuthCode = new Insert();
+      $insertAuthCode->into(AuthCode::class)
+        ->values(['user_id' => $user->id])
+        ->returning(['id', 'created_in']);
+      $newAuthCode = $insertAuthCode->execute()[0];
+
+      $transaction->commit();
+      $jwtData = [
+        'id' => $user->id,
+        'name' => $user->name,
+        'number' => $user->number,
+        'created_in' => $newAuthCode['created_in'],
+      ];
+      $jwt = JWT::encode($jwtData, getenv('APP_JWT_SECRET'), 'HS256');
+      return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'Login code sent', 'token' => $jwt]);
+    }
+    $transaction->rollback();
+    return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User not found']);
   }
 }

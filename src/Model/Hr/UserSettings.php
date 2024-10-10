@@ -16,7 +16,7 @@ final class UserSettings extends Table
   public string $theme;
   public string $language;
 
-  public function __construct()
+  public function compose()
   {
   }
 }

@@ -18,7 +18,7 @@ final class Contact extends TrackableTable
   /** @not_nuable */
   public string $value;
 
-  public function __construct()
+  public function compose()
   {
   }
 }

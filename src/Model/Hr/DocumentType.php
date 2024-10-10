@@ -14,7 +14,7 @@ final class DocumentType extends Table
   /** @unique */
   public string $label;
 
-  public function __construct(string $label) {
+  public function compose(string $label) {
     $this->label = $label;
   }
 }

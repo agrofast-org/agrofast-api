@@ -11,11 +11,13 @@ final class Machinery extends Vehicle
   public Transport $schema;
   /** @primary */
   public Serial $id;
+  /** @not_nuable */
+  public string $name;
+  /** @not_nuable */
+  public string $model;
+  /** @not_nuable */
+  public string $plate;
 
-  public function __construct(
-    public string $name,
-    public string $model,
-    public string $plate,
-  ) {
+  public function compose() {
   }
 }

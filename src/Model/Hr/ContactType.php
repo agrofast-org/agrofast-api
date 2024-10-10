@@ -15,7 +15,7 @@ final class ContactType extends Table
    * @unique */
   public string $label;
 
-  public function __construct()
+  public function compose()
   {
   }
 }
