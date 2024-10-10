@@ -3,14 +3,10 @@
 namespace Ilias\Choir\Model\Hr;
 
 use Ilias\Choir\Database\Schemas\Hr;
-use Ilias\Maestro\Abstract\Query;
 use Ilias\Maestro\Abstract\TrackableTable;
 use Ilias\Maestro\Database\Expression;
 use Ilias\Maestro\Database\Insert;
-use Ilias\Maestro\Database\PDOConnection;
-use Ilias\Maestro\Database\Select;
 use Ilias\Maestro\Types\Serial;
-use Ilias\Maestro\Types\Timestamp;
 
 final class AuthCode extends TrackableTable
 {
@@ -21,8 +17,26 @@ final class AuthCode extends TrackableTable
   public User $userId;
   public string|Expression $code = 'generate_four_digit_auth_code()';
 
+  public function __construct($params) {
+    parent::__construct(...$params);
+  }
+
   public function compose(string $code)
   {
     $this->code = $code;
+  }
+
+  public static function create(int $userId): array
+  {
+    $user = User::fetchRow(['id' => $userId]);
+    if ($user) {
+      $insert = new Insert();
+      $insert->into(AuthCode::class)
+        ->values(['user_id' => $user->id])
+        ->returning(['*']);
+      $authCode = $insert->execute()[0];
+      return $authCode;
+    }
+    throw new \Exception('User not found');
   }
 }
