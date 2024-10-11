@@ -26,6 +26,7 @@ class UserController
     if (isset($params['id']) || isset($params['telephone']) || isset($params['name'])) {
       $select = new Select();
       $select->from(['u' => User::class]);
+
       $conditions = [];
       $conditionsLike = [];
       if (isset($params['id'])) {
@@ -35,8 +36,8 @@ class UserController
       } elseif (isset($params['name'])) {
         $conditionsLike["u.name"] = $params['name'];
       }
-      $select->where($conditions, Query::OR , Query::EQUALS);
-      $select->where($conditionsLike, Query::OR , Query::LIKE);
+      $select->where($conditions, Query::OR , Query::EQUALS)
+        ->where($conditionsLike, Query::OR , Query::LIKE);
 
       try {
         $result = $select->execute();

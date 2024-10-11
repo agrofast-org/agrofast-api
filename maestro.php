@@ -21,4 +21,4 @@ require_once("./vendor/autoload.php");
 // $insert = new Insert(Maestro::SQL_STRICT, PDOConnection::get());
 // $result = $insert->into(User::class)->values($user)->returning(['id'])->execute();
 
-echo SmsSender::send('5564996020731', 'Hello, this is a test message') . "\n";
+echo SmsSender::send('+5564996020731', 'Hello, this is a test message') . "\n";
