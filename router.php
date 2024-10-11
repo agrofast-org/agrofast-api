@@ -4,9 +4,10 @@ use Ilias\Choir\Controller\DebugController;
 use Ilias\Choir\Controller\IndexController;
 use Ilias\Choir\Controller\MachineryController;
 use Ilias\Choir\Controller\RequestController;
-use Ilias\Choir\Controller\TransportController;
+use Ilias\Choir\Controller\CarrierController;
 use Ilias\Choir\Controller\UserController;
 use Ilias\Choir\Middleware\AuthUserMiddleware;
+use Ilias\Choir\Middleware\Carrieriddleware;
 use Ilias\Choir\Middleware\EnvironmentMiddleware;
 use Ilias\Choir\Middleware\JwtMiddleware;
 use Ilias\Rhetoric\Router\Router;
@@ -46,10 +47,10 @@ Router::group("/machinery", function ($router) {
 // Transport vehicle routes
 
 Router::group("/transport", function ($router) {
-  $router->get("/", TransportController::class . "@listTransports");
-  $router->post("/create", TransportController::class . "@createTransport");
-  $router->put("/update", MachineryController::class . "@updateTransport");
-  $router->delete("/disable", MachineryController::class . "@disableTransport");
+  $router->get("/", CarrierController::class . "@listTransports");
+  $router->post("/create", CarrierController::class . "@createTransport");
+  $router->put("/update", CarrierController::class . "@updateTransport");
+  $router->delete("/disable", CarrierController::class . "@disableTransport");
 }, [new AuthUserMiddleware()]);
 
 // Requests routes
@@ -57,7 +58,7 @@ Router::group("/transport", function ($router) {
 Router::group("/request", function ($router) {
   $router->post("/", RequestController::class . "@listRequests");
   $router->post("/create", RequestController::class . "@makeRequest");
-  $router->put("/update", MachineryController::class . "@updateRequest");
-  $router->delete("/cancel", MachineryController::class . "@cancelRequest");
+  $router->put("/update", RequestController::class . "@updateRequest");
+  $router->delete("/cancel", RequestController::class . "@cancelRequest");
 }, [new AuthUserMiddleware()]);
 

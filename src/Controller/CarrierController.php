@@ -3,7 +3,7 @@
 namespace Ilias\Choir\Controller;
 
 use Ilias\Choir\Model\Hr\User;
-use Ilias\Choir\Model\Transport\Machinery;
+use Ilias\Choir\Model\Transport\Carrier;
 use Ilias\Maestro\Database\Insert;
 use Ilias\Maestro\Database\Select;
 use Ilias\Maestro\Database\Transaction;
@@ -12,20 +12,19 @@ use Ilias\Opherator\JsonResponse;
 use Ilias\Opherator\Request;
 use Ilias\Opherator\Request\StatusCode;
 
-class MachineryController
+class CarrierController
 {
-
-  public static function listMachinery()
+  public static function listTransports()
   {
     $user = User::getAuthenticatedUser();
     $select = new Select();
-    $result = $select->from(['m' => Machinery::class])
+    $result = $select->from(['m' => Carrier::class])
       ->where(['m.user_id' => $user->id])
       ->execute();
     return $result;
   }
 
-  public static function createMachine()
+  public static function createTransport()
   {
     $user = User::getAuthenticatedUser();
     $params = Request::getBody();
@@ -36,7 +35,7 @@ class MachineryController
     $transaction->begin();
     try {
       $insert = new Insert();
-      $insert->into(Machinery::class)
+      $insert->into(Carrier::class)
         ->values([
           'user_id' => $user->id,
           'name' => $params['name'],
@@ -51,7 +50,7 @@ class MachineryController
     }
   }
 
-  public static function updateMachine()
+  public static function updateTransport()
   {
     $user = User::getAuthenticatedUser();
     $params = Request::getBody();
@@ -62,7 +61,7 @@ class MachineryController
     $transaction->begin();
     try {
       $update = new Update();
-      $update->table(Machinery::class)
+      $update->table(Carrier::class)
         ->set([
           'name' => $params['name'],
           'model' => $params['model'],
@@ -77,7 +76,7 @@ class MachineryController
     }
   }
 
-  public static function disableMachine()
+  public static function disableTransport()
   {
     $user = User::getAuthenticatedUser();
     $params = Request::getBody();
@@ -88,7 +87,7 @@ class MachineryController
     $transaction->begin();
     try {
       $update = new Update();
-      $update->table(Machinery::class)
+      $update->table(Carrier::class)
         ->set(['active' => true])
         ->where(['id' => $params['id']]);
       $update->execute();

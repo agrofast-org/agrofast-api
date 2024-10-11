@@ -34,6 +34,7 @@ final class AuthCode extends TrackableTable
       $insert->into(AuthCode::class)
         ->values(['user_id' => $user->id])
         ->returning(['*']);
+        
       $authCode = $insert->execute()[0];
       return $authCode;
     }

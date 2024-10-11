@@ -24,7 +24,8 @@
     "ilias/opherator": "^1.0",
     "ilias/maestro": "^1.2",
     "ilias/dotenv": "^1.0",
-    "firebase/php-jwt": "^6.10"
+    "firebase/php-jwt": "^6.10",
+    "pear/http_request2": "^2.6"
   },
   "minimum-stability": "stable"
 }
