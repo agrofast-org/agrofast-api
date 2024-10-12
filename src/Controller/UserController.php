@@ -81,11 +81,8 @@ class UserController
 
       $result = $insert->execute()[0];
       if ($result) {
-        $insert = new Insert();
-        $insert->into(AuthCode::class)
-          ->values(['user_id' => $result['id']])
-          ->returning(['id', 'created_in']);
-        $authCode = $insert->execute()[0];
+        $authCode = AuthCode::create($result['id']);
+
         $result['created_in'] = $authCode['created_in'];
 
         $transaction->commit();
@@ -183,11 +180,7 @@ class UserController
         ->where(['user_id' => $user->id]);
       $updateUserAuthCodes->execute();
 
-      $insertAuthCode = new Insert();
-      $insertAuthCode->into(AuthCode::class)
-        ->values(['user_id' => $user->id])
-        ->returning(['id', 'created_in']);
-      $newAuthCode = $insertAuthCode->execute()[0];
+      $newAuthCode = AuthCode::create((int)$user->id);
 
       $transaction->commit();
       $jwtData = [

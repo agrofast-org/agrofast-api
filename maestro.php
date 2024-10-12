@@ -2,6 +2,7 @@
 use Ilias\Choir\Database\AgrofastDB;
 use Ilias\Choir\Model\Hr\User;
 use Ilias\Choir\Service\SmsSender;
+use Ilias\Dotenv\Environment;
 use Ilias\Maestro\Core\Maestro;
 use Ilias\Maestro\Core\Manager;
 use Ilias\Maestro\Database\Insert;
@@ -9,6 +10,8 @@ use Ilias\Maestro\Database\PDOConnection;
 use Ilias\Maestro\Types\Timestamp;
 
 require_once("./vendor/autoload.php");
+
+Environment::setup(null, Environment::SUPPRESS_EXCEPTION);
 
 // $coreDatabase = new Manager();
 // $agrofastDB = new AgrofastDB();
@@ -21,4 +24,4 @@ require_once("./vendor/autoload.php");
 // $insert = new Insert(Maestro::SQL_STRICT, PDOConnection::get());
 // $result = $insert->into(User::class)->values($user)->returning(['id'])->execute();
 
-echo SmsSender::send('+5564996020731', 'Hello, this is a test message') . "\n";
+// echo SmsSender::send('+5564996020731', 'Hello, this is a test message') . "\n";
