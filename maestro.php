@@ -13,10 +13,10 @@ require_once("./vendor/autoload.php");
 
 Environment::setup(null, Environment::SUPPRESS_EXCEPTION);
 
-// $coreDatabase = new Manager();
-// $agrofastDB = new AgrofastDB();
+$coreDatabase = new Manager();
+$agrofastDB = new AgrofastDB();
 
-// print implode("\n", $coreDatabase->createDatabase($agrofastDB, false)) . "\n";
+print implode("\n", $coreDatabase->createDatabase($agrofastDB, false)) . "\n";
 
 // print $coreDatabase->createTable(User::class) . "\n";
 

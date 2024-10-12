@@ -21,6 +21,8 @@ Router::group("/debug", function ($router) {
     $router->get("/", DebugController::class . "@getEnvironmentInstructions");
     $router->get("/{variable}", DebugController::class . "@getEnvironmentVariable");
   });
+  $router->get("/lasterror", DebugController::class . "@getLastError");
+
   $router->get("/dir", DebugController::class . "@mapProjectFiles");
   $router->get("/file", DebugController::class . "@getFileContent");
   $router->post("/body", DebugController::class . "@showBody");

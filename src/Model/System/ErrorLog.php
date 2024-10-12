@@ -15,7 +15,14 @@ final class ErrorLog extends Table
   public Serial $id;
   public string $json;
   public string $params;
-  public Timestamp | Expression | string $createdIn = Expression::CURRENT_TIMESTAMP;
+  public Timestamp|Expression|string $createdIn = Expression::CURRENT_TIMESTAMP;
+
+  public function __construct(string $errors, string $params, Timestamp $createdIn = new Timestamp())
+  {
+    $this->json = $errors;
+    $this->params = $params;
+    $this->createdIn = $createdIn;
+  }
 
   public function compose($json, $params, $createdIn = null)
   {

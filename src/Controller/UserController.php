@@ -55,6 +55,10 @@ class UserController
   public static function createUser()
   {
     $params = Request::getBody();
+    $arrEr = User::validateInsert($params);
+    if (!empty($arrEr)) {
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Required fields not supplied', 'fields' => $arrEr]);
+    }
     $user = User::fetchRow(['number' => $params['number']]);
 
     if ($user) {
@@ -64,10 +68,6 @@ class UserController
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User already exists']);
     }
     try {
-      if (empty($params['name']) || empty($params['number']) || empty($params['password'])) {
-        return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Name, number, and password are required']);
-      }
-
       $user = new User($params['name'], $params['number'], $params['password'], true, new Timestamp());
       $user->authenticated = false;
       $user->password = md5($user->password);
@@ -130,7 +130,7 @@ class UserController
         $updateUser->execute();
         $updateAuthCode->execute();
         $session = $insertSession->execute()[0];
-        $user->session_id = $session['id']; 
+        $user->session_id = $session['id'];
 
         $jwtData = [
           'id' => $user->id,
@@ -180,7 +180,7 @@ class UserController
         ->where(['user_id' => $user->id]);
       $updateUserAuthCodes->execute();
 
-      $newAuthCode = AuthCode::create((int)$user->id);
+      $newAuthCode = AuthCode::create((int) $user->id);
 
       $transaction->commit();
       $jwtData = [

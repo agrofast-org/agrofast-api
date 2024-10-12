@@ -1,0 +1,21 @@
+-- Inserting document types for multiple countries
+INSERT INTO "hr"."document_type" ("name", "label") VALUES
+('passport', 'Passport'),
+('id_card', 'National ID Card'),
+('driver_license', 'Driver’s License'),
+('social_security_card', 'Social Security Card'),
+('residence_permit', 'Residence Permit'),
+('voter_id', 'Voter ID'),
+('tax_identification_number', 'Tax Identification Number'),
+('birth_certificate', 'Birth Certificate'),
+('health_insurance_card', 'Health Insurance Card'),
+('visa', 'Visa'),
+('aadhar_card', 'Aadhar Card (India)'),
+('curp', 'CURP (Mexico)'),
+('national_insurance_number', 'National Insurance Number (UK)'),
+('cnh', 'Carteira Nacional de Habilitação (Brazil)'),
+('dni', 'Documento Nacional de Identidad (Argentina)'),
+('nif', 'Número de Identificación Fiscal (Spain)'),
+('nip', 'Numer Identyfikacji Podatkowej (Poland)'),
+('cpf', 'Cadastro de Pessoas Físicas (Brazil)'),
+('ssn', 'Social Security Number (USA)');

@@ -2,7 +2,9 @@
 
 namespace Ilias\Choir\Exceptions;
 
-class AuthorizationNotProvidedException extends \Exception
+use Ilias\Rhetoric\Exceptions\MiddlewareException;
+
+class AuthorizationNotProvidedException extends MiddlewareException
 {
   public function __construct()
   {

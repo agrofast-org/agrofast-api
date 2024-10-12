@@ -7,6 +7,7 @@ use Firebase\JWT\Key;
 use Ilias\Choir\Database\Schemas\Hr;
 use Ilias\Choir\Exceptions\AuthorizationNotProvidedException;
 use Ilias\Choir\Exceptions\UserNotFoundException;
+use Ilias\Choir\Utilities\Utils;
 use Ilias\Maestro\Abstract\TrackableTable;
 use Ilias\Maestro\Types\Serial;
 use Ilias\Maestro\Types\Timestamp;
@@ -48,6 +49,28 @@ final class User extends TrackableTable
     $this->password = $password;
     $this->active = $active;
     $this->createdIn = $createdIn;
+  }
+
+  public static function validateInsert(array $params): array
+  {
+    $arErr = [];
+    if (!isset($params["name"]) || empty($params["name"])) {
+      $arErr["name"] = "user_name_required_message";
+    }
+    $numberErr = Utils::validatePhoneNumber($params["number"]);
+    if (!empty($numberErr)) {
+      $arErr["number"] = $numberErr;
+    }
+    $passwordErr = Utils::validatePassword($params["password"]);
+    if (!empty($passwordErr)) {
+      $arErr["password"] = $passwordErr;
+    }
+    return $arErr;
+  }
+
+  public static function validateUpdate(array $params): array
+  {
+    return self::validateInsert($params);    
   }
 
   public static function getAuthenticatedUser()

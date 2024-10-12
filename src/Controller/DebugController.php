@@ -3,7 +3,11 @@
 namespace Ilias\Choir\Controller;
 
 use Ilias\Choir\Bootstrap\Core;
+use Ilias\Choir\Model\System\ErrorLog;
+use Ilias\Maestro\Database\Select;
+use Ilias\Opherator\JsonResponse;
 use Ilias\Opherator\Request;
+use Ilias\Opherator\Request\StatusCode;
 use Ilias\Opherator\Response;
 use Ilias\Choir\Utilities\DirectoryReader;
 use Ilias\Choir\Utilities\FileReader;
@@ -63,5 +67,20 @@ class DebugController
   public static function showBody()
   {
     Response::appendResponse("data", Request::getBody());
+  }
+
+  public static function getLastError()
+  {
+    $select = new Select();
+    $select->from(['e' => ErrorLog::class])
+      ->order('created_in', 'DESC')
+      ->limit(1);
+    $result = $select->execute()[0];
+    if ($result) {
+      $result['json'] = json_decode($result['json']);
+      $result['params'] = json_decode($result['params']);
+      return new JsonResponse(new StatusCode(StatusCode::OK), ['data' => $result]);
+    }
+    return new JsonResponse(new StatusCode(StatusCode::OK), ['data'=> null]);
   }
 }

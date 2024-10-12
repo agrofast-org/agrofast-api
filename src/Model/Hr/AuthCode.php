@@ -41,7 +41,7 @@ final class AuthCode extends TrackableTable
         ->returning(['*']);
       $authCode = $insert->execute()[0];
       
-      SmsSender::send($user->number, "Seu codigo de autenticacao para o Agrofast e: {$authCode['code']}");
+      // SmsSender::send($user->number, "Seu codigo de autenticacao para o Agrofast e: {$authCode['code']}");
 
       return $authCode;
     }

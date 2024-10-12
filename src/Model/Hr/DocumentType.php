@@ -12,6 +12,8 @@ final class DocumentType extends Table
   /** @primary */
   public Serial $id;
   /** @unique */
+  public string $name;
+  /** @unique */
   public string $label;
 
   public function compose(string $label) {

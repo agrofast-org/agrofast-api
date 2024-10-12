@@ -2,7 +2,9 @@
 
 namespace Ilias\Choir\Exceptions;
 
-class UserNotFoundException extends \Exception
+use Ilias\Rhetoric\Exceptions\MiddlewareException;
+
+class UserNotFoundException extends MiddlewareException
 {
   public function __construct()
   {

@@ -28,19 +28,7 @@ CREATE TABLE IF NOT EXISTS "hr"."document" (
 );
 CREATE TABLE IF NOT EXISTS "hr"."document_type" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
-	"label" TEXT NOT NULL UNIQUE
-);
-CREATE TABLE IF NOT EXISTS "hr"."profile" (
-	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
-	"user_id" INTEGER NOT NULL,
-	"profile_type" INTEGER NOT NULL,
-	"active" BOOLEAN NULL DEFAULT TRUE,
-	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-	"updated_in" TIMESTAMP NULL,
-	"inactivated_in" TIMESTAMP NULL
-);
-CREATE TABLE IF NOT EXISTS "hr"."profile_type" (
-	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
+	"name" TEXT NULL UNIQUE,
 	"label" TEXT NOT NULL UNIQUE
 );
 CREATE TABLE IF NOT EXISTS "hr"."session" (
@@ -71,10 +59,10 @@ CREATE TABLE IF NOT EXISTS "hr"."user_settings" (
 );
 CREATE TABLE IF NOT EXISTS "transport"."machinery" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
+	"user_id" INTEGER NOT NULL,
 	"name" TEXT NOT NULL,
 	"model" TEXT NOT NULL,
-	"plate" TEXT NOT NULL,
-	"user_id" INTEGER NOT NULL,
+	"plate" TEXT NOT NULL UNIQUE,
 	"active" BOOLEAN NULL DEFAULT TRUE,
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 	"updated_in" TIMESTAMP NULL,
@@ -133,8 +121,6 @@ CREATE TABLE IF NOT EXISTS "system"."error_log" (
 ALTER TABLE "hr"."auth_code" ADD CONSTRAINT fk_auth_code_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_document_type FOREIGN KEY ("document_type") REFERENCES "hr"."document_type"("id");
-ALTER TABLE "hr"."profile" ADD CONSTRAINT fk_profile_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "hr"."profile" ADD CONSTRAINT fk_profile_profile_type FOREIGN KEY ("profile_type") REFERENCES "hr"."profile_type"("id");
 ALTER TABLE "hr"."session" ADD CONSTRAINT fk_session_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "hr"."user_settings" ADD CONSTRAINT fk_user_settings_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "transport"."machinery" ADD CONSTRAINT fk_machinery_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");

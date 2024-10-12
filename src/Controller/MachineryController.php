@@ -22,15 +22,16 @@ class MachineryController
     $result = $select->from(['m' => Machinery::class])
       ->where(['m.user_id' => $user->id])
       ->execute();
-    return $result;
+    return new JsonResponse(new StatusCode(StatusCode::OK), ['data' => $result]);
   }
 
   public static function createMachine()
   {
     $user = User::getAuthenticatedUser();
     $params = Request::getBody();
-    if (empty($params['name']) || empty($params['model']) || empty($params['plate'])) {
-      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Missing required fields']);
+    $arErr = Machinery::validateInsert($params);
+    if (!empty($arErr)) {
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Missing required fields', 'fields' => $arErr]);
     }
     $transaction = new Transaction();
     $transaction->begin();
@@ -45,6 +46,8 @@ class MachineryController
         ]);
       $insert->execute();
       $transaction->commit();
+
+      return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'Machine created']);
     } catch (\Throwable) {
       $transaction->rollback();
       return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to create machine']);
