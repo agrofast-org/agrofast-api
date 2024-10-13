@@ -10,7 +10,7 @@ final class Contact extends TrackableTable
 {
   public Hr $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
   public User $userId;
   /** @not_nuable */

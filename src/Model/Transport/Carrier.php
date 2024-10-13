@@ -11,9 +11,7 @@ final class Carrier extends Vehicle
 {
   public Transport $schema;
   /** @primary */
-  public Serial $id;
-  /** @not_nuable */
-  public User $userId;
+  public Serial|int $id;
 
   public static function validateInsert(array $params): array
   {

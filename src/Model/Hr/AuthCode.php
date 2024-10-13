@@ -14,9 +14,9 @@ final class AuthCode extends TrackableTable
 {
   public Hr $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
-  public User $userId;
+  public User|int $userId;
   public string|Expression $code = 'generate_four_digit_auth_code()';
 
   public function __construct($params) {

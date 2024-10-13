@@ -11,13 +11,13 @@ final class Offer extends TrackableTable
 {
   public Transport $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
-  public User $userId;
+  public User|int $userId;
   /** @not_nuable */
-  public Request $requestId;
+  public Request|int $requestId;
   /** @not_nuable */
-  public Carrier $carrierId;
+  public Carrier|int $carrierId;
   /** @not_nuable */
   public float $price;
 

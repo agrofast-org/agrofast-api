@@ -13,10 +13,16 @@ require_once("./vendor/autoload.php");
 
 Environment::setup(null, Environment::SUPPRESS_EXCEPTION);
 
-$coreDatabase = new Manager();
-$agrofastDB = new AgrofastDB();
+PDOConnection::get(dbHost: "localhost");
+// $coreDatabase = new Manager();
+// $agrofastDB = new AgrofastDB();
 
-print implode("\n", $coreDatabase->createDatabase($agrofastDB, false)) . "\n";
+// print implode("\n", $coreDatabase->createDatabase($agrofastDB, false)) . "\n";
+
+$user = User::fetchAll()[0];
+$user->name = "Murilo Elias";
+$user->updatedIn = '';
+$user->save();
 
 // print $coreDatabase->createTable(User::class) . "\n";
 

@@ -12,9 +12,9 @@ final class Request extends TrackableTable
 {
   public Transport $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
-  public User $userId;
+  public User|int $userId;
   /** @not_nuable */
   public string $origin;
   /** @not_nuable */

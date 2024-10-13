@@ -22,7 +22,7 @@
     "php": "^8.2",
     "ilias/rhetoric": "^1.0",
     "ilias/opherator": "^1.0",
-    "ilias/maestro": "^1.2",
+    "ilias/maestro": "^1.3",
     "ilias/dotenv": "^1.0",
     "firebase/php-jwt": "^6.10",
     "vonage/client": "^4.1"

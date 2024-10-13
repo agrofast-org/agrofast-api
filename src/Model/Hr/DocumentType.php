@@ -10,13 +10,15 @@ final class DocumentType extends Table
 {
   public Hr $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @unique */
   public string $name;
   /** @unique */
   public string $label;
 
-  public function compose(string $label) {
+  public function compose(string $name, string $label)
+  {
+    $this->name = $name;
     $this->label = $label;
   }
 }

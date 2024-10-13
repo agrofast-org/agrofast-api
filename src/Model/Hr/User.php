@@ -13,12 +13,13 @@ use Ilias\Maestro\Types\Serial;
 use Ilias\Maestro\Types\Timestamp;
 use Ilias\Maestro\Types\Unique;
 use Ilias\Opherator\Request;
+use stdClass;
 
 final class User extends TrackableTable
 {
   public Hr $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
   public string $name;
   /** @unique */
@@ -26,7 +27,7 @@ final class User extends TrackableTable
   public string $password;
   public bool $authenticated = false;
 
-  private static ?\stdClass $user = null;
+  private static null|stdClass|User $user = null;
 
   public function __construct(string $name, string $number, string $password, bool $active = true, $createdIn = new Timestamp())
   {

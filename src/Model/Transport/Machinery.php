@@ -10,7 +10,7 @@ final class Machinery extends Vehicle
 {
   public Transport $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
 
   public function compose()

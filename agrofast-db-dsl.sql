@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS "hr"."auth_code" (
 );
 CREATE TABLE IF NOT EXISTS "hr"."contact_type" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
+	"name" TEXT NOT NULL UNIQUE,
 	"label" TEXT NOT NULL UNIQUE
 );
 CREATE TABLE IF NOT EXISTS "hr"."document" (
@@ -28,7 +29,7 @@ CREATE TABLE IF NOT EXISTS "hr"."document" (
 );
 CREATE TABLE IF NOT EXISTS "hr"."document_type" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
-	"name" TEXT NULL UNIQUE,
+	"name" TEXT NOT NULL UNIQUE,
 	"label" TEXT NOT NULL UNIQUE
 );
 CREATE TABLE IF NOT EXISTS "hr"."session" (
@@ -118,17 +119,3 @@ CREATE TABLE IF NOT EXISTS "system"."error_log" (
 	"params" TEXT NOT NULL,
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
 );
-ALTER TABLE "hr"."auth_code" ADD CONSTRAINT fk_auth_code_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_document_type FOREIGN KEY ("document_type") REFERENCES "hr"."document_type"("id");
-ALTER TABLE "hr"."session" ADD CONSTRAINT fk_session_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "hr"."user_settings" ADD CONSTRAINT fk_user_settings_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "transport"."machinery" ADD CONSTRAINT fk_machinery_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_request_id FOREIGN KEY ("request_id") REFERENCES "transport"."request"("id");
-ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_carrier_id FOREIGN KEY ("carrier_id") REFERENCES "transport"."carrier"("id");
-ALTER TABLE "transport"."request" ADD CONSTRAINT fk_request_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "transport"."carrier" ADD CONSTRAINT fk_carrier_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_from_user_id FOREIGN KEY ("from_user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_to_user_id FOREIGN KEY ("to_user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_answer_to FOREIGN KEY ("answer_to") REFERENCES "chat"."message"("id");

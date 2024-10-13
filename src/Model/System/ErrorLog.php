@@ -12,7 +12,7 @@ final class ErrorLog extends Table
 {
   public System $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   public string $json;
   public string $params;
   public Timestamp|Expression|string $createdIn = Expression::CURRENT_TIMESTAMP;

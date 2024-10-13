@@ -10,11 +10,11 @@ final class Document extends TrackableTable
 {
   public Hr $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
-  public User $userId;
+  public User|int $userId;
   /** @not_nuable */
-  public DocumentType $documentType;
+  public DocumentType|int $documentType;
   /** @unique */
   public string $document;
 
