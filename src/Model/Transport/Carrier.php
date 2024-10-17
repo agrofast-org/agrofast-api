@@ -30,6 +30,10 @@ final class Carrier extends Vehicle
 
   public static function validateUpdate(array $params): array
   {
-    return self::validateInsert($params);
+    $arErr = self::validateInsert($params);
+    if (!isset($params["id"]) || empty($params["id"])) {
+      $arErr["id"] = "machinery_id_required_message";
+    }
+    return $arErr;
   }
 }

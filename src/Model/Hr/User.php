@@ -6,6 +6,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Ilias\Choir\Database\Schemas\Hr;
 use Ilias\Choir\Exceptions\AuthorizationNotProvidedException;
+use Ilias\Choir\Exceptions\UserNotAuthorizedException;
 use Ilias\Choir\Exceptions\UserNotFoundException;
 use Ilias\Choir\Utilities\Utils;
 use Ilias\Maestro\Abstract\TrackableTable;
@@ -83,6 +84,9 @@ final class User extends TrackableTable
       }
       $token = str_replace('Bearer ', '', $headers['Authorization']);
       $user = JWT::decode($token, new Key(getenv('APP_JWT_SECRET'), 'HS256'));
+      if (!isset($user->session_id)) {
+        throw new UserNotAuthorizedException();
+      }
       $fetchedUser = self::fetchRow(['id' => $user->id]);
       if ($fetchedUser) {
         self::$user = $fetchedUser;

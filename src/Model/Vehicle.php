@@ -12,7 +12,6 @@ class Vehicle extends TrackableTable
   public string $name;
   /** @not_nuable */
   public string $model;
-  /** @not_nuable
-   * @unique */
+  /** @not_nuable */
   public string $plate;
 }

@@ -15,6 +15,7 @@ final class DocumentType extends Table
   public string $name;
   /** @unique */
   public string $label;
+  public bool $active = true;
 
   public function compose(string $name, string $label)
   {

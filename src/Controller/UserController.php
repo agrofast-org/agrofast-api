@@ -7,6 +7,7 @@ use Firebase\JWT\Key;
 use Ilias\Choir\Model\Hr\AuthCode;
 use Ilias\Choir\Model\Hr\Session;
 use Ilias\Choir\Model\Hr\User;
+use Ilias\Choir\Utilities\Utils;
 use Ilias\Maestro\Abstract\Query;
 use Ilias\Maestro\Database\Expression;
 use Ilias\Maestro\Database\Insert;
@@ -52,12 +53,32 @@ class UserController
     return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'No user information provided']);
   }
 
+  public static function checkIfExists()
+  {
+    $params = Request::getQuery();
+    if (empty($params['number'])) {
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User number is required']);
+    }
+    $arErr = Utils::validatePhoneNumber($params['number']);
+    if (!empty($arErr)) {
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Invalid number', 'errors' => $arErr]);
+    }
+    $user = User::fetchRow(['number' => $params['number']]);
+    if (empty($user)) {
+      return new JsonResponse(new StatusCode(StatusCode::NOT_FOUND), ['message' => 'User not found']);
+    }
+    return new JsonResponse(new StatusCode(StatusCode::OK), ['message'=> 'User found','data'=> [
+      'name' => $user->name,
+      'number' => $user->number,
+    ]]);
+  }
+
   public static function createUser()
   {
     $params = Request::getBody();
-    $arrEr = User::validateInsert($params);
-    if (!empty($arrEr)) {
-      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Required fields not supplied', 'fields' => $arrEr]);
+    $arErr = User::validateInsert($params);
+    if (!empty($arErr)) {
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Required fields not supplied', 'fields' => $arErr]);
     }
     $user = User::fetchRow(['number' => $params['number']]);
 

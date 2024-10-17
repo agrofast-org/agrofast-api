@@ -32,7 +32,7 @@ final class AuthCode extends TrackableTable
   {
     $user = User::fetchRow(['id' => $userId]);
     if ($user) {
-      if (!Utils::validatePhoneNumber($user->number)) {
+      if (!empty(Utils::validatePhoneNumber($user->number))) {
         throw new \Exception('Invalid phone number');
       }
       $insert = new Insert();
