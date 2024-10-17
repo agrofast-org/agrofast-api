@@ -12,12 +12,19 @@ final class ErrorLog extends Table
 {
   public System $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   public string $json;
   public string $params;
-  public Timestamp | Expression | string $createdIn = Expression::CURRENT_TIMESTAMP;
+  public Timestamp|Expression|string $createdIn = Expression::CURRENT_TIMESTAMP;
 
-  public function __construct($json, $params, $createdIn = null)
+  public function __construct(string $errors, string $params, Timestamp $createdIn = new Timestamp())
+  {
+    $this->json = $errors;
+    $this->params = $params;
+    $this->createdIn = $createdIn;
+  }
+
+  public function compose($json, $params, $createdIn = null)
   {
     $this->json = $json;
     $this->params = $params;

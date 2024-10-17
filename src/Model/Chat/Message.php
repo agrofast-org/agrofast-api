@@ -11,13 +11,18 @@ final class Message extends TrackableTable
 {
   public Chat $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
-  public User $fromUserId;
+  public User|int $fromUserId;
   /** @not_nuable */
-  public User $toUserId;
+  public User|int $toUserId;
   /** @nuable */
-  public ?Message $answerTo = null;
+  public Message|int|null $answerTo = null;
   /** @not_nuable */
   public string $message;
+
+  public function compose(string $message): void
+  {
+    $this->message = $message;
+  }
 }

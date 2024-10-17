@@ -28,6 +28,7 @@ class Core
 
       Response::jsonResponse();
       Response::setResponse(Router::handle() ?? []);
+
     } catch (EnvironmentNotFound $environmentNotFoundEx) {
       self::handleEnvironmentException($environmentNotFoundEx);
     } catch (RouteNotFoundException $notFoundEx) {
@@ -62,8 +63,8 @@ class Core
       );
       $insert = new Insert();
       $insert->into($error::class)
-        ->values($error)
-        ->execute();
+      ->values($error)
+      ->execute();
     }
   }
 

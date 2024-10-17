@@ -11,7 +11,7 @@ class IndexController
 {
   public static function handleApiIndex()
   {
-    $response = new JsonResponse(StatusCode::OK, [
+    $response = new JsonResponse(new StatusCode(StatusCode::OK), [
       "message" => 'Welcome to the Agrofast API',
     ]);
     return $response;

@@ -10,12 +10,34 @@ final class Machinery extends Vehicle
 {
   public Transport $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
+  /** @not_nuable */
 
-  public function __construct(
-    public string $name,
-    public string $model,
-    public string $plate,
-  ) {
+  public function compose()
+  {
+  }
+
+  public static function validateInsert(array $params): array
+  {
+    $arErr = [];
+    if (!isset($params["name"]) || empty($params["name"])) {
+      $arErr["name"] = "machinery_name_required_message";
+    }
+    if (!isset($params["model"]) || empty($params["model"])) {
+      $arErr["model"] = "machinery_model_required_message";
+    }
+    if (!isset($params["plate"]) || empty($params["plate"])) {
+      $arErr["plate"] = "machinery_plate_required_message";
+    }
+    return $arErr;
+  }
+
+  public static function validateUpdate(array $params): array
+  {
+    $arErr = self::validateInsert($params);
+    if (!isset($params["id"]) || empty($params["id"])) {
+      $arErr["id"] = "machinery_id_required_message";
+    }
+    return $arErr;
   }
 }

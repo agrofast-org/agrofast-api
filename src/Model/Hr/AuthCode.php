@@ -3,40 +3,48 @@
 namespace Ilias\Choir\Model\Hr;
 
 use Ilias\Choir\Database\Schemas\Hr;
-use Ilias\Maestro\Abstract\Query;
+use Ilias\Choir\Service\SmsSender;
+use Ilias\Choir\Utilities\Utils;
 use Ilias\Maestro\Abstract\TrackableTable;
 use Ilias\Maestro\Database\Expression;
-use Ilias\Maestro\Database\PDOConnection;
-use Ilias\Maestro\Database\Select;
+use Ilias\Maestro\Database\Insert;
 use Ilias\Maestro\Types\Serial;
-use Ilias\Maestro\Types\Timestamp;
 
 final class AuthCode extends TrackableTable
 {
   public Hr $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @not_nuable */
-  public User $userId;
+  public User|int $userId;
   public string|Expression $code = 'generate_four_digit_auth_code()';
 
-  public function __construct(string $code)
+  public function __construct($params) {
+    parent::__construct(...$params);
+  }
+
+  public function compose(string $code)
   {
     $this->code = $code;
   }
 
-  public static function createCode(int $userId, string $number)
+  public static function create(int $userId): array
   {
-    $select = new Select(pdo: PDOConnection::get());
-    $authCode = $select->from(['a' => AuthCode::class])
-      ->where(['a.id' => $userId], Query::AND , compaction: Query::EQUALS)
-      ->where(['a.created_at' => new Timestamp(strtotime('-2 hours'))], Query::AND , compaction: Query::LESS_THAN_OR_EQUAL)
-      ->order('a.created_at', Select::DESC)
-      ->execute()[0];
-    if ($authCode) {
+    $user = User::fetchRow(['id' => $userId]);
+    if ($user) {
+      if (!empty(Utils::validatePhoneNumber($user->number))) {
+        throw new \Exception('Invalid phone number');
+      }
+      $insert = new Insert();
+      $insert->into(AuthCode::class)
+        ->values(['user_id' => $user->id])
+        ->returning(['*']);
+      $authCode = $insert->execute()[0];
+      
+      // SmsSender::send($user->number, "Seu codigo de autenticacao para o Agrofast e: {$authCode['code']}");
+
       return $authCode;
     }
-    $insert = new Insert(pdo: PDOConnection::get());
-    return $insert->into(User::class)->values(['user_id' => $userId])->returning(['id'])->execute()[0];
+    throw new \Exception('User not found');
   }
 }

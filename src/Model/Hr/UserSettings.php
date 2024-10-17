@@ -10,13 +10,13 @@ final class UserSettings extends Table
 {
   public Hr $schema;
   /** @primary */
-  public Serial $id;
+  public Serial|int $id;
   /** @unique */
-  public User $userId;
+  public User|int $userId;
   public string $theme;
   public string $language;
 
-  public function __construct()
+  public function compose()
   {
   }
 }

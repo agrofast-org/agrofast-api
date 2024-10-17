@@ -10,12 +10,15 @@ final class ContactType extends Table
 {
   public Hr $schema;
   /** @primary */
-  public Serial $id;
-  /** @not_nuable 
-   * @unique */
+  public Serial|int $id;
+  /** @unique */
+  public string $name;
+  /** @unique */
   public string $label;
 
-  public function __construct()
+  public function compose(string $name, string $label)
   {
+    $this->name = $name;
+    $this->label = $label;
   }
 }
