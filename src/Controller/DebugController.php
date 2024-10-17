@@ -25,7 +25,8 @@ class DebugController
         "params" => Router::getParams(),
         "body" => Request::getBody(),
         "query" => Request::getQuery(),
-      ]
+      ],
+      "raw_data" => file_get_contents('php://input'),
     ]);
   }
 
