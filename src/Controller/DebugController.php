@@ -17,56 +17,70 @@ class DebugController
 {
   public static function showEnvironment()
   {
-    Response::appendResponse("message", ["ping" => "pong"]);
-    Response::appendResponse("data", ["request" => $GLOBALS]);
-    Response::appendResponse("request", [
-      "request_method" => Request::getMethod(),
-      "params" => Router::getParams(),
-      Request::hasBody() && "body" => Request::getBody(),
-      "query" => Request::getQuery(),
+    return new JsonResponse(new StatusCode(StatusCode::OK), [
+      "message" => ["ping" => "pong"],
+      "data" => ["request" => $GLOBALS],
+      "request" => [
+        "request_method" => Request::getMethod(),
+        "params" => Router::getParams(),
+        "body" => Request::getBody(),
+        "query" => Request::getQuery(),
+      ]
     ]);
   }
 
   public static function showNestedParams()
   {
-    Response::appendResponse("request", [
-      "params" => Router::getParams(),
-      "query" => Request::getQuery(),
+    return new JsonResponse(new StatusCode(StatusCode::OK), [
+      "request" => [
+        "params" => Router::getParams(),
+        "query" => Request::getQuery(),
+      ]
     ]);
   }
 
   public static function getEnvironmentInstructions()
   {
-    Response::appendResponse("message", [
-      "instruction" => "There is none yet."
+    return new JsonResponse(new StatusCode(StatusCode::OK), [
+      "message" => [
+        "instruction" => "There is none yet."
+      ]
     ]);
   }
 
   public static function getEnvironmentVariable()
   {
-    Response::appendResponse("data", [
-      "requested_var" => Router::getParams()["variable"],
-      // "variable_val" => Environments::$vars[Request::$params["variable"]]
+    return new JsonResponse(new StatusCode(StatusCode::OK), [
+      "message" => "This functionality will not return values.",
+      "data" => [
+        "requested_var" => Router::getParams()["variable"],
+        // "variable_val" => Environments::$vars[Request::$params["variable"]]
+      ]
     ]);
-    Response::appendResponse("message", "This functionality will not return values.");
   }
 
   public static function mapProjectFiles()
   {
     $directoryReader = new DirectoryReader($_SERVER['DOCUMENT_ROOT']);
-    Response::appendResponse("data", $directoryReader->readDirectory());
+    return new JsonResponse(new StatusCode(StatusCode::OK), [
+      "data" => $directoryReader->readDirectory()
+    ]);
   }
 
   public static function getFileContent()
   {
     $filePath = Request::getQuery()["path"];
     $directoryReader = new FileReader($_SERVER['DOCUMENT_ROOT'] . DIRECTORY_SEPARATOR . $filePath);
-    Response::appendResponse("data", $directoryReader->readFile());
+    return new JsonResponse(new StatusCode(StatusCode::OK), [
+      'data' => $directoryReader->readFile()
+    ]);
   }
 
   public static function showBody()
   {
-    Response::appendResponse("data", Request::getBody());
+    return new JsonResponse(new StatusCode(StatusCode::OK), [
+      "data" => Request::getBody()
+    ]);
   }
 
   public static function getLastError()
@@ -81,6 +95,6 @@ class DebugController
       $result['params'] = json_decode($result['params']);
       return new JsonResponse(new StatusCode(StatusCode::OK), ['data' => $result]);
     }
-    return new JsonResponse(new StatusCode(StatusCode::OK), ['data'=> null]);
+    return new JsonResponse(new StatusCode(StatusCode::OK), ['data' => null]);
   }
 }
