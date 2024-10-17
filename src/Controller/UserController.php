@@ -17,6 +17,7 @@ use Ilias\Maestro\Types\Timestamp;
 use Ilias\Opherator\JsonResponse;
 use Ilias\Opherator\Request;
 use Ilias\Opherator\Request\StatusCode;
+use Ilias\Rhetoric\Router\Router;
 
 class UserController
 {
@@ -54,7 +55,7 @@ class UserController
 
   public static function checkIfExists()
   {
-    $params = Request::getQuery();
+    $params = Router::getParams();
     if (empty($params['number'])) {
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User number is required']);
     }

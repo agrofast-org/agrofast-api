@@ -33,7 +33,7 @@ Router::group("/debug", function ($router) {
 
 Router::group("/user", function ($router) {
   $router->get("/", UserController::class . "@getUser");
-  $router->get("/exists", UserController::class . "@checkIfExists");
+  $router->get("/{number}/exists", UserController::class . "@checkIfExists");
   $router->post("/", UserController::class . "@createUser");
   $router->post("/auth", UserController::class . "@authenticateUser", [new JwtMiddleware()]);
   $router->post("/login", UserController::class . "@userLogin");
