@@ -9,7 +9,6 @@ use Ilias\Choir\Model\Hr\Session;
 use Ilias\Choir\Model\Hr\User;
 use Ilias\Choir\Utilities\Utils;
 use Ilias\Maestro\Abstract\Query;
-use Ilias\Maestro\Database\Expression;
 use Ilias\Maestro\Database\Insert;
 use Ilias\Maestro\Database\Select;
 use Ilias\Maestro\Database\Transaction;
