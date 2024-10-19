@@ -55,7 +55,7 @@ class UserController
 
   public static function checkIfExists()
   {
-    $params = Router::getParams();
+    $params = Request::getQuery();
     if (empty($params['number'])) {
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User number is required']);
     }
