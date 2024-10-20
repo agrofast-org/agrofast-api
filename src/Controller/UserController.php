@@ -35,7 +35,8 @@ class UserController
       } elseif (isset($params['telephone'])) {
         $conditionsLike['u.number'] = $params['telephone'];
       } elseif (isset($params['name'])) {
-        $conditionsLike["u.name"] = $params['name'];
+        $nameSearch = implode("|", explode(' ', strtolower($params['name'])));
+        $conditionsLike["u.name"] = $nameSearch;
       }
       $select->where($conditions, Query::OR , Query::EQUALS)
         ->where($conditionsLike, Query::OR , Query::LIKE);
@@ -67,10 +68,13 @@ class UserController
     if (empty($user)) {
       return new JsonResponse(new StatusCode(StatusCode::NOT_FOUND), ['message' => 'User not found']);
     }
-    return new JsonResponse(new StatusCode(StatusCode::OK), ['message'=> 'User found','data'=> [
-      'name' => $user->name,
-      'number' => $user->number,
-    ]]);
+    return new JsonResponse(new StatusCode(StatusCode::OK), [
+      'message' => 'User found',
+      'data' => [
+        'name' => $user->name,
+        'number' => $user->number,
+      ]
+    ]);
   }
 
   public static function createUser()

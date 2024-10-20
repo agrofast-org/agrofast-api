@@ -24,6 +24,8 @@ final class User extends TrackableTable
   /** @not_nuable */
   public string $name;
   /** @unique */
+    /** @not_nuable */
+    public string $surname;
   public string $number;
   public string $password;
   public bool $authenticated = false;
@@ -58,6 +60,9 @@ final class User extends TrackableTable
     $arErr = [];
     if (!isset($params["name"]) || empty($params["name"])) {
       $arErr["name"] = "user_name_required_message";
+    }
+    if (!isset($params["surname"]) || empty($params["surname"])) {
+      $arErr["surname"] = "user_surname_required_message";
     }
     $numberErr = Utils::validatePhoneNumber($params["number"]);
     if (!empty($numberErr)) {

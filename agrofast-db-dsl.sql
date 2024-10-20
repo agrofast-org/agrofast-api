@@ -45,7 +45,8 @@ CREATE TABLE IF NOT EXISTS "hr"."session" (
 CREATE TABLE IF NOT EXISTS "hr"."user" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
 	"name" TEXT NOT NULL,
-	"number" TEXT NOT NULL UNIQUE,
+	"surname" TEXT NOT NULL,
+	"number" TEXT NOT NULL,
 	"password" TEXT NOT NULL,
 	"authenticated" BOOLEAN NULL,
 	"active" BOOLEAN NOT NULL DEFAULT TRUE,
