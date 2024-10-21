@@ -38,8 +38,8 @@ class UserController
         $nameSearch = implode("|", explode(' ', strtolower($params['name'])));
         $conditionsLike["u.name"] = $nameSearch;
       }
-      $select->where($conditions, Query::OR, Query::EQUALS)
-        ->where($conditionsLike, Query::OR, Query::LIKE);
+      $select->where($conditions, Query::OR , Query::EQUALS)
+        ->where($conditionsLike, Query::OR , Query::LIKE);
 
       try {
         $result = $select->execute();
@@ -92,6 +92,8 @@ class UserController
       }
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User already exists']);
     }
+    $transaction = new Transaction();
+    $transaction->begin();
     try {
       $user = new User(trim($params['name']), $params['number'], $params['password'], true, new Timestamp());
       $user->surname = trim($params['surname']);
@@ -102,8 +104,6 @@ class UserController
         ->values($user)
         ->returning(['id', 'name', 'number']);
 
-      $transaction = new Transaction();
-      $transaction->begin();
 
       $result = $insert->execute()[0];
       if ($result) {
@@ -191,16 +191,34 @@ class UserController
     $select = new Select();
     $select->from(['a' => AuthCode::class])
       ->where(['a.user_id' => $userFromToken->id], compaction: Query::EQUALS)
-      ->where(['a.created_in' => new Timestamp(strtotime('-3 minutes'))], compaction: Query::LESS_THAN_OR_EQUAL)
+      ->where(['a.created_in' => (new Timestamp())->setTimestamp(strtotime('-3 minutes'))], compaction: Query::GREATER_THAN_OR_EQUAL)
       ->where(['a.active' => true], compaction: Query::EQUALS)
       ->order('a.created_in', Select::DESC);
 
     $result = $select->execute()[0];
     if (!empty($result)) {
       AuthCode::send($user->number, $result['code']);
-      return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'Code resent']);
+      return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'Code resent', 'code' => 'same']);
     }
-    return new JsonResponse(new StatusCode(StatusCode::NOT_FOUND), ['message' => 'No active code found']);
+
+    $transaction = new Transaction();
+    $transaction->begin();
+    try {
+      $updateUserAuthCodes = new Update();
+      $updateUserAuthCodes->table(AuthCode::class)
+        ->set(['active' => false])
+        ->where(['user_id' => $userFromToken->id]);
+      $updateUserAuthCodes->execute();  
+
+      $newAuthCode = AuthCode::create($userFromToken->id);
+      AuthCode::send($user->number, $newAuthCode['code']);
+
+      $transaction->commit();
+      return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'Code resent', 'code' => 'new']);
+    } catch (\Throwable $th) {
+      $transaction->rollback();
+      return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to resend code', 'error' => $th->getMessage()]);
+    }
   }
 
   public static function userLogin()
@@ -220,7 +238,7 @@ class UserController
       $select = new Select();
       $select->from(['a' => AuthCode::class], ['created_in'])
         ->where(['a.user_id' => $user->id], compaction: Query::EQUALS)
-        ->where(['a.created_in' => new Timestamp(strtotime('-3 minutes'))], compaction: Query::LESS_THAN_OR_EQUAL)
+        ->where(['a.created_in' => (new Timestamp())->setTimestamp(strtotime('-3 minutes'))], compaction: Query::GREATER_THAN_OR_EQUAL)
         ->where(['a.active' => true], compaction: Query::EQUALS)
         ->order('a.created_in', Select::DESC);
       $authCode = $select->execute()[0];

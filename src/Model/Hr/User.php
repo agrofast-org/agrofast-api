@@ -23,8 +23,9 @@ final class User extends TrackableTable
   /** @not_nuable */
   public string $name;
   /** @unique */
-    /** @not_nuable */
-    public string $surname;
+  /** @not_nuable */
+  public string $surname;
+  public string $profile_picture;
   public string $number;
   public string $password;
   public bool $authenticated = false;
@@ -76,7 +77,7 @@ final class User extends TrackableTable
 
   public static function validateUpdate(array $params): array
   {
-    return self::validateInsert($params);    
+    return self::validateInsert($params);
   }
 
   public static function getAuthenticatedUser()
