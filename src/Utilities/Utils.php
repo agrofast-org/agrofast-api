@@ -34,11 +34,8 @@ class Utils
     if (strlen($password) < 8) {
       $arErr[] = 'user_password_length_message';
     }
-    if (!preg_match('/[A-Z]/', $password)) {
-      $arErr[] = 'user_password_uppercase_message';
-    }
-    if (!preg_match('/[a-z]/', $password)) {
-      $arErr[] = 'user_password_lowercase_message';
+    if (!preg_match('/[A-Za-z]/', $password)) {
+      $arErr[] = 'user_password_character_message';
     }
     return $arErr;
   }

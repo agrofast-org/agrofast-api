@@ -19,7 +19,8 @@ final class AuthCode extends TrackableTable
   public User|int $userId;
   public string|Expression $code = 'generate_four_digit_auth_code()';
 
-  public function __construct($params) {
+  public function __construct($params)
+  {
     parent::__construct(...$params);
   }
 
@@ -40,11 +41,16 @@ final class AuthCode extends TrackableTable
         ->values(['user_id' => $user->id])
         ->returning(['*']);
       $authCode = $insert->execute()[0];
-      
-      // SmsSender::send($user->number, "Seu codigo de autenticacao para o Agrofast e: {$authCode['code']}");
+
+      self::send($user->number, $authCode['code']);
 
       return $authCode;
     }
     throw new \Exception('User not found');
+  }
+
+  public static function send(string $number, string $code)
+  {
+    // SmsSender::send($number, "Seu codigo de autenticacao para o Agrofast é: {$code}");
   }
 }

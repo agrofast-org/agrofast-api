@@ -38,8 +38,8 @@ class UserController
         $nameSearch = implode("|", explode(' ', strtolower($params['name'])));
         $conditionsLike["u.name"] = $nameSearch;
       }
-      $select->where($conditions, Query::OR , Query::EQUALS)
-        ->where($conditionsLike, Query::OR , Query::LIKE);
+      $select->where($conditions, Query::OR, Query::EQUALS)
+        ->where($conditionsLike, Query::OR, Query::LIKE);
 
       try {
         $result = $select->execute();
@@ -93,7 +93,8 @@ class UserController
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'User already exists']);
     }
     try {
-      $user = new User($params['name'], $params['number'], $params['password'], true, new Timestamp());
+      $user = new User(trim($params['name']), $params['number'], $params['password'], true, new Timestamp());
+      $user->surname = trim($params['surname']);
       $user->authenticated = false;
       $user->password = md5($user->password);
       $insert = new Insert();
@@ -112,7 +113,7 @@ class UserController
 
         $transaction->commit();
         $jwt = JWT::encode($result, getenv('APP_JWT_SECRET'), 'HS256');
-        return new JsonResponse(new StatusCode(StatusCode::CREATED), ['message' => 'User created and auth code sent', 'token' => $jwt]);
+        return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User created and auth code sent', 'token' => $jwt]);
       }
       $transaction->rollback();
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Could not create user']);
@@ -177,16 +178,45 @@ class UserController
     }
   }
 
+  public function resendCode()
+  {
+    $headers = Request::getHeaders();
+    $token = str_replace('Bearer ', '', $headers['Authorization']);
+    $userFromToken = JWT::decode($token, new Key(getenv('APP_JWT_SECRET'), 'HS256'));
+
+    $user = User::fetchRow(['id' => $userFromToken->id]);
+    if (empty($user)) {
+      return new JsonResponse(new StatusCode(StatusCode::NOT_FOUND), ['message' => 'User not found']);
+    }
+    $select = new Select();
+    $select->from(['a' => AuthCode::class])
+      ->where(['a.user_id' => $userFromToken->id], compaction: Query::EQUALS)
+      ->where(['a.created_in' => new Timestamp(strtotime('-3 minutes'))], compaction: Query::LESS_THAN_OR_EQUAL)
+      ->where(['a.active' => true], compaction: Query::EQUALS)
+      ->order('a.created_in', Select::DESC);
+
+    $result = $select->execute()[0];
+    if (!empty($result)) {
+      AuthCode::send($user->number, $result['code']);
+      return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'Code resent']);
+    }
+    return new JsonResponse(new StatusCode(StatusCode::NOT_FOUND), ['message' => 'No active code found']);
+  }
+
   public static function userLogin()
   {
     $params = Request::getBody();
     if (empty($params['number']) || empty($params['password'])) {
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Number and password are required']);
     }
-    $user = User::fetchRow(['number' => $params['number'], 'password' => md5($params['password'])]);
+    $user = User::fetchRow(['number' => $params['number']]);
     $transaction = new Transaction();
     $transaction->begin();
     if ($user) {
+      if ($user->password != md5($params['password'])) {
+        $transaction->rollback();
+        return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Wrong password', 'error' => 'invalid_password']);
+      }
       $select = new Select();
       $select->from(['a' => AuthCode::class], ['created_in'])
         ->where(['a.user_id' => $user->id], compaction: Query::EQUALS)

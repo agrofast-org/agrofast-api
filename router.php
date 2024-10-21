@@ -23,7 +23,7 @@ Router::group("/debug", function ($router) {
     $router->get("/{variable}", DebugController::class . "@getEnvironmentVariable");
   });
   $router->get("/lasterror", DebugController::class . "@getLastError");
-  
+
   $router->get("/dir", DebugController::class . "@mapProjectFiles");
   $router->get("/file", DebugController::class . "@getFileContent");
   $router->post("/body", DebugController::class . "@showBody");
@@ -35,8 +35,9 @@ Router::group("/user", function ($router) {
   $router->get("/", UserController::class . "@getUser");
   $router->get("/exists", UserController::class . "@checkIfExists");
   $router->post("/", UserController::class . "@createUser");
-  $router->post("/auth", UserController::class . "@authenticateUser", [new JwtMiddleware()]);
+  $router->get("/auth", UserController::class . "@authenticateUser", [new JwtMiddleware()]);
   $router->post("/login", UserController::class . "@userLogin");
+  $router->get("/resend-code", UserController::class . "@resendCode", [new JwtMiddleware()]);
 }, []);
 
 // Machinery routes
