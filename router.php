@@ -33,8 +33,10 @@ Router::group("/debug", function ($router) {
 
 Router::group("/user", function ($router) {
   $router->get("/", UserController::class . "@getUser");
-  $router->get("/exists", UserController::class . "@checkIfExists");
+  $router->put("/", UserController::class . "@updateUser", [new JwtMiddleware]);
   $router->post("/", UserController::class . "@createUser");
+  $router->get("/info", UserController::class . "@getUserInfo", [new JwtMiddleware()]);
+  $router->get("/exists", UserController::class . "@checkIfExists");
   $router->get("/auth", UserController::class . "@authenticateUser", [new JwtMiddleware()]);
   $router->post("/login", UserController::class . "@userLogin");
   $router->get("/resend-code", UserController::class . "@resendCode", [new JwtMiddleware()]);

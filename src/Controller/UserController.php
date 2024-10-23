@@ -54,6 +54,15 @@ class UserController
     return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'No user information provided']);
   }
 
+  public static function getUserInfo()
+  {
+    $user = User::getAuthenticatedUser();
+    if (!$user) {
+      return new JsonResponse(new StatusCode(StatusCode::UNAUTHORIZED), ['message' => 'User not authenticated']);
+    }
+    return new JsonResponse(new StatusCode(StatusCode::OK), ['data' => $user]);
+  }
+
   public static function checkIfExists()
   {
     $params = Request::getQuery();
@@ -120,6 +129,33 @@ class UserController
     } catch (\Throwable $t) {
       $transaction->rollback();
       return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to create user', 'error' => $t->getMessage()]);
+    }
+  }
+
+  public static function updateUser()
+  {
+    $headers = Request::getHeaders();
+    $body = Request::getBody();
+    $token = str_replace('Bearer ', '', $headers['Authorization']);
+    $userFromToken = JWT::decode($token, new Key(getenv('APP_JWT_SECRET'), 'HS256'));
+    $user = User::fetchRow(['id' => $userFromToken->id]);
+    if (empty($user)) {
+      return new JsonResponse(new StatusCode(StatusCode::NOT_FOUND), ['message' => 'User not found']);
+    }
+    $arErr = User::validateUpdate($body);
+    if (!empty($arErr)) {
+      return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'Required fields not supplied', 'fields' => $arErr]);
+    }
+    $update = new Update();
+    $update->table(User::class)
+      ->set($body)
+      ->where(['id' => $user->id]);
+
+    try {
+      $update->execute();
+      return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User updated successfully']);
+    } catch (\Exception $e) {
+      return new JsonResponse(new StatusCode(StatusCode::INTERNAL_SERVER_ERROR), ['message' => 'Failed to update user', 'error' => $e->getMessage()]);
     }
   }
 
@@ -208,7 +244,7 @@ class UserController
       $updateUserAuthCodes->table(AuthCode::class)
         ->set(['active' => false])
         ->where(['user_id' => $userFromToken->id]);
-      $updateUserAuthCodes->execute();  
+      $updateUserAuthCodes->execute();
 
       $newAuthCode = AuthCode::create($userFromToken->id);
       AuthCode::send($user->number, $newAuthCode['code']);
