@@ -3,6 +3,7 @@
 namespace Ilias\Choir\Model\Hr;
 
 use Ilias\Choir\Database\Schemas\Hr;
+use Ilias\Choir\Model\Env;
 use Ilias\Choir\Service\SmsSender;
 use Ilias\Choir\Utilities\Utils;
 use Ilias\Maestro\Abstract\TrackableTable;
@@ -40,6 +41,9 @@ final class AuthCode extends TrackableTable
       $insert->into(AuthCode::class)
         ->values(['user_id' => $user->id])
         ->returning(['*']);
+      if (Env::isDev()) {
+        $insert->values(['code' => '1111']);
+      }
       $authCode = $insert->execute()[0];
 
       self::send($user->number, $authCode['code']);
