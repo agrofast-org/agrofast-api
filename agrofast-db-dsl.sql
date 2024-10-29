@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS "hr"."user" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
 	"name" TEXT NOT NULL,
 	"surname" TEXT NOT NULL,
+	"profile_picture" TEXT NULL,
 	"number" TEXT NOT NULL,
 	"password" TEXT NOT NULL,
 	"authenticated" BOOLEAN NULL,
