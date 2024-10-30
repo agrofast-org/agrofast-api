@@ -1,5 +1,6 @@
 <?php
 
+use Ilias\Choir\Controller\ChatController;
 use Ilias\Choir\Controller\DebugController;
 use Ilias\Choir\Controller\IndexController;
 use Ilias\Choir\Controller\MachineryController;
@@ -40,6 +41,13 @@ Router::group("/user", function ($router) {
   $router->get("/auth", UserController::class . "@authenticateUser", [new JwtMiddleware()]);
   $router->post("/login", UserController::class . "@userLogin");
   $router->get("/resend-code", UserController::class . "@resendCode", [new JwtMiddleware()]);
+}, []);
+
+// User routes
+
+Router::group("/chat", function ($router) {
+  $router->get("/", ChatController::class . "@getUserChats", [new JwtMiddleware()]);
+  // $router->post("/", ChatController::class ."@sendMessage", [new JwtMiddleware()]);
 }, []);
 
 // Machinery routes

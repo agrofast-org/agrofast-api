@@ -17,7 +17,6 @@ use Ilias\Maestro\Types\Timestamp;
 use Ilias\Opherator\JsonResponse;
 use Ilias\Opherator\Request;
 use Ilias\Opherator\Request\StatusCode;
-use Ilias\Rhetoric\Router\Router;
 
 class UserController
 {

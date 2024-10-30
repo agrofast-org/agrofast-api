@@ -5,6 +5,7 @@ namespace Ilias\Choir\Model\Chat;
 use Ilias\Choir\Database\Schemas\Chat;
 use Ilias\Choir\Model\Hr\User;
 use Ilias\Maestro\Abstract\TrackableTable;
+use Ilias\Maestro\Database\Expression;
 use Ilias\Maestro\Database\Insert;
 use Ilias\Maestro\Database\Select;
 use Ilias\Maestro\Database\Transaction;
@@ -55,10 +56,27 @@ final class Message extends TrackableTable
 
   public static function getUserChats(int $userId)
   {
+    $subSelect = new Select();
+    $subSelect->from(['m' => Message::class], ['from_user_id', 'last_message_time' => new Expression("MAX(created_in)")])
+      ->group(['from_user_id']);
     $select = new Select();
-    $select->from(['m'=> Message::class])
-      ->where(['to_user_id' => $userId])
-      ->group(['from_user_id'])
-      ->order('created_at', 'desc');
+    $select->from(['m' => Message::class], ['message', 'from_user_id'])
+      ->join(['u' => User::class], 'u.id = m.to_user_id', ['name'])
+      ->join (['lm'=> $subSelect],'m.from_user_id = lm.from_user_id AND m.created_in = lm.last_message_time', [])
+      ->where(['m.to_user_id' => $userId]);
+    return $select->execute() ?? null;
   }
 }
+
+/*
+SELECT m.message, m.from_user_id, u.name
+FROM chat.message m
+INNER JOIN hr."user" u ON u.id = m.from_user_id
+INNER JOIN (
+    SELECT from_user_id, MAX(
+            created_in) AS last_message_time
+    FROM chat.message
+    GROUP BY from_user_id
+) AS lm ON m.from_user_id = lm.from_user_id AND m.created_in = lm.last_message_time
+WHERE m.to_user_id = 6;
+*/

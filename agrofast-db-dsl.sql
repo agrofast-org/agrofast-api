@@ -111,6 +111,7 @@ CREATE TABLE IF NOT EXISTS "chat"."message" (
 	"to_user_id" INTEGER NOT NULL,
 	"answer_to" INTEGER NULL,
 	"message" TEXT NOT NULL,
+	"is_read" BOOLEAN NULL,
 	"active" BOOLEAN NULL DEFAULT TRUE,
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 	"updated_in" TIMESTAMP NULL,
