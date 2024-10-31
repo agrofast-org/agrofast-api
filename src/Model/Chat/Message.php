@@ -17,23 +17,27 @@ final class Message extends TrackableTable
   /** @primary */
   public Serial|int $id;
   /** @not_nuable */
-  public User|int $fromUserId;
+  public User|int $userId;
   /** @not_nuable */
-  public User|int $toUserId;
+  public Chat|int $chatId;
   /** @nuable */
   public Message|int|null $answerTo = null;
   /** @not_nuable */
   public string $message;
-  public bool $isRead = false;
 
-  public function compose(string $message): void
-  {
+  public function compose(
+    int $userId,
+    int $chatId,
+    string $message
+  ): void {
+    $this->userId = $userId;
+    $this->chatId = $chatId;
     $this->message = $message;
   }
 
-  public static function sendMessage(int $fromUserId, int $toUserId, string $message, int $answerTo = null): self
+  public static function sendMessage(int $userId, int $chatId, string $message, int $answerTo = null): self
   {
-    $message = new self($fromUserId, $toUserId, $message);
+    $message = new self($userId, $chatId, $message);
     if (!empty($answerTo)) {
       $message->answerTo = $answerTo;
     }
@@ -62,7 +66,7 @@ final class Message extends TrackableTable
     $select = new Select();
     $select->from(['m' => Message::class], ['message', 'from_user_id'])
       ->join(['u' => User::class], 'u.id = m.to_user_id', ['name'])
-      ->join (['lm'=> $subSelect],'m.from_user_id = lm.from_user_id AND m.created_in = lm.last_message_time', [])
+      ->join(['lm' => $subSelect], 'm.from_user_id = lm.from_user_id AND m.created_in = lm.last_message_time', [])
       ->where(['m.to_user_id' => $userId]);
     return $select->execute() ?? null;
   }

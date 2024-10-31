@@ -27,6 +27,7 @@ final class User extends TrackableTable
   public string $surname;
   public string $profile_picture;
   public string $number;
+  public string $email = null;
   public string $password;
   public bool $authenticated = false;
 

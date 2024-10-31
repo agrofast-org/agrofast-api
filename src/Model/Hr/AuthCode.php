@@ -19,6 +19,7 @@ final class AuthCode extends TrackableTable
   /** @not_nuable */
   public User|int $userId;
   public string|Expression $code = 'generate_four_digit_auth_code()';
+  public int $attempts = 0;
 
   public function __construct($params)
   {
