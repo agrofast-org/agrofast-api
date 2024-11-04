@@ -11,10 +11,10 @@ use Ilias\Maestro\Types\Postgres;
 
 final class AgrofastDB extends Database
 {
-  public Hr $Hr;
-  public Transport $Transport;
-  public Chat $Chat;
-  public System $System;
+  public Hr $hr;
+  public Transport $transport;
+  public Chat $chat;
+  public System $system;
 
   public function __construct()
   {

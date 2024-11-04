@@ -17,7 +17,7 @@ PDOConnection::get(dbHost: "localhost");
 $coreDatabase = new Manager();
 $agrofastDB = new AgrofastDB();
 
-print implode("\n", $coreDatabase->createDatabase($agrofastDB, true)) . "\n";
+print implode("\n", $coreDatabase->createDatabase($agrofastDB, false)) . "\n";
 
 // $user = User::fetchAll()[0];
 // $user->name = "Murilo Elias";

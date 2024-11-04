@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS "hr"."auth_code" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
 	"user_id" INTEGER NOT NULL,
 	"code" TEXT NOT NULL DEFAULT generate_four_digit_auth_code(),
+	"attempts" INTEGER NULL,
 	"active" BOOLEAN NULL DEFAULT TRUE,
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 	"updated_in" TIMESTAMP NULL,
@@ -48,6 +49,7 @@ CREATE TABLE IF NOT EXISTS "hr"."user" (
 	"surname" TEXT NOT NULL,
 	"profile_picture" TEXT NULL,
 	"number" TEXT NOT NULL,
+	"email" TEXT NULL,
 	"password" TEXT NOT NULL,
 	"authenticated" BOOLEAN NULL,
 	"active" BOOLEAN NOT NULL DEFAULT TRUE,
@@ -105,17 +107,30 @@ CREATE TABLE IF NOT EXISTS "transport"."carrier" (
 	"updated_in" TIMESTAMP NULL,
 	"inactivated_in" TIMESTAMP NULL
 );
+CREATE TABLE IF NOT EXISTS "chat"."chat_user" (
+	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
+	"chat_id" TEXT NOT NULL,
+	"user_id" INTEGER NOT NULL,
+	"active" BOOLEAN NULL DEFAULT TRUE,
+	"joined_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+	"left_in" TIMESTAMP NULL
+);
 CREATE TABLE IF NOT EXISTS "chat"."message" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
-	"from_user_id" INTEGER NOT NULL,
-	"to_user_id" INTEGER NOT NULL,
+	"user_id" INTEGER NOT NULL,
+	"chat_id" TEXT NOT NULL,
 	"answer_to" INTEGER NULL,
 	"message" TEXT NOT NULL,
-	"is_read" BOOLEAN NULL,
 	"active" BOOLEAN NULL DEFAULT TRUE,
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 	"updated_in" TIMESTAMP NULL,
 	"inactivated_in" TIMESTAMP NULL
+);
+CREATE TABLE IF NOT EXISTS "chat"."reactions" (
+	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
+	"message_id" INTEGER NOT NULL,
+	"user_id" INTEGER NOT NULL,
+	"element" TEXT NOT NULL
 );
 CREATE TABLE IF NOT EXISTS "system"."error_log" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
@@ -134,6 +149,8 @@ ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_request_id FOREIGN KEY (
 ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_carrier_id FOREIGN KEY ("carrier_id") REFERENCES "transport"."carrier"("id");
 ALTER TABLE "transport"."request" ADD CONSTRAINT fk_request_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "transport"."carrier" ADD CONSTRAINT fk_carrier_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_from_user_id FOREIGN KEY ("from_user_id") REFERENCES "hr"."user"("id");
-ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_to_user_id FOREIGN KEY ("to_user_id") REFERENCES "hr"."user"("id");
+ALTER TABLE "chat"."chat_user" ADD CONSTRAINT fk_chat_user_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
+ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "chat"."message" ADD CONSTRAINT fk_message_answer_to FOREIGN KEY ("answer_to") REFERENCES "chat"."message"("id");
+ALTER TABLE "chat"."reactions" ADD CONSTRAINT fk_reactions_message_id FOREIGN KEY ("message_id") REFERENCES "chat"."message"("id");
+ALTER TABLE "chat"."reactions" ADD CONSTRAINT fk_reactions_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");

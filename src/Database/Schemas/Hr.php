@@ -6,8 +6,6 @@ use Ilias\Choir\Model\Hr\AuthCode;
 use Ilias\Choir\Model\Hr\ContactType;
 use Ilias\Choir\Model\Hr\Document;
 use Ilias\Choir\Model\Hr\DocumentType;
-use Ilias\Choir\Model\Hr\Profile;
-use Ilias\Choir\Model\Hr\ProfileType;
 use Ilias\Choir\Model\Hr\Session;
 use Ilias\Choir\Model\Hr\User;
 use Ilias\Choir\Model\Hr\UserSettings;
@@ -19,8 +17,6 @@ final class Hr extends Schema
   public ContactType $contactType;
   public Document $document;
   public DocumentType $documentType;
-  public Profile $profile;
-  public ProfileType $profileType;
   public Session $session;
   public User $user;
   public UserSettings $userSettings;

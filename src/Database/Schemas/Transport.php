@@ -13,5 +13,5 @@ final class Transport extends Schema
   public Machinery $machinery;
   public Offer $offer;
   public Request $request;
-  public Carrier $Carrier;
+  public Carrier $carrier;
 }
