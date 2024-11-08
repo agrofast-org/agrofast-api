@@ -112,15 +112,21 @@ class UserController
         ->values($user)
         ->returning(['id', 'name', 'number']);
 
-
       $result = $insert->execute()[0];
       if ($result) {
         $authCode = AuthCode::create($result['id']);
+
 
         $result['created_in'] = $authCode['created_in'];
 
         $transaction->commit();
         $jwt = JWT::encode($result, getenv('APP_JWT_SECRET'), 'HS256');
+
+        $insertSession = new Insert();
+        $insertSession->into(Session::class)
+          ->values(['user_id' => $user->id, 'token' => $jwt]);
+        $insertSession->execute();
+
         return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User created and auth code sent', 'token' => $jwt]);
       }
       $transaction->rollback();
@@ -172,7 +178,7 @@ class UserController
     $transaction->begin();
 
     try {
-      $authCode = AuthCode::fetchRow(['user_id' => $user->id, 'code' => $query['code'], 'active' => true]);
+      $authCode = AuthCode::fetchRow(['user_id' => $user->id, 'code' => $query['code'], 'token' => $token, 'active' => true]);
       if ($authCode) {
         $updateUser = new Update();
         $updateUser->table(User::class)
@@ -183,27 +189,36 @@ class UserController
           ->set(['active' => false])
           ->where(['user_id' => $user->id]);
 
-        $insertSession = new Insert();
-        $insertSession->into(Session::class)
-          ->values(['user_id' => $user->id, 'token' => ''])
-          ->returning(['id', 'created_in']);
-
         $updateUser->execute();
         $updateAuthCode->execute();
-        $session = $insertSession->execute()[0];
-        $user->session_id = $session['id'];
 
-        $jwtData = [
-          'id' => $user->id,
-          'name' => $user->name,
-          'number' => $user->number,
-          'session_id' => $user->session_id,
-          'session_ts' => $session['created_in'],
-        ];
-        $token = JWT::encode($jwtData, getenv('APP_JWT_SECRET'), 'HS256');
+        $selectSession = new Select();
+        $selectSession->from(['s' => Session::class])
+          ->where(['s.user_id' => $user->id, 'authenticated' => false, 'token' => $token], Query::AND , Query::EQUALS);
 
-        $transaction->commit();
-        return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User authenticated', 'token' => $token, 'data' => $user]);
+        $session = $selectSession->execute()[0];
+        if (!empty($session)) {
+          $sessionUpdate = new Update();
+          $sessionUpdate->table(User::class)
+            ->set(['authenticated' => true])
+            ->where(['id' => $session->id]);
+          $sessionUpdate->execute();
+
+          $user->session_id = $session['id'];
+
+          $jwtData = [
+            'id' => $user->id,
+            'name' => $user->name,
+            'number' => $user->number,
+            'session_id' => $user->session_id,
+            'session_ts' => $session['created_in'],
+          ];
+          $token = JWT::encode($jwtData, getenv('APP_JWT_SECRET'), 'HS256');
+
+          $transaction->commit();
+          return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'User authenticated', 'token' => $token, 'data' => $user]);
+        }
+        return new JsonResponse(new StatusCode(StatusCode::NOT_FOUND), ['message' => 'No session found']);
       }
       $transaction->rollback();
       return new JsonResponse(new StatusCode(StatusCode::BAD_REQUEST), ['message' => 'No matching code found']);
@@ -289,6 +304,8 @@ class UserController
       $updateUserAuthCodes->execute();
 
       $newAuthCode = AuthCode::create((int) $user->id);
+      $insertSession = new Insert();
+
 
       $transaction->commit();
       $jwtData = [
@@ -297,7 +314,13 @@ class UserController
         'number' => $user->number,
         'created_in' => $newAuthCode['created_in'],
       ];
+
       $jwt = JWT::encode($jwtData, getenv('APP_JWT_SECRET'), 'HS256');
+      $insertSession->into(Session::class)
+        ->values(['user_id' => $user->id, 'token' => $jwt])
+        ->returning(['id', 'created_in']);
+      $insertSession->execute();
+
       return new JsonResponse(new StatusCode(StatusCode::OK), ['message' => 'Login code sent', 'token' => $jwt]);
     }
     $transaction->rollback();

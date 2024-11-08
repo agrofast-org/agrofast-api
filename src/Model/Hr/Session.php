@@ -14,7 +14,11 @@ final class Session extends TrackableTable
   /** @not_nuable */
   public User|int $userId;
   /** @not_nuable */
-  public string $token;
+  public AuthCode|int $authCodeId;
+  /** @not_nuable */
+  public bool $authenticated = false;
+  /** @not_nuable */
+  public string $tempToken;
 
   public function compose()
   {
