@@ -37,7 +37,9 @@ CREATE TABLE IF NOT EXISTS "hr"."document_type" (
 CREATE TABLE IF NOT EXISTS "hr"."session" (
 	"id" SERIAL NOT NULL PRIMARY KEY UNIQUE,
 	"user_id" INTEGER NOT NULL,
-	"token" TEXT NOT NULL,
+	"auth_code_id" INTEGER NOT NULL,
+	"authenticated" BOOLEAN NOT NULL,
+	"temp_token" TEXT NOT NULL,
 	"active" BOOLEAN NULL DEFAULT TRUE,
 	"created_in" TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
 	"updated_in" TIMESTAMP NULL,
@@ -142,6 +144,7 @@ ALTER TABLE "hr"."auth_code" ADD CONSTRAINT fk_auth_code_user_id FOREIGN KEY ("u
 ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "hr"."document" ADD CONSTRAINT fk_document_document_type FOREIGN KEY ("document_type") REFERENCES "hr"."document_type"("id");
 ALTER TABLE "hr"."session" ADD CONSTRAINT fk_session_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
+ALTER TABLE "hr"."session" ADD CONSTRAINT fk_session_auth_code_id FOREIGN KEY ("auth_code_id") REFERENCES "hr"."auth_code"("id");
 ALTER TABLE "hr"."user_settings" ADD CONSTRAINT fk_user_settings_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "transport"."machinery" ADD CONSTRAINT fk_machinery_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");
 ALTER TABLE "transport"."offer" ADD CONSTRAINT fk_offer_user_id FOREIGN KEY ("user_id") REFERENCES "hr"."user"("id");

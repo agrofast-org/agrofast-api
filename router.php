@@ -48,7 +48,7 @@ Router::group("/user", function ($router) {
 Router::group("/chat", function ($router) {
   $router->get("/", ChatController::class . "@getUserChats", [new JwtMiddleware()]);
   // $router->post("/", ChatController::class ."@sendMessage", [new JwtMiddleware()]);
-}, []);
+}, [new AuthUserMiddleware()]);
 
 // Machinery routes
 

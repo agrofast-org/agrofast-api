@@ -1,13 +1,9 @@
 <?php
+
 use Ilias\Choir\Database\AgrofastDB;
-use Ilias\Choir\Model\Hr\User;
-use Ilias\Choir\Service\SmsSender;
 use Ilias\Dotenv\Environment;
-use Ilias\Maestro\Core\Maestro;
 use Ilias\Maestro\Core\Manager;
-use Ilias\Maestro\Database\Insert;
 use Ilias\Maestro\Database\PDOConnection;
-use Ilias\Maestro\Types\Timestamp;
 
 require_once("./vendor/autoload.php");
 
@@ -17,7 +13,7 @@ PDOConnection::get(dbHost: "localhost");
 $coreDatabase = new Manager();
 $agrofastDB = new AgrofastDB();
 
-print implode("\n", $coreDatabase->createDatabase($agrofastDB, false)) . "\n";
+print implode("\n", $coreDatabase->createDatabase($agrofastDB, true)) . "\n";
 
 // $user = User::fetchAll()[0];
 // $user->name = "Murilo Elias";

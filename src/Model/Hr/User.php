@@ -73,6 +73,13 @@ final class User extends TrackableTable
     if (!empty($passwordErr)) {
       $arErr["password"] = $passwordErr;
     }
+    if ($params["password"] !== $params["password_confirm"]) {
+      $arErr["password_confirm"] = "password_not_coincide_message";
+      $arErr["password"][] = "password_not_coincide_message";
+    }
+    if (empty($params["password_confirm"])) {
+      $arErr["password_confirm"] = "password_confirm_required_message";
+    }
     return $arErr;
   }
 
