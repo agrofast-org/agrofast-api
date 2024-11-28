@@ -1,7 +1,7 @@
-# Acessando o Banco de Dados Localhost com Ngrok
+# Agrofast API
 
-Usar ngrok para conseguir acessar o banco de dados localhost(testes)
+Use o seguinte comando para iniciar o serviços da API
 
 ```bash
-ngrok tcp 5432
+docker compose -b
 ```
