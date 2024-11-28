@@ -1,34 +1,5 @@
 services:
-  api:
-    container_name: agrofast-api
-    build:
-      context: .
-      dockerfile: Dockerfile
-    restart: always
-    working_dir: /var/www
-
-    volumes:
-      - ./:/var/www
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    depends_on:
-      - database
-      - httpserver
-
-  database:
-    container_name: agrofast-db
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_DB: $DB_DATABASE
-      POSTGRES_PASSWORD: $DB_PASSWORD
-      POSTGRES_HOST_AUTH_METHOD: trust
-      PGDATA: /data/postgres
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  httpserver:
+  agrofast-nginx:
     container_name: agrofast-nginx
     image: nginx:alpine
     restart: always
@@ -38,8 +9,49 @@ services:
     volumes:
       - ./:/var/www
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+    networks:
+      - agrofast-network
+
+  agrofast-php-fpm:
+    container_name: agrofast-php-fpm
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: always
+    working_dir: /var/www
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./:/var/www
+      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    depends_on:
+      - agrofast-postgres
+      - agrofast-nginx
+    networks:
+      - agrofast-network
+
+  agrofast-postgres:
+    container_name: agrofast-postgres
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: trust
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - agrofast-network
 
 volumes:
   postgres:
   cache:
     driver: local
+
+networks:
+  agrofast-network:
+    driver: bridge
