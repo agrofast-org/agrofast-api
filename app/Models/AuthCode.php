@@ -36,22 +36,17 @@ class AuthCode extends Model
     if (!$user) {
       throw new \Exception('User not found');
     }
-
     if (!self::validatePhoneNumber($user->number)) {
       throw new \Exception('Invalid phone number');
     }
-
     $code = env('APP_ENV') === 'local' ? '1111' : rand(1000, 9999);
-
     self::where('user_id', $userId)->update(['active' => false]);
-
     $authCode = self::create([
       'user_id' => $userId,
       'code' => $code,
     ]);
 
     SmsSender::send($user->number, "Seu código de autenticação para o Agrofast é: {$code}");
-
     return $authCode;
   }
 
