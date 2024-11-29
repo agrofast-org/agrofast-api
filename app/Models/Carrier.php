@@ -9,6 +9,7 @@ class Carrier extends Model
 {
   use HasFactory;
 
+  protected $table = 'carrier';
   protected $fillable = [
     'user_id',
     'name',

@@ -9,6 +9,8 @@ services:
     volumes:
       - ./:/var/www
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+    environment:
+      - SERVER_NAME=agrofast.api.com
     networks:
       - agrofast-network
 

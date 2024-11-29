@@ -10,7 +10,7 @@ use Throwable;
 class Message extends Model
 {
   use HasFactory;
-
+  protected $table = 'message';
   protected $fillable = [
     'user_id',
     'chat_id',
@@ -70,16 +70,16 @@ class Message extends Model
   }
 
   /**
-   * Retrieve chats for a user.
+   * Retrieve chat for a user.
    *
    * @param int $userId
    * @return \Illuminate\Support\Collection|null
    */
-  public static function getUserChats(int $userId)
+  public static function getUserchat(int $userId)
   {
-    return DB::table('messages as m')
+    return DB::table('message as m')
       ->select('m.message', 'm.user_id', 'u.name', DB::raw('MAX(m.created_at) as last_message_time'))
-      ->join('users as u', 'u.id', '=', 'm.user_id')
+      ->join('user as u', 'u.id', '=', 'm.user_id')
       ->where('m.chat_id', $userId)
       ->groupBy('m.user_id', 'm.message', 'u.name')
       ->get();

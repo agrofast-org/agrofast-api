@@ -11,12 +11,12 @@ use Illuminate\Support\Facades\Auth;
 class MessageController extends Controller
 {
   /**
-   * Retrieve messages for a specific chat.
+   * Retrieve message for a specific chat.
    *
    * @param string $chatUuid
    * @return JsonResponse
    */
-  public function getMessages(string $chatUuid): JsonResponse
+  public function getmessage(string $chatUuid): JsonResponse
   {
     $chat = Chat::where('uuid', $chatUuid)->first();
 
@@ -24,10 +24,10 @@ class MessageController extends Controller
       return response()->json(['message' => 'Chat not found'], 404);
     }
 
-    $messages = $chat->messages()->orderBy('created_at', 'asc')->get();
+    $message = $chat->message()->orderBy('created_at', 'asc')->get();
 
     return response()->json([
-      'data' => $messages,
+      'data' => $message,
     ], 200);
   }
 
@@ -42,9 +42,9 @@ class MessageController extends Controller
     $user = Auth::user();
 
     $validated = $request->validate([
-      'chat_id' => 'required|exists:chats,uuid',
+      'chat_id' => 'required|exists:chat,uuid',
       'message' => 'required|string',
-      'answer_to' => 'nullable|exists:messages,id',
+      'answer_to' => 'nullable|exists:message,id',
     ]);
 
     try {

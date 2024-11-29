@@ -9,6 +9,7 @@ class Chat extends Model
 {
   use HasFactory;
 
+  protected $table = 'chat';
   protected $primaryKey = 'uuid';
   public $incrementing = false;
   protected $keyType = 'string';
@@ -21,14 +22,14 @@ class Chat extends Model
   ];
 
   /**
-   * Get the messages for the chat.
+   * Get the message for the chat.
    *
    * @param string $chatUuid
    * @return \Illuminate\Database\Eloquent\Collection
    */
-  public function getMessages(string $chatUuid)
+  public function getmessage(string $chatUuid)
   {
-    return $this->messages()
+    return $this->message()
       ->where('uuid', $chatUuid)
       ->orderBy('created_at', 'ASC')
       ->take(50)
@@ -40,7 +41,7 @@ class Chat extends Model
    *
    * @return \Illuminate\Database\Eloquent\Relations\HasMany
    */
-  public function messages()
+  public function message()
   {
     return $this->hasMany(Message::class, 'chat_uuid', 'uuid');
   }

@@ -4,11 +4,10 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateChatsTable extends Migration
-{
+return new class extends Migration {
   public function up()
   {
-    Schema::create('chats', function (Blueprint $table) {
+    Schema::create('chat', function (Blueprint $table) {
       $table->uuid('uuid')->primary();
       $table->string('name')->nullable();
       $table->string('picture')->nullable();
@@ -19,6 +18,6 @@ class CreateChatsTable extends Migration
 
   public function down()
   {
-    Schema::dropIfExists('chats');
+    Schema::dropIfExists('chat');
   }
-}
+};

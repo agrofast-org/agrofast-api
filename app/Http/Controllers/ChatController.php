@@ -9,20 +9,20 @@ use Illuminate\Http\JsonResponse;
 class ChatController extends Controller
 {
   /**
-   * Retrieve chats for the authenticated user.
+   * Retrieve chat for the authenticated user.
    *
    * @return JsonResponse
    */
-  public function getUserChats(): JsonResponse
+  public function getUserchat(): JsonResponse
   {
     // Retrieve the authenticated user
     $user = Auth::user();
 
-    // Fetch chats for the authenticated user
-    $chats = Message::getUserChats($user->id);
+    // Fetch chat for the authenticated user
+    $chat = Message::getUserchat($user->id);
 
     return response()->json([
-      'data' => $chats,
+      'data' => $chat,
     ], 200);
   }
 }

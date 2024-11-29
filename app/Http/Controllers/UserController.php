@@ -79,7 +79,7 @@ class UserController extends Controller
     $validated = $request->validate([
       'name' => 'required|string|max:255',
       'surname' => 'required|string|max:255',
-      'number' => 'required|string|max:255|unique:users,number',
+      'number' => 'required|string|max:255|unique:user,number',
       'password' => 'required|string|min:8|confirmed',
     ]);
 
@@ -108,7 +108,7 @@ class UserController extends Controller
     $validated = $request->validate([
       'name' => 'sometimes|string|max:255',
       'surname' => 'sometimes|string|max:255',
-      'number' => 'sometimes|string|max:255|unique:users,number,' . $user->id,
+      'number' => 'sometimes|string|max:255|unique:user,number,' . $user->id,
     ]);
 
     $user->update($validated);

@@ -4,12 +4,10 @@ namespace App\Models;
 
 use App\Services\SmsSender;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
 
 class AuthCode extends Model
 {
+  protected $table = 'auth_code';
   protected $fillable = [
     'user_id',
     'code',

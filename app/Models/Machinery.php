@@ -9,6 +9,7 @@ class Machinery extends Model
 {
   use HasFactory;
 
+  protected $table = 'machinery';
   protected $fillable = [
     'user_id',
     'name',
