@@ -8,21 +8,21 @@ use Illuminate\Http\JsonResponse;
 
 class ChatController extends Controller
 {
-  /**
-   * Retrieve chat for the authenticated user.
-   *
-   * @return JsonResponse
-   */
-  public function getUserchat(): JsonResponse
-  {
-    // Retrieve the authenticated user
-    $user = Auth::user();
+    /**
+     * Retrieve chat for the authenticated user.
+     *
+     * @return JsonResponse
+     */
+    public function getUserchat(): JsonResponse
+    {
+        // Retrieve the authenticated user
+        $user = Auth::user();
 
-    // Fetch chat for the authenticated user
-    $chat = Message::getUserchat($user->id);
+        // Fetch chat for the authenticated user
+        $chat = Message::getUserchat($user->id);
 
-    return response()->json([
-      'data' => $chat,
-    ], 200);
-  }
+        return response()->json([
+          'data' => $chat,
+        ], 200);
+    }
 }

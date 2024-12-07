@@ -9,40 +9,41 @@ use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
-  use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
-  protected $table = 'user';
-  protected $fillable = [
-    'name',
-    'surname',
-    'profile_picture',
-    'number',
-    'email',
-    'authenticated',
-    'active',
-  ];
+    protected $table    = 'user';
+    protected $fillable = [
+      'name',
+      'surname',
+      'profile_picture',
+      'number',
+      'email',
+      'authenticated',
+      'active',
+    ];
 
-  protected $casts = [
-    'authenticated' => 'boolean',
-    'active' => 'boolean',
-  ];
+    protected $casts = [
+      'authenticated' => 'boolean',
+      'active'        => 'boolean',
+    ];
 
-  protected $dates = [
-    'created_at',
-    'updated_at',
-    'inactivated_at',
-  ];
+    protected $dates = [
+      'created_at',
+      'updated_at',
+      'inactivated_at',
+    ];
 
-  protected $hidden = [
-    'password',
-    'remember_token',
-  ];
+    protected $hidden = [
+      'password',
+      'remember_token',
+    ];
 
-  /**
-   * Mutator to hash the password.
-   */
-  public function setPasswordAttribute($value)
-  {
-    $this->attributes['password'] = Hash::make($value);
-  }
+    /**
+     * Mutator to hash the password.
+     */
+    public function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::make($value);
+    }
 }
