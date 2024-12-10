@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('requests', function (Blueprint $table) {
+        Schema::create('transport.requests', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('user')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('origin');
             $table->string('destination');
             $table->timestamp('desired_date');
@@ -21,6 +21,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('requests');
+        Schema::dropIfExists('transport.requests');
     }
 };

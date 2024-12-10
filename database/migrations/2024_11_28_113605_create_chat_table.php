@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up()
     {
-        Schema::create('chat', function (Blueprint $table) {
+        Schema::create('chat.chat', function (Blueprint $table) {
             $table->uuid('uuid')->primary();
             $table->string('name')->nullable();
             $table->string('picture')->nullable();
@@ -18,6 +18,6 @@ return new class () extends Migration {
 
     public function down()
     {
-        Schema::dropIfExists('chat');
+        Schema::dropIfExists('chat.chat');
     }
 };

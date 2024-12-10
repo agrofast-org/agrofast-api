@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('offers', function (Blueprint $table) {
+        Schema::create('transport.offers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('user')->onDelete('cascade');
-            $table->foreignId('request_id')->constrained('requests')->onDelete('cascade');
-            $table->foreignId('carrier_id')->constrained('carriers')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
+            $table->foreignId('request_id')->constrained('transport.requests')->onDelete('cascade');
+            $table->foreignId('carrier_id')->constrained('transport.carriers')->onDelete('cascade');
             $table->decimal('price', 10, 2);
             $table->boolean('active')->default(true);
             $table->timestamps();
@@ -21,6 +21,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('offers');
+        Schema::dropIfExists('transport.offers');
     }
 };

@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('carriers', function (Blueprint $table) {
+        Schema::create('transport.carriers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('user')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('name');
             $table->string('model');
             $table->string('plate')->unique();
@@ -21,6 +21,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('carriers');
+        Schema::dropIfExists('transport.carriers');
     }
 };
