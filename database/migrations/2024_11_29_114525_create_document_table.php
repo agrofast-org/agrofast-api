@@ -2,12 +2,15 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('document', function (Blueprint $table) {
+        DB::statement('CREATE SCHEMA IF NOT EXISTS hr');
+
+        Schema::create('hr.document', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->integer('document_type');
@@ -20,6 +23,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('chat.document');
+        Schema::dropIfExists('hr.document');
     }
 };

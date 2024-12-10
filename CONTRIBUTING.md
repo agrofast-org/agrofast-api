@@ -96,7 +96,46 @@ Os commits devem ser claros, concisos e seguir o seguinte formato:
 
 ---
 
-## **4. Boas Práticas**
+## **4. Sempre usar php-cs-fixer**
+
+1. **Download do arquivo `.phar`:**
+   Use `curl` ou `wget` para baixar a ultima versão do `php-cs-fixer`:
+
+   ```bash
+   curl -L https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/latest/download/php-cs-fixer.phar -o php-cs-fixer
+   ```
+
+2. **Transformar em um arquivo executável:**
+   Mude as permissões do arquivo:
+
+   ```bash
+   chmod +x php-cs-fixer
+   ```
+
+3. **Mover para um diretório no seu PATH:**
+    Mova o arquivo para um local no seu PATH, como `/usr/local/bin`:
+
+    ```bash
+    sudo mv php-cs-fixer /usr/local/bin/php-cs-fixer
+    ```
+
+4. **Verificar a instalação:**
+    Certifique-se de que está acessível globalmente:
+
+    ```bash
+    php-cs-fixer --version
+    ```
+
+5. **Executar o comando:**
+    Agora execute o comando no terminal:
+
+    ```bash
+    php-cs-fixer fix
+    ```
+
+---
+
+## **5. Boas Práticas**
 
 - **Pequenas Alterações:** Divida grandes mudanças em commits ou pull requests menores.
 - **Comentários Claros:** Descreva por que você fez as mudanças, não apenas o que mudou.

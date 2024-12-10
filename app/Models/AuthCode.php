@@ -7,8 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class AuthCode extends Model
 {
-    protected $table    = 'auth_code';
-    protected $fillable = [
+    protected $schema    = 'hr';
+    protected $table     = 'auth_code';
+    protected $fillable  = [
       'user_id',
       'code',
       'attempts',

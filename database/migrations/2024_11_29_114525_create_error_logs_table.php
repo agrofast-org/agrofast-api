@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('error_logs', function (Blueprint $table) {
+        DB::statement('CREATE SCHEMA IF NOT EXISTS system');
+
+        Schema::create('system.error_logs', function (Blueprint $table) {
             $table->id();
             $table->text('json');
             $table->text('params');
@@ -18,6 +20,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('error_logs');
+        Schema::dropIfExists('system.error_logs');
     }
 };

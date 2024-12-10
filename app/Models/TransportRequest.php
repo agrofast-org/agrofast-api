@@ -8,8 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class TransportRequest extends Model
 {
     use HasFactory;
-    protected $table    = 'transport_request';
-    protected $fillable = [
+
+    protected $schema    = 'transport';
+    protected $table     = 'request';
+    protected $fillable  = [
       'user_id',
       'origin',
       'destination',

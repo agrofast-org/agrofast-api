@@ -12,8 +12,9 @@ class User extends Authenticatable
     use HasFactory;
     use Notifiable;
 
-    protected $table    = 'user';
-    protected $fillable = [
+    protected $schema    = 'hr';
+    protected $table     = 'user';
+    protected $fillable  = [
       'name',
       'surname',
       'profile_picture',

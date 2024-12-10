@@ -8,17 +8,19 @@ use Illuminate\Database\Eloquent\Model;
 class Offer extends Model
 {
     use HasFactory;
+
+    protected $schema   = 'transport';
     protected $table    = 'offer';
     protected $fillable = [
-      'user_id',
-      'request_id',
-      'carrier_id',
-      'float',
-      'active',
+        'user_id',
+        'request_id',
+        'carrier_id',
+        'float',
+        'active',
     ];
 
     protected $attributes = [
-      'active' => true, // Valor padrão
+        'active' => true, // Valor padrão
     ];
 
     /**

@@ -10,8 +10,10 @@ use Throwable;
 class Message extends Model
 {
     use HasFactory;
-    protected $table    = 'message';
-    protected $fillable = [
+
+    protected $schema    = 'chat';
+    protected $table     = 'message';
+    protected $fillable  = [
       'user_id',
       'chat_id',
       'answer_to',

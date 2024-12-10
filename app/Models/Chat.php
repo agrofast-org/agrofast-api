@@ -9,16 +9,17 @@ class Chat extends Model
 {
     use HasFactory;
 
+    protected $schema     = 'chat';
     protected $table      = 'chat';
     protected $primaryKey = 'uuid';
     public $incrementing  = false;
     protected $keyType    = 'string';
 
     protected $fillable = [
-      'uuid',
-      'name',
-      'picture',
-      'is_group',
+        'uuid',
+        'name',
+        'picture',
+        'is_group',
     ];
 
     /**
@@ -31,10 +32,10 @@ class Chat extends Model
     public function getmessage(string $chatUuid)
     {
         return $this->message()
-          ->where('uuid', $chatUuid)
-          ->orderBy('created_at', 'ASC')
-          ->take(50)
-          ->get();
+            ->where('uuid', $chatUuid)
+            ->orderBy('created_at', 'ASC')
+            ->take(50)
+            ->get();
     }
 
     /**
