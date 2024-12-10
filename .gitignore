@@ -6,7 +6,7 @@
 /storage/*.key
 /storage/pail
 /vendor
-# composer.lock
+composer.lock
 .php-cs-fixer.cache
 .env
 .env.backup
