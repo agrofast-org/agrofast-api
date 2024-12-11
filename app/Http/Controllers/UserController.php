@@ -6,10 +6,10 @@ use App\Models\AuthCode;
 use App\Models\User;
 use App\Services\SmsSender;
 use Carbon\Carbon;
+use Firebase\JWT\JWT;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Firebase\JWT\JWT;
 
 class UserController extends Controller
 {
@@ -18,15 +18,15 @@ class UserController extends Controller
      */
     public function getUser(Request $request)
     {
-        $query     = $request->only(['id', 'telephone', 'name']);
+        $query = $request->only(['id', 'telephone', 'name']);
         $userQuery = User::query();
 
-        if (!empty($query['id'])) {
+        if (! empty($query['id'])) {
             $userQuery->where('id', $query['id']);
-        } elseif (!empty($query['telephone'])) {
+        } elseif (! empty($query['telephone'])) {
             $userQuery->where('number', $query['telephone']);
-        } elseif (!empty($query['name'])) {
-            $userQuery->where('name', 'like', '%' . $query['name'] . '%');
+        } elseif (! empty($query['name'])) {
+            $userQuery->where('name', 'like', '%'.$query['name'].'%');
         }
 
         $user = $userQuery->first();
@@ -45,7 +45,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not authenticated'], 401);
         }
 
@@ -58,12 +58,12 @@ class UserController extends Controller
     public function checkIfExists(Request $request)
     {
         $validated = $request->validate([
-          'number' => 'required|string|max:255',
+            'number' => 'required|string|max:255',
         ]);
 
         $user = User::where('number', $validated['number'])->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
@@ -77,15 +77,43 @@ class UserController extends Controller
     {
         $validated = User::validateInsert($request->all());
 
-        $user = User::create($validated);
+        if (! empty($validated)) {
+            return response()->json(['message' => 'Error creating user', 'fields' => $validated], 400);
+        }
+
+        $existingUser = User::where('number', $request->input('number'))->first();
+
+        if ($existingUser) {
+            return response()->json(['message' => 'User already exists'], 400);
+        }
+
+        $user = User::create($request->all());
 
         $jwt = JWT::encode(
-            ['id' => $user->id, 'name' => $user->name, 'number' => $user->number],
+            [
+                'iss' => env('APP_URL'),
+                'sub' => $user->id,
+                'aud' => 'agrofast-app-services',
+                'iat' => now()->timestamp,
+                'jti' => uniqid(),
+                'id' => $user->id,
+                'name' => $user->name,
+                'number' => $user->number,
+            ],
             env('APP_KEY'),
             'HS256'
         );
 
-        return response()->json(['message' => 'User created successfully', 'token' => $jwt], 201);
+        $data = [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'number' => $user->number,
+            ],
+            'token' => $jwt,
+        ];
+
+        return response()->json(['message' => 'User created successfully', 'data' => $data], 201);
     }
 
     /**
@@ -95,15 +123,15 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $validated = $request->validate([
-          'name'    => 'sometimes|string|max:255',
-          'surname' => 'sometimes|string|max:255',
-          'number'  => 'sometimes|string|max:255|unique:user,number,' . $user->id,
-        ]);
+        $validated = User::validateInsert($request->all());
+
+        if (! empty($validated)) {
+            return response()->json(['message' => 'Error creating user', 'fields' => $validated], 400);
+        }
 
         $user->update($validated);
 
@@ -114,20 +142,20 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not authenticated'], 401);
         }
 
         $validated = $request->validate([
-          'code' => 'required|string',
+            'code' => 'required|string',
         ]);
 
         $authCode = AuthCode::where('user_id', $user->id)
-          ->where('active', true)
-          ->orderBy('created_at', 'desc')
-          ->first();
+            ->where('active', true)
+            ->orderBy('created_at', 'desc')
+            ->first();
 
-        if (!$authCode || $authCode->code !== $validated['code']) {
+        if (! $authCode || $authCode->code !== $validated['code']) {
             return response()->json(['message' => 'Invalid authentication code'], 400);
         }
 
@@ -135,7 +163,31 @@ class UserController extends Controller
 
         $user->update(['authenticated' => true]);
 
-        return response()->json(['message' => 'User authenticated successfully'], 200);
+        $jwt = JWT::encode(
+            [
+                'iss' => env('APP_URL'),
+                'sub' => $user->id,
+                'aud' => 'agrofast-app-services',
+                'iat' => now()->timestamp,
+                'jti' => uniqid(),
+                'id' => $user->id,
+                'name' => $user->name,
+                'number' => $user->number,
+            ],
+            env('APP_KEY'),
+            'HS256'
+        );
+
+        $data = [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'number' => $user->number,
+            ],
+            'token' => $jwt,
+        ];
+
+        return response()->json(['message' => 'User authenticated successfully', 'data' => $data], 200);
     }
 
     /**
@@ -145,14 +197,14 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'User not found'], 404);
         }
 
         $recentCode = AuthCode::where('user_id', $user->id)
-          ->where('active', true)
-          ->where('created_at', '>=', Carbon::now()->subMinutes(3))
-          ->first();
+            ->where('active', true)
+            ->where('created_at', '>=', Carbon::now()->subMinutes(3))
+            ->first();
 
         if ($recentCode) {
             SmsSender::send($user->number, "Seu código de autenticação para o Agrofast é: {$recentCode->code}");
@@ -175,13 +227,13 @@ class UserController extends Controller
     public function userLogin(Request $request)
     {
         $validated = $request->validate([
-          'number'   => 'required|string',
-          'password' => 'required|string',
+            'number' => 'required|string',
+            'password' => 'required|string',
         ]);
 
         $user = User::where('number', $validated['number'])->first();
 
-        if (!$user || !Hash::check($validated['password'], $user->password)) {
+        if (! $user || ! Hash::check($validated['password'], $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 

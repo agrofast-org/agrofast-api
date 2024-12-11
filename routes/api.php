@@ -1,16 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CarrierController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MachineryController;
-use App\Http\Controllers\RequestController;
-use App\Http\Controllers\CarrierController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OfferController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\UserController;
+use App\Http\Middleware\BasicAuthMiddleware;
 use App\Http\Middleware\JwtMiddleware;
+use Illuminate\Support\Facades\Route;
 
 // Route::get('/', function () {
 //     return view('welcome');
@@ -44,9 +45,9 @@ Route::prefix('user')->group(function () {
     Route::post('/', [UserController::class, 'createUser']);
     Route::get('/info', [UserController::class, 'getUserInfo'])->middleware(JwtMiddleware::class);
     Route::get('/exists', [UserController::class, 'checkIfExists']);
-    Route::get('/auth', [UserController::class, 'authenticateUser'])->middleware(JwtMiddleware::class);
+    Route::get('/auth', [UserController::class, 'authenticateUser'])->middleware(BasicAuthMiddleware::class);
     Route::post('/login', [UserController::class, 'userLogin']);
-    Route::get('/resend-code', [UserController::class, 'resendCode'])->middleware(JwtMiddleware::class);
+    Route::get('/resend-code', [UserController::class, 'resendCode'])->middleware(BasicAuthMiddleware::class);
 });
 
 // Chat routes

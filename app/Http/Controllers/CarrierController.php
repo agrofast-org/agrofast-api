@@ -16,7 +16,7 @@ class CarrierController extends Controller
      */
     public function listTransports(): JsonResponse
     {
-        $user     = Auth::user();
+        $user = Auth::user();
         $carriers = Carrier::where('user_id', $user->id)->get();
 
         return response()->json(['data' => $carriers], 200);
@@ -34,17 +34,17 @@ class CarrierController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-          'name'  => 'required|string|max:255',
-          'model' => 'required|string|max:255',
-          'plate' => 'required|string|max:255|unique:carriers,plate',
+            'name'  => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'plate' => 'required|string|max:255|unique:carriers,plate',
         ]);
 
         try {
             Carrier::create([
-              'user_id' => $user->id,
-              'name'    => $validated['name'],
-              'model'   => $validated['model'],
-              'plate'   => $validated['plate'],
+                'user_id' => $user->id,
+                'name'    => $validated['name'],
+                'model'   => $validated['model'],
+                'plate'   => $validated['plate'],
             ]);
 
             return response()->json(['message' => 'Carrier created'], 201);
@@ -65,23 +65,23 @@ class CarrierController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-          'id'    => 'required|exists:carriers,id',
-          'name'  => 'required|string|max:255',
-          'model' => 'required|string|max:255',
-          'plate' => 'required|string|max:255|unique:carriers,plate,' . $request->id,
+            'id'    => 'required|exists:carriers,id',
+            'name'  => 'required|string|max:255',
+            'model' => 'required|string|max:255',
+            'plate' => 'required|string|max:255|unique:carriers,plate,'.$request->id,
         ]);
 
         $carrier = Carrier::where('id', $validated['id'])->where('user_id', $user->id)->first();
 
-        if (!$carrier) {
+        if (! $carrier) {
             return response()->json(['message' => 'Carrier not found'], 404);
         }
 
         try {
             $carrier->update([
-              'name'  => $validated['name'],
-              'model' => $validated['model'],
-              'plate' => $validated['plate'],
+                'name'  => $validated['name'],
+                'model' => $validated['model'],
+                'plate' => $validated['plate'],
             ]);
 
             return response()->json(['message' => 'Carrier updated'], 200);
@@ -102,12 +102,12 @@ class CarrierController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-          'id' => 'required|exists:carriers,id',
+            'id' => 'required|exists:carriers,id',
         ]);
 
         $carrier = Carrier::where('id', $validated['id'])->where('user_id', $user->id)->first();
 
-        if (!$carrier) {
+        if (! $carrier) {
             return response()->json(['message' => 'Carrier not found'], 404);
         }
 

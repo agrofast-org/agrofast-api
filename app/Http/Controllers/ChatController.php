@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Message;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class ChatController extends Controller
 {
@@ -22,7 +22,7 @@ class ChatController extends Controller
         $chat = Message::getUserchat($user->id);
 
         return response()->json([
-          'data' => $chat,
+            'data' => $chat,
         ], 200);
     }
 }

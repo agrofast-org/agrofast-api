@@ -14,11 +14,11 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
-        \App\Http\Middleware\TrustHosts::class,
-        \App\Http\Middleware\TrustProxies::class,
+        Middleware\TrustHosts::class,
+        Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
         \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \App\Http\Middleware\TrimStrings::class,
+        Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
     ];
 
@@ -35,7 +35,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
         'api' => [
-            \Illuminate\Routing\Middleware\ThrottleRequests::class . ':api',
+            \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -48,7 +48,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth'             => \App\Http\Middleware\JwtMiddleware::class,
+        'auth'             => Middleware\BasicAuthMiddleware::class,
         'auth.basic'       => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'cache.headers'    => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can'              => \Illuminate\Auth\Middleware\Authorize::class,

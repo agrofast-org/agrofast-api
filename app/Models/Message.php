@@ -11,12 +11,13 @@ class Message extends Model
 {
     use HasFactory;
 
-    protected $table     = 'chat.message';
-    protected $fillable  = [
-      'user_id',
-      'chat_id',
-      'answer_to',
-      'message',
+    protected $table = 'chat.message';
+
+    protected $fillable = [
+        'user_id',
+        'chat_id',
+        'answer_to',
+        'message',
     ];
 
     /**
@@ -53,12 +54,12 @@ class Message extends Model
 
         try {
             $messageData = [
-              'user_id' => $userId,
-              'chat_id' => $chatId,
-              'message' => $message,
+                'user_id' => $userId,
+                'chat_id' => $chatId,
+                'message' => $message,
             ];
 
-            if (!empty($answerTo)) {
+            if (! empty($answerTo)) {
                 $messageData['answer_to'] = $answerTo;
             }
 
@@ -69,7 +70,7 @@ class Message extends Model
             return $newMessage;
         } catch (Throwable $e) {
             DB::rollBack();
-            throw new \Exception('Failed to send message: ' . $e->getMessage());
+            throw new \Exception('Failed to send message: '.$e->getMessage());
         }
     }
 

@@ -9,7 +9,8 @@ class Offer extends Model
 {
     use HasFactory;
 
-    protected $table    = 'transport.offer';
+    protected $table = 'transport.offer';
+
     protected $fillable = [
         'user_id',
         'request_id',

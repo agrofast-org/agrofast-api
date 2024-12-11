@@ -11,55 +11,55 @@ class DebugController extends Controller
     public function showEnvironment(Request $request)
     {
         return response()->json([
-          'message' => ['ping' => 'pong'],
-          'data'    => ['request' => $GLOBALS],
-          'request' => [
-            'request_method' => $request->method(),
-            'params'         => $request->route()->parameters(),
-            'body'           => $request->all(),
-            'query'          => $request->query(),
-          ],
-          'raw_data' => $request->getContent(),
+            'message' => ['ping' => 'pong'],
+            'data'    => ['request' => $GLOBALS],
+            'request' => [
+                'request_method' => $request->method(),
+                'params'         => $request->route()->parameters(),
+                'body'           => $request->all(),
+                'query'          => $request->query(),
+            ],
+            'raw_data' => $request->getContent(),
         ]);
     }
 
     public function showNestedParams(Request $request)
     {
         return response()->json([
-          'request' => [
-            'params' => $request->route()->parameters(),
-            'query'  => $request->query(),
-          ],
+            'request' => [
+                'params' => $request->route()->parameters(),
+                'query'  => $request->query(),
+            ],
         ]);
     }
 
     public function getEnvironmentInstructions()
     {
         return response()->json([
-          'message' => [
-            'instruction' => 'There is none yet.',
-          ],
+            'message' => [
+                'instruction' => 'There is none yet.',
+            ],
         ]);
     }
 
     public function getEnvironmentVariable($variable)
     {
         return response()->json([
-          'message' => 'This functionality will not return values.',
-          'data'    => [
-            'requested_var' => $variable,
+            'message' => 'This functionality will not return values.',
+            'data'    => [
+                'requested_var' => $variable,
 
-          ],
+            ],
         ]);
     }
 
     public function mapProjectFiles()
     {
         $projectRoot = base_path();
-        $files       = $this->readDirectory($projectRoot);
+        $files = $this->readDirectory($projectRoot);
 
         return response()->json([
-          'data' => $files,
+            'data' => $files,
         ]);
     }
 
@@ -70,19 +70,19 @@ class DebugController extends Controller
 
         if (File::exists($fullPath)) {
             return response()->json([
-              'data' => File::get($fullPath),
+                'data' => File::get($fullPath),
             ]);
         }
 
         return response()->json([
-          'message' => 'File not found',
+            'message' => 'File not found',
         ], 404);
     }
 
     public function showBody(Request $request)
     {
         return response()->json([
-          'data' => $request->all(),
+            'data' => $request->all(),
         ]);
     }
 
@@ -105,11 +105,11 @@ class DebugController extends Controller
                 continue;
             }
 
-            $path    = $directory . DIRECTORY_SEPARATOR . $item;
+            $path = $directory.DIRECTORY_SEPARATOR.$item;
             $items[] = [
-              'name' => $item,
-              'type' => is_dir($path) ? 'directory' : 'file',
-              'path' => $path,
+                'name' => $item,
+                'type' => is_dir($path) ? 'directory' : 'file',
+                'path' => $path,
             ];
         }
 

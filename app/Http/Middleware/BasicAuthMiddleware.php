@@ -2,14 +2,13 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Session;
 use Closure;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class JwtMiddleware
+class BasicAuthMiddleware
 {
     public function handle($request, Closure $next)
     {
@@ -19,12 +18,8 @@ class JwtMiddleware
         }
 
         try {
-            $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
-            $session = Session::where('id', $decoded->sid)->first();
-            if (! $session) {
-                return response()->json(['message' => 'Invalid token'], Response::HTTP_UNAUTHORIZED);
-            }
-            Auth::loginUsingId($session->user_id);
+            $decoded = JWT::decode($token, new Key(env('APP_JWT_SECRET'), 'HS256'));
+            Auth::loginUsingId($decoded->id);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Invalid token'], Response::HTTP_UNAUTHORIZED);
         }

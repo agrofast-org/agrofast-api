@@ -16,7 +16,7 @@ class RequestController extends Controller
      */
     public function listRequests(): JsonResponse
     {
-        $user     = Auth::user();
+        $user = Auth::user();
         $requests = TransportRequest::where('user_id', $user->id)->get();
 
         return response()->json(['data' => $requests], 200);
@@ -34,8 +34,8 @@ class RequestController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-          'origin'      => 'required|string|max:255',
-          'destination' => 'required|string|max:255',
+            'origin'      => 'required|string|max:255',
+            'destination' => 'required|string|max:255',
         ]);
 
         // Ensure user doesn't have an active request
@@ -49,9 +49,9 @@ class RequestController extends Controller
 
         try {
             TransportRequest::create([
-              'user_id'     => $user->id,
-              'origin'      => $validated['origin'],
-              'destination' => $validated['destination'],
+                'user_id'     => $user->id,
+                'origin'      => $validated['origin'],
+                'destination' => $validated['destination'],
             ]);
 
             return response()->json(['message' => 'Request created'], 201);
@@ -72,23 +72,23 @@ class RequestController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-          'id'          => 'required|exists:transport_requests,id',
-          'origin'      => 'required|string|max:255',
-          'destination' => 'required|string|max:255',
+            'id'          => 'required|exists:transport_requests,id',
+            'origin'      => 'required|string|max:255',
+            'destination' => 'required|string|max:255',
         ]);
 
         $transportRequest = TransportRequest::where('id', $validated['id'])
           ->where('user_id', $user->id)
           ->first();
 
-        if (!$transportRequest) {
+        if (! $transportRequest) {
             return response()->json(['message' => 'Request not found'], 404);
         }
 
         try {
             $transportRequest->update([
-              'origin'      => $validated['origin'],
-              'destination' => $validated['destination'],
+                'origin'      => $validated['origin'],
+                'destination' => $validated['destination'],
             ]);
 
             return response()->json(['message' => 'Request updated'], 200);
@@ -109,14 +109,14 @@ class RequestController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-          'id' => 'required|exists:transport_requests,id',
+            'id' => 'required|exists:transport_requests,id',
         ]);
 
         $transportRequest = TransportRequest::where('id', $validated['id'])
           ->where('user_id', $user->id)
           ->first();
 
-        if (!$transportRequest) {
+        if (! $transportRequest) {
             return response()->json(['message' => 'Request not found'], 404);
         }
 

@@ -15,7 +15,7 @@ class IndexController extends Controller
     public function handleApiIndex(): JsonResponse
     {
         return response()->json([
-          'message' => 'Welcome to the Agrofast API',
+            'message' => 'Welcome to the Agrofast API',
         ], 200);
     }
 
@@ -28,12 +28,12 @@ class IndexController extends Controller
     {
         $path = public_path('img/favicon.ico');
 
-        if (!file_exists($path)) {
+        if (! file_exists($path)) {
             abort(404, 'Favicon not found.');
         }
 
         return Response::file($path, [
-          'Content-Type' => 'image/x-icon',
+            'Content-Type' => 'image/x-icon',
         ]);
     }
 }

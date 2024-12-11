@@ -11,6 +11,7 @@ class AuthCode extends Model
     use HasFactory;
 
     protected $table = 'hr.auth_code';
+
     protected $fillable = [
         'user_id',
         'code',
@@ -20,7 +21,7 @@ class AuthCode extends Model
 
     protected $attributes = [
         'attempts' => 0,
-        'active' => true,
+        'active'   => true,
     ];
 
     /**
@@ -32,24 +33,27 @@ class AuthCode extends Model
      *
      * @throws \Exception
      */
-    public static function createCode(int $userId): AuthCode
+    public static function createCode(int $userId): self
     {
         $user = User::find($userId);
 
-        if (!$user) {
+        if (! $user) {
             throw new \Exception('User not found');
         }
-        if (!self::validatePhoneNumber($user->number)) {
+        if (! self::validatePhoneNumber($user->number)) {
             throw new \Exception('Invalid phone number');
         }
         $code = (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development') ? '1111' : rand(1000, 9999);
         self::where('user_id', $userId)->update(['active' => false]);
         $authCode = self::create([
             'user_id' => $userId,
-            'code' => $code,
+            'code'    => $code,
         ]);
 
-        SmsSender::send($user->number, "Seu código de autenticação para o Agrofast é: {$code}");
+        // Added this verification to avoid sending SMS in local environment. It's really expensive XD.
+        if (env('SMS_SERVICE_ENABLED') === 'true' || env('SMS_SERVICE_ENABLED') === true) {
+            SmsSender::send($user->number, "Seu código de autenticação para o Agrofast é: {$code}");
+        }
 
         return $authCode;
     }
@@ -63,6 +67,6 @@ class AuthCode extends Model
      */
     private static function validatePhoneNumber(string $number): bool
     {
-        return !empty($number);
+        return ! empty($number);
     }
 }
