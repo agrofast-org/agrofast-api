@@ -9,8 +9,7 @@ class Machinery extends Model
 {
     use HasFactory;
 
-    protected $schema    = 'transport';
-    protected $table     = 'machinery';
+    protected $table     = 'transport.machinery';
     protected $fillable  = [
       'user_id',
       'name',

@@ -9,8 +9,7 @@ class Chat extends Model
 {
     use HasFactory;
 
-    protected $schema     = 'chat';
-    protected $table      = 'chat';
+    protected $table      = 'chat.chat';
     protected $primaryKey = 'uuid';
     public $incrementing  = false;
     protected $keyType    = 'string';

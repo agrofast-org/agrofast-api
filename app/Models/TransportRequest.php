@@ -9,8 +9,7 @@ class TransportRequest extends Model
 {
     use HasFactory;
 
-    protected $schema    = 'transport';
-    protected $table     = 'request';
+    protected $table     = 'transport.request';
     protected $fillable  = [
       'user_id',
       'origin',

@@ -3,22 +3,24 @@
 namespace App\Models;
 
 use App\Services\SmsSender;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class AuthCode extends Model
 {
-    protected $schema    = 'hr';
-    protected $table     = 'auth_code';
-    protected $fillable  = [
-      'user_id',
-      'code',
-      'attempts',
-      'active',
+    use HasFactory;
+
+    protected $table = 'hr.auth_code';
+    protected $fillable = [
+        'user_id',
+        'code',
+        'attempts',
+        'active',
     ];
 
     protected $attributes = [
-      'attempts' => 0,
-      'active'   => true,
+        'attempts' => 0,
+        'active' => true,
     ];
 
     /**
@@ -40,11 +42,11 @@ class AuthCode extends Model
         if (!self::validatePhoneNumber($user->number)) {
             throw new \Exception('Invalid phone number');
         }
-        $code = env('APP_ENV') === 'local' ? '1111' : rand(1000, 9999);
+        $code = (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development') ? '1111' : rand(1000, 9999);
         self::where('user_id', $userId)->update(['active' => false]);
         $authCode = self::create([
-          'user_id' => $userId,
-          'code'    => $code,
+            'user_id' => $userId,
+            'code' => $code,
         ]);
 
         SmsSender::send($user->number, "Seu código de autenticação para o Agrofast é: {$code}");

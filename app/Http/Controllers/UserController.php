@@ -75,18 +75,13 @@ class UserController extends Controller
      */
     public function createUser(Request $request)
     {
-        $validated = $request->validate([
-          'name'     => 'required|string|max:255',
-          'surname'  => 'required|string|max:255',
-          'number'   => 'required|string|max:255|unique:user,number',
-          'password' => 'required|string|min:8|confirmed',
-        ]);
+        $validated = User::validateInsert($request->all());
 
         $user = User::create($validated);
 
         $jwt = JWT::encode(
             ['id' => $user->id, 'name' => $user->name, 'number' => $user->number],
-            env('APP_JWT_SECRET'),
+            env('APP_KEY'),
             'HS256'
         );
 
@@ -192,7 +187,7 @@ class UserController extends Controller
 
         $jwt = JWT::encode(
             ['id' => $user->id, 'name' => $user->name, 'number' => $user->number],
-            env('APP_JWT_SECRET'),
+            env('APP_KEY'),
             'HS256'
         );
 

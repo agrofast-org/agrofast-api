@@ -9,8 +9,7 @@ class Carrier extends Model
 {
     use HasFactory;
 
-    protected $schema    = 'transport';
-    protected $table     = 'carrier';
+    protected $table     = 'transport.carrier';
     protected $fillable  = [
       'user_id',
       'name',
