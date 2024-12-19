@@ -45,14 +45,15 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
       PGDATA: /data/postgres
     volumes:
-      - postgres:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
       - agrofast-network
 
 volumes:
-  postgres:
+  postgres_data:
+  minio_data:
   cache:
     driver: local
 
