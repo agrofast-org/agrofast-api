@@ -11,6 +11,8 @@ services:
       - ./docker/nginx/conf.d/:/etc/nginx/conf.d
     environment:
       - SERVER_NAME=agrofast.api.com
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - agrofast-network
 
