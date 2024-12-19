@@ -71,16 +71,3 @@ final class Message extends TrackableTable
     return $select->execute() ?? null;
   }
 }
-
-/*
-SELECT m.message, m.from_user_id, u.name
-FROM chat.message m
-INNER JOIN hr."user" u ON u.id = m.from_user_id
-INNER JOIN (
-    SELECT from_user_id, MAX(
-            created_in) AS last_message_time
-    FROM chat.message
-    GROUP BY from_user_id
-) AS lm ON m.from_user_id = lm.from_user_id AND m.created_in = lm.last_message_time
-WHERE m.to_user_id = 6;
-*/
