@@ -1,62 +1,74 @@
 services:
-  agrofast-nginx:
-    container_name: agrofast-nginx
-    image: nginx:alpine
-    restart: always
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./:/var/www
-      - ./docker/nginx/conf.d/:/etc/nginx/conf.d
-    environment:
-      - SERVER_NAME=agrofast.api.com
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    networks:
-      - agrofast-network
+    agrofast-nginx:
+        container_name: agrofast-nginx
+        image: nginx:alpine
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            # - ../agrofast-api/:/var/www/api
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+        environment:
+            - SERVER_API_NAME=local.api.agrofast.tech
+            - SERVER_WEB_NAME=local.web.agrofast.tech
+            - SERVER_PORTFOLIO_NAME=local.agrofast.tech
+            - SERVER_SOCKET_NAME=local.socket.agrofast.tech
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        networks:
+            - agrofast-network
 
-  agrofast-php-fpm:
-    container_name: agrofast-php-fpm
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    restart: always
-    working_dir: /var/www
-    ports:
-      - "9000:9000"
-    volumes:
-      - ./:/var/www
-      - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
-    depends_on:
-      - agrofast-postgres
-      - agrofast-nginx
-    networks:
-      - agrofast-network
+    agrofast-php-fpm:
+        container_name: agrofast-php-fpm
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        restart: always
+        working_dir: /var/www
+        ports:
+            - "9000:9000"
+        volumes:
+            - ./:/var/www
+            - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+        depends_on:
+            - agrofast-postgres
+            - agrofast-nginx
+        networks:
+            - agrofast-network
 
-  agrofast-postgres:
-    container_name: agrofast-postgres
-    image: postgres:latest
-    restart: always
-    environment:
-      POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_HOST_AUTH_METHOD: trust
-      PGDATA: /data/postgres
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    networks:
-      - agrofast-network
+    agrofast-postgres:
+        container_name: agrofast-postgres
+        image: postgres:latest
+        restart: always
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_HOST_AUTH_METHOD: trust
+            PGDATA: /data/postgres
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        networks:
+            - agrofast-network
+
+    agrofast-redis:
+        container_name: agrofast-redis
+        image: redis:alpine
+        restart: always
+        ports:
+            - "6379:6379"
+        networks:
+            - agrofast-network
 
 volumes:
-  postgres_data:
-  minio_data:
-  cache:
-    driver: local
+    postgres_data:
+    minio_data:
+    cache:
+        driver: local
 
 networks:
-  agrofast-network:
-    driver: bridge
+    agrofast-network:
+        driver: bridge

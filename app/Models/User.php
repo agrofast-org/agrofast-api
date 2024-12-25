@@ -13,7 +13,9 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $table = 'hr.user';
+
     protected $primaryKey = 'id';
+
     protected $fillable = [
         'name',
         'surname',
@@ -21,12 +23,14 @@ class User extends Authenticatable
         'number',
         'email',
         'password',
-        'authenticated',
+        'number_authenticated',
+        'email_authenticated',
         'active',
     ];
 
     protected $casts = [
-        'authenticated' => 'boolean',
+        'number_authenticated' => 'boolean',
+        'email_authenticated' => 'boolean',
         'active' => 'boolean',
     ];
 
@@ -47,6 +51,13 @@ class User extends Authenticatable
     public function setPasswordAttribute($value)
     {
         $this->attributes['password'] = Hash::make($value);
+    }
+
+    public static function prepareInsert(array $params): array
+    {
+        $params['number'] = preg_replace('/\D/', '', $params['number']);
+
+        return $params;
     }
 
     public static function validateInsert(array $params): array

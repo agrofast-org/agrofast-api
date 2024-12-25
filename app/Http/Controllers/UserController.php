@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuthCode;
+use App\Models\Session;
 use App\Models\User;
 use App\Services\SmsSender;
 use Carbon\Carbon;
@@ -75,19 +76,22 @@ class UserController extends Controller
      */
     public function createUser(Request $request)
     {
-        $validated = User::validateInsert($request->all());
+        $params = User::prepareInsert($request->all());
+        $validated = User::validateInsert(User::prepareInsert($params));
 
         if (! empty($validated)) {
             return response()->json(['message' => 'Error creating user', 'fields' => $validated], 400);
         }
 
-        $existingUser = User::where('number', $request->input('number'))->first();
+        $existingUser = User::where('number', $params['number'])->first();
 
         if ($existingUser) {
             return response()->json(['message' => 'User already exists'], 400);
         }
 
-        $user = User::create($request->all());
+        $user = User::create($params);
+
+        AuthCode::createCode($user->id);
 
         $jwt = JWT::encode(
             [
@@ -155,18 +159,33 @@ class UserController extends Controller
             ->orderBy('created_at', 'desc')
             ->first();
 
-        if (! $authCode || $authCode->code !== $validated['code']) {
+        if (! $authCode) {
+            return response()->json(['message' => 'Invalid authentication code'], 400);
+        }
+
+        if ($authCode->code !== $validated['code']) {
+            $authCode->update(['attempts' => $authCode->attempts + 1]);
+
             return response()->json(['message' => 'Invalid authentication code'], 400);
         }
 
         $authCode->update(['active' => false]);
 
-        $user->update(['authenticated' => true]);
+        $user->update(['number_authenticated' => true]);
+
+        $session = Session::create([
+            'user_id' => $user->id,
+            'ip_address' => "'{$request->ip()}'",
+            'user_agent' => "'{$request->userAgent()}'",
+            'payload' => json_encode($request->all()),
+            'last_activity' => Carbon::now()->timestamp,
+        ]);
 
         $jwt = JWT::encode(
             [
                 'iss' => env('APP_URL'),
                 'sub' => $user->id,
+                'sid' => $session->id,
                 'aud' => 'agrofast-app-services',
                 'iat' => now()->timestamp,
                 'jti' => uniqid(),
@@ -183,6 +202,7 @@ class UserController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'number' => $user->number,
+                'picture' => $user->profile_picture,
             ],
             'token' => $jwt,
         ];

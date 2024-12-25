@@ -11,10 +11,15 @@ class Session extends Model
     use HasFactory;
 
     protected $table = 'hr.session';
+
     protected $primaryKey = 'id';
+
     protected $keyType = 'string';
+
     public $incrementing = false;
+
     public $timestamps = false;
+
     protected $fillable = [
         'id',
         'user_id',
@@ -23,6 +28,7 @@ class Session extends Model
         'payload',
         'last_activity',
     ];
+
     protected $casts = [
         'payload' => 'array',
         'last_activity' => 'datetime',

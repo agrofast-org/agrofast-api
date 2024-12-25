@@ -23,7 +23,9 @@ Route::fallback(function () {
 
 // Rota inicial
 Route::get('/', [IndexController::class, 'handleApiIndex']);
-Route::get('/favicon.ico', [IndexController::class, 'favicon']);
+Route::get('/favicon.ico', function () {
+    return response()->file(public_path('favicon.ico'));
+});
 
 // Debug routes
 Route::prefix('debug')->group(function () {
@@ -51,17 +53,17 @@ Route::prefix('user')->group(function () {
 });
 
 // Chat routes
-Route::middleware('auth.jwt')->group(function () {
+Route::middleware(JwtMiddleware::class)->group(function () {
     Route::get('/chat', [ChatController::class, 'getUserchat']);
 });
-Route::middleware('auth.jwt')->prefix('message')->group(function () {
+Route::middleware(JwtMiddleware::class)->prefix('message')->group(function () {
     Route::get('/{chatUuid}', [MessageController::class, 'getmessage']); // Get message in a chat
     Route::post('/', [MessageController::class, 'sendMessage']); // Send a message
     Route::delete('/{id}', [MessageController::class, 'deleteMessage']); // Delete a message
 });
 
 // Machinery routes
-Route::prefix('machinery')->middleware('auth.user')->group(function () {
+Route::middleware(JwtMiddleware::class)->prefix('machinery')->group(function () {
     Route::get('/', [MachineryController::class, 'listMachinery']);
     Route::post('/create', [MachineryController::class, 'createMachine']);
     Route::put('/update', [MachineryController::class, 'updateMachine']);
@@ -69,7 +71,7 @@ Route::prefix('machinery')->middleware('auth.user')->group(function () {
 });
 
 // Transport vehicle routes
-Route::middleware('auth.jwt')->prefix('transport')->group(function () {
+Route::middleware(JwtMiddleware::class)->prefix('transport')->group(function () {
     Route::get('/', [CarrierController::class, 'listTransports']);
     Route::post('/create', [CarrierController::class, 'createTransport']);
     Route::put('/update', [CarrierController::class, 'updateTransport']);
@@ -77,7 +79,7 @@ Route::middleware('auth.jwt')->prefix('transport')->group(function () {
 });
 
 // Request routes
-Route::middleware('auth.jwt')->prefix('request')->group(function () {
+Route::middleware(JwtMiddleware::class)->prefix('request')->group(function () {
     Route::get('/', [RequestController::class, 'listRequests']);
     Route::post('/create', [RequestController::class, 'makeRequest']);
     Route::put('/update', [RequestController::class, 'updateRequest']);
@@ -85,7 +87,7 @@ Route::middleware('auth.jwt')->prefix('request')->group(function () {
 });
 
 // Offer routes
-Route::middleware('auth.jwt')->prefix('offer')->group(function () {
+Route::middleware(JwtMiddleware::class)->prefix('offer')->group(function () {
     Route::get('/', [OfferController::class, 'listOffers']);
     Route::post('/create', [OfferController::class, 'makeOffer']);
     Route::put('/update', [OfferController::class, 'updateOffer']);

@@ -18,7 +18,7 @@ class BasicAuthMiddleware
         }
 
         try {
-            $decoded = JWT::decode($token, new Key(env('APP_JWT_SECRET'), 'HS256'));
+            $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
             Auth::loginUsingId($decoded->id);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Invalid token'], Response::HTTP_UNAUTHORIZED);

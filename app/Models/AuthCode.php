@@ -5,10 +5,12 @@ namespace App\Models;
 use App\Services\SmsSender;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
 
 class AuthCode extends Model
 {
     use HasFactory;
+    use Notifiable;
 
     protected $table = 'hr.auth_code';
 
@@ -21,7 +23,7 @@ class AuthCode extends Model
 
     protected $attributes = [
         'attempts' => 0,
-        'active'   => true,
+        'active' => true,
     ];
 
     /**
@@ -47,11 +49,12 @@ class AuthCode extends Model
         self::where('user_id', $userId)->update(['active' => false]);
         $authCode = self::create([
             'user_id' => $userId,
-            'code'    => $code,
+            'code' => $code,
         ]);
 
+        $smsEnabled = env('SMS_SERVICE_ENABLED', false);
         // Added this verification to avoid sending SMS in local environment. It's really expensive XD.
-        if (env('SMS_SERVICE_ENABLED') === 'true' || env('SMS_SERVICE_ENABLED') === true) {
+        if ($smsEnabled || $smsEnabled === 'true') {
             SmsSender::send($user->number, "Seu código de autenticação para o Agrofast é: {$code}");
         }
 

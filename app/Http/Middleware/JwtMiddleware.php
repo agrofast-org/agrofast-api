@@ -22,7 +22,7 @@ class JwtMiddleware
             $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
             $session = Session::where('id', $decoded->sid)->first();
             if (! $session) {
-                return response()->json(['message' => 'Invalid token'], Response::HTTP_UNAUTHORIZED);
+                return response()->json(['message' => 'User not authenticated'], Response::HTTP_UNAUTHORIZED);
             }
             Auth::loginUsingId($session->user_id);
         } catch (\Exception $e) {

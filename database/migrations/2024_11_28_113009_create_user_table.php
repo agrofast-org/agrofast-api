@@ -19,9 +19,11 @@ return new class() extends Migration {
             $table->string('surname');
             $table->string('number')->unique();
             $table->string('email')->unique()->nullable();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean('authenticated')->default(false);
+            $table->boolean('number_verified')->default(false);
+            $table->timestamp('number_verified_at')->nullable();
+            $table->boolean('email_verified')->default(false);
+            $table->timestamp('email_verified_at')->nullable();
             $table->boolean('active')->default(true);
             $table->string('profile_picture')->nullable();
             $table->rememberToken();
@@ -35,12 +37,12 @@ return new class() extends Migration {
         });
 
         Schema::create('hr.session', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->foreignId('user_id')->nullable()->constrained('hr.user')->onDelete('cascade');
+            $table->id();
+            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
-            $table->longText('payload');
-            $table->integer('last_activity')->index();
+            $table->longText('payload')->nullable();
+            $table->timestamp('last_activity')->default(DB::raw('CURRENT_TIMESTAMP'));
         });
 
         Schema::create('hr.auth_code', function (Blueprint $table) {
