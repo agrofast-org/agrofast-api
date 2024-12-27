@@ -1,26 +1,30 @@
 <?php
 
+use App\Models\FilesImage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use App\Models\FilesImage;
-use Illuminate\Support\Facades\Auth;
 
-Route::get("/", function () {
+Route::get('/', function () {
     return response()->json([
         'message' => 'Agrofast data bucket',
     ], 200);
 });
 
 Route::post('/upload', function (Request $request) {
-    if (!$request->hasFile('image') || !$request->file('image')->isValid()) {
+    if (! $request->hasFile('image') || ! $request->file('image')->isValid()) {
         return response()->json(['message' => 'Invalid image upload'], 400);
     }
     $file = $request->file('image');
-    $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
+    $fileName = Str::uuid().'.'.$file->getClientOriginalExtension();
 
-    $path = $file->storeAs('images', $fileName, 'minio');
+    $path = $file->storeAs('images', $fileName, env('FILESYSTEM_DISK', 's3'));
+
+    if (! $path) {
+        return response()->json(['message' => 'Failed to upload image'], 500);
+    }
 
     $user = Auth::user();
 
@@ -35,13 +39,23 @@ Route::post('/upload', function (Request $request) {
 
     return response()->json([
         'message' => 'Image uploaded successfully',
-        'file' => $fileRecord
+        'file' => $fileRecord,
     ], 201);
 });
 
+Route::post('/upload/old', function (Request $request) {
+    if (! $request->hasFile('image') || ! $request->file('image')->isValid()) {
+        return response()->json(['message' => 'Invalid image upload'], 400);
+    }
+
+    $path = $request->file('image')->store('images');
+
+    return response()->json(['message' => 'Image uploaded successfully', 'path' => $path], 201);
+});
 
 Route::get('/ ', function (Request $request) {
     $files = Storage::allFiles('images');
+
     return response()->json($files);
 });
 
@@ -58,9 +72,9 @@ Route::get('/last', function () {
 });
 
 Route::get('/image/{filename}', function ($filename) {
-    $path = 'images/' . $filename;
+    $path = 'images/'.$filename;
 
-    if (!Storage::exists($path)) {
+    if (! Storage::exists($path)) {
         return response()->json(['message' => 'Image not found'], 404);
     }
 

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('/assets')->group(function () {
     Route::prefix('/public')->group(function () {
         Route::get('/{file}', function () {
-            return response()->file(public_path('assets/' . request()->file));
+            return response()->file(public_path('assets/'.request()->file));
         });
     });
 });
@@ -39,7 +39,7 @@ Route::prefix('user')->group(function () {
     Route::get('/{id}', [UserController::class, 'get']);
     Route::post('/', [UserController::class, 'create']);
     Route::put('/', [UserController::class, 'update'])->middleware(['auth']);
-    Route::prefix("info")->middleware(['auth'])->group(function () {
+    Route::prefix('info')->middleware(['auth'])->group(function () {
         Route::get('/me', [UserController::class, 'self']);
         Route::get('/{id}', [UserController::class, 'info']);
     });

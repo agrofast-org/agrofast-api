@@ -8,5 +8,6 @@ Route::get('/', function () {
 });
 Route::get('/migrate', function () {
     $output = Artisan::call('migrate');
+
     return response()->json(['output' => Artisan::output()]);
 });
