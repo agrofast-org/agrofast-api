@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->string('path');
             $table->string('mime_type');
             $table->unsignedBigInteger('size');
-            $table->foreignId('uploaded_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('uploaded_by')->nullable()->constrained('hr.user')->onDelete('set null');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
