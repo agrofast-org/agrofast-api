@@ -12,7 +12,7 @@ class IndexController extends Controller
      *
      * @return JsonResponse
      */
-    public function handleApiIndex(): JsonResponse
+    public function index(): JsonResponse
     {
         return response()->json([
             'message' => 'Welcome to the Agrofast API',

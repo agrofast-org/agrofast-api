@@ -9,22 +9,15 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OfferController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\UserController;
-use App\Http\Middleware\BasicAuthMiddleware;
-use App\Http\Middleware\JwtMiddleware;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
-Route::fallback(function () {
-    return response()->json(['message' => 'Endpoint not found'], 404);
-});
-
-// Rota inicial
-Route::get('/', [IndexController::class, 'handleApiIndex']);
-Route::get('/favicon.ico', function () {
-    return response()->file(public_path('favicon.ico'));
+// Assets routes
+Route::prefix('/assets')->group(function () {
+    Route::prefix('/public')->group(function () {
+        Route::get('/{file}', function () {
+            return response()->file(public_path('assets/' . request()->file));
+        });
+    });
 });
 
 // Debug routes
@@ -38,32 +31,36 @@ Route::prefix('debug')->group(function () {
     Route::get('/dir', [DebugController::class, 'mapProjectFiles']);
     Route::get('/file', [DebugController::class, 'getFileContent']);
     Route::post('/body', [DebugController::class, 'showBody']);
-})->middleware('environment');
+})->middleware(['dev.env']);
 
 // User routes
 Route::prefix('user')->group(function () {
-    Route::get('/', [UserController::class, 'getUser']);
-    Route::put('/', [UserController::class, 'updateUser'])->middleware(JwtMiddleware::class);
-    Route::post('/', [UserController::class, 'createUser']);
-    Route::get('/info', [UserController::class, 'getUserInfo'])->middleware(JwtMiddleware::class);
-    Route::get('/exists', [UserController::class, 'checkIfExists']);
-    Route::get('/auth', [UserController::class, 'authenticateUser'])->middleware(BasicAuthMiddleware::class);
-    Route::post('/login', [UserController::class, 'userLogin']);
-    Route::get('/resend-code', [UserController::class, 'resendCode'])->middleware(BasicAuthMiddleware::class);
-});
+    // Route::get('/', [UserController::class, 'list']);
+    Route::get('/{id}', [UserController::class, 'get']);
+    Route::post('/', [UserController::class, 'create']);
+    Route::put('/', [UserController::class, 'update'])->middleware(['auth']);
+    Route::prefix("info")->middleware(['auth'])->group(function () {
+        Route::get('/me', [UserController::class, 'self']);
+        Route::get('/{id}', [UserController::class, 'info']);
+    });
+    Route::get('/exists', [UserController::class, 'exists']);
+    Route::get('/auth', [UserController::class, 'authenticate'])->middleware(['auth.basic']);
+    Route::post('/login', [UserController::class, 'login']);
+    Route::get('/resend-code', [UserController::class, 'resendCode'])->middleware(['auth.basic']);
+})->middleware(['db.safe']);
 
 // Chat routes
-Route::middleware(JwtMiddleware::class)->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/chat', [ChatController::class, 'getUserchat']);
 });
-Route::middleware(JwtMiddleware::class)->prefix('message')->group(function () {
+Route::middleware(['auth'])->prefix('message')->group(function () {
     Route::get('/{chatUuid}', [MessageController::class, 'getmessage']); // Get message in a chat
     Route::post('/', [MessageController::class, 'sendMessage']); // Send a message
     Route::delete('/{id}', [MessageController::class, 'deleteMessage']); // Delete a message
 });
 
 // Machinery routes
-Route::middleware(JwtMiddleware::class)->prefix('machinery')->group(function () {
+Route::middleware(['auth'])->prefix('machinery')->group(function () {
     Route::get('/', [MachineryController::class, 'listMachinery']);
     Route::post('/create', [MachineryController::class, 'createMachine']);
     Route::put('/update', [MachineryController::class, 'updateMachine']);
@@ -71,7 +68,7 @@ Route::middleware(JwtMiddleware::class)->prefix('machinery')->group(function () 
 });
 
 // Transport vehicle routes
-Route::middleware(JwtMiddleware::class)->prefix('transport')->group(function () {
+Route::middleware(['auth'])->prefix('transport')->group(function () {
     Route::get('/', [CarrierController::class, 'listTransports']);
     Route::post('/create', [CarrierController::class, 'createTransport']);
     Route::put('/update', [CarrierController::class, 'updateTransport']);
@@ -79,7 +76,7 @@ Route::middleware(JwtMiddleware::class)->prefix('transport')->group(function () 
 });
 
 // Request routes
-Route::middleware(JwtMiddleware::class)->prefix('request')->group(function () {
+Route::middleware(['auth'])->prefix('request')->group(function () {
     Route::get('/', [RequestController::class, 'listRequests']);
     Route::post('/create', [RequestController::class, 'makeRequest']);
     Route::put('/update', [RequestController::class, 'updateRequest']);
@@ -87,7 +84,7 @@ Route::middleware(JwtMiddleware::class)->prefix('request')->group(function () {
 });
 
 // Offer routes
-Route::middleware(JwtMiddleware::class)->prefix('offer')->group(function () {
+Route::middleware(['auth'])->prefix('offer')->group(function () {
     Route::get('/', [OfferController::class, 'listOffers']);
     Route::post('/create', [OfferController::class, 'makeOffer']);
     Route::put('/update', [OfferController::class, 'updateOffer']);

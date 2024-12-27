@@ -8,8 +8,6 @@ use Illuminate\Support\Facades\Schema;
 return new class() extends Migration {
     public function up(): void
     {
-        DB::statement('CREATE SCHEMA IF NOT EXISTS system');
-
         Schema::create('system.error_logs', function (Blueprint $table) {
             $table->id();
             $table->text('json');

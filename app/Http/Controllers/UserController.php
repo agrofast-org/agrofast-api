@@ -14,10 +14,7 @@ use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
-    /**
-     * Get a single user by ID, phone, or name.
-     */
-    public function getUser(Request $request)
+    public function get(Request $request)
     {
         $query = $request->only(['id', 'telephone', 'name']);
         $userQuery = User::query();
@@ -39,10 +36,14 @@ class UserController extends Controller
         return response()->json(['message' => 'User not found'], 404);
     }
 
-    /**
-     * Get authenticated user info.
-     */
-    public function getUserInfo()
+    public function list(Request $request)
+    {
+        // TODO: Implement list method with complex pagination and filtering
+
+        return response()->json(['message' => 'Not implemented'], 501);
+    }
+
+    public function self()
     {
         $user = Auth::user();
 
@@ -53,10 +54,18 @@ class UserController extends Controller
         return response()->json(['data' => $user], 200);
     }
 
-    /**
-     * Check if a user exists by phone number.
-     */
-    public function checkIfExists(Request $request)
+    public function info($id)
+    {
+        $user = User::find($id, ['id', 'name', 'number', 'profile_picture']);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        return response()->json(['data' => $user], 200);
+    }
+
+    public function exists(Request $request)
     {
         $validated = $request->validate([
             'number' => 'required|string|max:255',
@@ -71,10 +80,7 @@ class UserController extends Controller
         return response()->json(['message' => 'User found', 'data' => $user], 200);
     }
 
-    /**
-     * Create a new user.
-     */
-    public function createUser(Request $request)
+    public function create(Request $request)
     {
         $params = User::prepareInsert($request->all());
         $validated = User::validateInsert(User::prepareInsert($params));
@@ -120,10 +126,7 @@ class UserController extends Controller
         return response()->json(['message' => 'User created successfully', 'data' => $data], 201);
     }
 
-    /**
-     * Update an existing user.
-     */
-    public function updateUser(Request $request)
+    public function update(Request $request)
     {
         $user = Auth::user();
 
@@ -142,7 +145,7 @@ class UserController extends Controller
         return response()->json(['message' => 'User updated successfully'], 200);
     }
 
-    public function authenticateUser(Request $request)
+    public function authenticate(Request $request)
     {
         $user = Auth::user();
 
@@ -210,9 +213,6 @@ class UserController extends Controller
         return response()->json(['message' => 'User authenticated successfully', 'data' => $data], 200);
     }
 
-    /**
-     * Resend authentication code to the user.
-     */
     public function resendCode()
     {
         $user = Auth::user();
@@ -241,10 +241,7 @@ class UserController extends Controller
         }
     }
 
-    /**
-     * User login method that initiates the authentication process.
-     */
-    public function userLogin(Request $request)
+    public function login(Request $request)
     {
         $validated = $request->validate([
             'number' => 'required|string',

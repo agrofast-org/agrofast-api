@@ -10,6 +10,13 @@ return new class() extends Migration {
     public function up(): void
     {
         DB::statement("SET TIME ZONE 'America/Sao_Paulo'");
+
+        DB::statement('CREATE SCHEMA IF NOT EXISTS hr');
+        DB::statement('CREATE SCHEMA IF NOT EXISTS chat');
+        DB::statement('CREATE SCHEMA IF NOT EXISTS transport');
+        DB::statement('CREATE SCHEMA IF NOT EXISTS system');
+        DB::statement('CREATE SCHEMA IF NOT EXISTS integration');
+        DB::statement('CREATE SCHEMA IF NOT EXISTS file');
     }
 
     /**

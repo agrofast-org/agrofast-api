@@ -11,8 +11,6 @@ return new class() extends Migration {
      */
     public function up(): void
     {
-        DB::statement('CREATE SCHEMA IF NOT EXISTS hr');
-
         Schema::create('hr.user', function (Blueprint $table) {
             $table->id();
             $table->string('name');

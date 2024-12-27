@@ -19,7 +19,6 @@ class DatabaseTransaction
     {
         DB::beginTransaction();
         try {
-            return response()->json(['message' => 'Database transaction started']);
             $response = $next($request);
             DB::commit();
 

@@ -51,6 +51,9 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => Middleware\JwtMiddleware::class,
         'auth.basic' => Middleware\BasicAuthMiddleware::class,
+        'dev.env' => Middleware\DevelopmentEnvironmentMiddleware::class,
+        'dev.auth' => Middleware\DeveloperAuthMiddleware::class,
+        'db.safe' => Middleware\DatabaseTransaction::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'password.confirm' => \Illuminate\Auth\Middleware\RequirePassword::class,
