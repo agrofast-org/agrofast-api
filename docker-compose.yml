@@ -1,31 +1,85 @@
 services:
-  nginx:
-    container_name: nginx
-    image: nginx:1.27.1
-    ports:
-      - "80:80"
-    volumes:
-      - .:/var/www/html/app
-      - ./config/nginx.conf:/etc/nginx/conf.d/default.conf
-    depends_on:
-      - php-fpm
-    environment:
-      - SERVER_NAME=agrofast.api.com
-    networks:
-      - app-network
+    agrofast-nginx:
+        container_name: agrofast-nginx
+        image: nginx:alpine
+        restart: always
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            # - ../agrofast-api/:/var/www/api
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        networks:
+            - agrofast-network
 
-  php-fpm:
-    container_name: php-fpm
-    build:
-      context: .
-      dockerfile: Dockerfile.dev
-    ports:
-      - "9000:9000"
-    volumes:
-      - .:/var/www/html/app
-    networks:
-      - app-network
+    agrofast-php-fpm:
+        container_name: agrofast-php-fpm
+        build:
+            context: .
+            dockerfile: Dockerfile.dev
+        restart: always
+        working_dir: /var/www
+        ports:
+            - "9000:9000"
+        volumes:
+            - ./:/var/www
+            - ./docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+        depends_on:
+            - agrofast-postgres
+            - agrofast-nginx
+            - agrofast-data-bucket
+        networks:
+            - agrofast-network
+
+    agrofast-postgres:
+        container_name: agrofast-postgres
+        image: postgres:latest
+        restart: always
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            POSTGRES_HOST_AUTH_METHOD: trust
+            PGDATA: /data/postgres
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        networks:
+            - agrofast-network
+
+    agrofast-redis:
+        container_name: agrofast-redis
+        image: redis:alpine
+        restart: always
+        ports:
+            - "6379:6379"
+        networks:
+            - agrofast-network
+
+    agrofast-data-bucket:
+        image: minio/minio:latest
+        container_name: agrofast-data-bucket
+        ports:
+            - "9100:9100" # Porta de acesso ao bucket MinIO
+            - "9101:9101" # Porta de acesso ao painel MinIO
+        environment:
+            MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
+            MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
+        volumes:
+            - minio_data:/data
+        command: server /data --address "0.0.0.0:9100" --console-address "0.0.0.0:9101"
+        networks:
+            - agrofast-network
+
+volumes:
+    postgres_data:
+    minio_data:
+    cache:
+        driver: local
 
 networks:
-  app-network:
-    driver: bridge
+    agrofast-network:
+        driver: bridge
