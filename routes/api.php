@@ -11,14 +11,7 @@ use App\Http\Controllers\RequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
-// Assets routes
-Route::prefix('/assets')->group(function () {
-    Route::prefix('/public')->group(function () {
-        Route::get('/{file}', function () {
-            return response()->file(public_path('assets/'.request()->file));
-        });
-    });
-});
+Route::get('/', [IndexController::class, 'index']);
 
 // Debug routes
 Route::prefix('debug')->group(function () {
@@ -34,15 +27,17 @@ Route::prefix('debug')->group(function () {
 })->middleware(['dev.env']);
 
 // User routes
-Route::prefix('user')->group(function () {
-    // Route::get('/', [UserController::class, 'list']);
-    Route::get('/{id}', [UserController::class, 'get']);
+Route::prefix('/user')->group(function () {
+    Route::get('/', [UserController::class, 'get']);
     Route::post('/', [UserController::class, 'create']);
     Route::put('/', [UserController::class, 'update'])->middleware(['auth']);
-    Route::prefix('info')->middleware(['auth'])->group(function () {
+    Route::prefix('/info')->middleware(['auth.basic'])->group(function () {
         Route::get('/me', [UserController::class, 'self']);
         Route::get('/{id}', [UserController::class, 'info']);
     });
+    Route::get('/picture', function () {
+        Route::post('/upload', [UserController::class, 'setPicture']);
+    })->middleware(['auth']);
     Route::get('/exists', [UserController::class, 'exists']);
     Route::get('/auth', [UserController::class, 'authenticate'])->middleware(['auth.basic']);
     Route::post('/login', [UserController::class, 'login']);

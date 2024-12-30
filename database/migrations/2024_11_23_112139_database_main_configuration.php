@@ -17,6 +17,7 @@ return new class() extends Migration {
         DB::statement('CREATE SCHEMA IF NOT EXISTS system');
         DB::statement('CREATE SCHEMA IF NOT EXISTS integration');
         DB::statement('CREATE SCHEMA IF NOT EXISTS file');
+        DB::statement('CREATE SCHEMA IF NOT EXISTS framework');
     }
 
     /**

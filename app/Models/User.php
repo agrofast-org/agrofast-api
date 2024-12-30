@@ -19,13 +19,16 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'surname',
-        'profile_picture',
         'number',
         'email',
         'password',
-        'number_authenticated',
-        'email_authenticated',
+        'number_verified',
+        'number_verified_at',
+        'email_verified',
+        'email_verified_at',
         'active',
+        'profile_picture',
+        'remember_token',
     ];
 
     protected $casts = [
@@ -37,7 +40,6 @@ class User extends Authenticatable
     protected $dates = [
         'created_at',
         'updated_at',
-        'inactivated_at',
     ];
 
     protected $hidden = [
@@ -68,11 +70,13 @@ class User extends Authenticatable
         $arErr = array_merge($arErr, self::validateRequiredField($params, 'surname', 'user_surname_required_message'));
         $arErr = array_merge($arErr, self::validatePhoneNumber($params['number'] ?? null));
         $arErr = array_merge($arErr, self::validatePassword($params['password'] ?? null, 'password'));
-        $arErr = array_merge($arErr, self::validatePassword($params['password_confirm'] ?? null, 'password_confirm'));
 
         if (empty($arErr['password']) && empty($arErr['password_confirm']) && $params['password'] !== $params['password_confirm']) {
             $arErr['password_confirm'][] = 'password_not_coincide_message';
             $arErr['password'][] = 'password_not_coincide_message';
+        }
+        if (! empty($arErr['password'])) {
+            $arErr['password_confirm'] = $arErr['password'];
         }
 
         return $arErr;
@@ -98,8 +102,15 @@ class User extends Authenticatable
         $arErr = [];
         if (empty($number)) {
             $arErr['number'][] = 'user_number_required_message';
-        } elseif (! preg_match('/^\+?[0-9]+$/', $number) || strlen(preg_replace('/\D/', '', $number)) < 10 || strlen(preg_replace('/\D/', '', $number)) > 14) {
+
+            return $arErr;
+        }
+        $cleanedNumber = preg_replace('/\D/', '', $number);
+        $length = strlen($cleanedNumber);
+        if ($length !== 13) {
             $arErr['number'][] = 'user_invalid_number_message';
+
+            return $arErr;
         }
 
         return $arErr;
@@ -124,7 +135,7 @@ class User extends Authenticatable
             $arErr[$field][] = 'user_password_required_message';
         } elseif (strlen($password) < 8) {
             $arErr[$field][] = 'user_password_length_message';
-        } elseif (! preg_match('/[A-Za-z]/', $password)) {
+        } elseif (! preg_match('/[A-Za-z]/', $password) || ! preg_match('/[0-9]/', $password)) {
             $arErr[$field][] = 'user_password_character_message';
         }
 

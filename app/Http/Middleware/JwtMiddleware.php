@@ -15,18 +15,18 @@ class JwtMiddleware
     {
         $token = $request->bearerToken();
         if (! $token) {
-            return response()->json(['message' => 'Authorization token not provided'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['message' => 'authentication_token_not_provided'], Response::HTTP_UNAUTHORIZED);
         }
 
         try {
             $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
             $session = Session::where('id', $decoded->sid)->first();
             if (! $session) {
-                return response()->json(['message' => 'User not authenticated'], Response::HTTP_UNAUTHORIZED);
+                return response()->json(['message' => 'user_not_authenticated'], Response::HTTP_UNAUTHORIZED);
             }
             Auth::loginUsingId($session->user_id);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Invalid token'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['message' => 'authentication_token'], Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);

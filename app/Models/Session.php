@@ -14,18 +14,15 @@ class Session extends Model
 
     protected $primaryKey = 'id';
 
-    protected $keyType = 'string';
-
-    public $incrementing = false;
-
     public $timestamps = false;
 
     protected $fillable = [
-        'id',
         'user_id',
         'ip_address',
         'user_agent',
-        'payload',
+        'auth_code_id',
+        'authenticated',
+        'created_at',
         'last_activity',
     ];
 

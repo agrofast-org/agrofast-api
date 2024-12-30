@@ -19,13 +19,16 @@ class DatabaseTransaction
     {
         DB::beginTransaction();
         try {
+            // return response()->json(['message' => 'An error occurred', 'error' => $e], 500);
+
             $response = $next($request);
             DB::commit();
 
             return $response;
         } catch (Throwable $e) {
             DB::rollBack();
-            throw $e;
+
+            return response()->json(['message' => 'An error occurred', 'error' => $e], 500);
         }
     }
 }

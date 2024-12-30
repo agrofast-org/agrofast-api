@@ -14,14 +14,14 @@ class BasicAuthMiddleware
     {
         $token = $request->bearerToken();
         if (! $token) {
-            return response()->json(['message' => 'Authorization token not provided'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['message' => 'authentication_token_not_provided'], Response::HTTP_UNAUTHORIZED);
         }
 
         try {
             $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
-            Auth::loginUsingId($decoded->id);
+            Auth::loginUsingId($decoded->sub);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Invalid token'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['message' => 'invalid_authentication_token', 'error' => $e], Response::HTTP_UNAUTHORIZED);
         }
 
         return $next($request);
