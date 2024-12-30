@@ -7,7 +7,10 @@ services:
             - "80:80"
             - "443:443"
         volumes:
-            - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/api.conf
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/console.conf
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/socket.conf
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/storage.conf
         extra_hosts:
             - "host.docker.internal:host-gateway"
         networks:
