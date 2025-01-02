@@ -50,6 +50,7 @@ return new class() extends Migration {
             $table->text('user_agent')->nullable();
             $table->foreignId('auth_code_id')->constrained('hr.auth_code')->onDelete('cascade');
             $table->boolean('authenticated')->default(false);
+            $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('last_activity')->default(DB::raw('CURRENT_TIMESTAMP'));
         });

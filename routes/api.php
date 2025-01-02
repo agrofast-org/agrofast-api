@@ -27,7 +27,7 @@ Route::prefix('debug')->group(function () {
 })->middleware(['dev.env']);
 
 // User routes
-Route::prefix('/user')->group(function () {
+Route::middleware(['db.safe'])->prefix('/user')->group(function () {
     Route::get('/', [UserController::class, 'get']);
     Route::post('/', [UserController::class, 'create']);
     Route::put('/', [UserController::class, 'update'])->middleware(['auth']);
@@ -42,7 +42,7 @@ Route::prefix('/user')->group(function () {
     Route::get('/auth', [UserController::class, 'authenticate'])->middleware(['auth.basic']);
     Route::post('/login', [UserController::class, 'login']);
     Route::get('/resend-code', [UserController::class, 'resendCode'])->middleware(['auth.basic']);
-})->middleware(['db.safe']);
+});
 
 // Chat routes
 Route::middleware(['auth'])->group(function () {

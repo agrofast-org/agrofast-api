@@ -26,6 +26,8 @@ class AuthCode extends Model
         'active' => true,
     ];
 
+    public const MAX_ATTEMPTS = 5;
+
     /**
      * Generate a new authentication code for the user.
      *
@@ -39,14 +41,7 @@ class AuthCode extends Model
     {
         $user = User::find($userId);
 
-        if (! $user) {
-            throw new \Exception('User not found');
-        }
-        if (! self::validatePhoneNumber($user->number)) {
-            throw new \Exception('Invalid phone number');
-        }
         $code = (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development') ? '1111' : rand(1000, 9999);
-        self::where('user_id', $userId)->update(['active' => false]);
         $authCode = self::create([
             'user_id' => $userId,
             'code' => $code,
@@ -54,22 +49,10 @@ class AuthCode extends Model
 
         $smsEnabled = env('SMS_SERVICE_ENABLED', false);
         // Added this verification to avoid sending SMS in local environment. It's really expensive XD.
-        if ($smsEnabled || $smsEnabled === 'true') {
+        if ($smsEnabled === true || $smsEnabled === 'true') {
             SmsSender::send($user->number, "Seu código de autenticação para o Agrofast é: {$code}");
         }
 
         return $authCode;
-    }
-
-    /**
-     * Validate a phone number (simple example).
-     *
-     * @param string $number
-     *
-     * @return bool
-     */
-    private static function validatePhoneNumber(string $number): bool
-    {
-        return ! empty($number);
     }
 }

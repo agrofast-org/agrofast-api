@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\ErrorLog;
 use Closure;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -19,16 +20,26 @@ class DatabaseTransaction
     {
         DB::beginTransaction();
         try {
-            // return response()->json(['message' => 'An error occurred', 'error' => $e], 500);
-
             $response = $next($request);
+
             DB::commit();
 
             return $response;
         } catch (Throwable $e) {
             DB::rollBack();
 
-            return response()->json(['message' => 'An error occurred', 'error' => $e], 500);
+            ErrorLog::create([
+                'url' => $request->url(),
+                'error_message' => $e->getMessage(),
+                'stack_trace' => $e->getTraceAsString(),
+                'request_data' => $request->all(),
+            ]);
+            logger()->error($e);
+
+            return response()->json([
+                'message' => 'An error occurred',
+                'error' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
+            ], 500);
         }
     }
 }

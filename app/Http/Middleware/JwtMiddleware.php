@@ -7,11 +7,12 @@ use Closure;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class JwtMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         $token = $request->bearerToken();
         if (! $token) {
@@ -21,7 +22,7 @@ class JwtMiddleware
         try {
             $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
             $session = Session::where('id', $decoded->sid)->first();
-            if (! $session) {
+            if (! $session || ! $session->authenticated) {
                 return response()->json(['message' => 'user_not_authenticated'], Response::HTTP_UNAUTHORIZED);
             }
             Auth::loginUsingId($session->user_id);

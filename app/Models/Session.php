@@ -22,6 +22,7 @@ class Session extends Model
         'user_agent',
         'auth_code_id',
         'authenticated',
+        'active',
         'created_at',
         'last_activity',
     ];

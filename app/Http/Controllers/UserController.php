@@ -129,7 +129,6 @@ class UserController extends Controller
         }
 
         $authCode = AuthCode::createCode($user->id);
-        // TODO: session is not creating correctly, it is returning the first created
         $session = Session::create([
             'user_id' => $user->id,
             'ip_address' => $request->ip(),
@@ -152,7 +151,7 @@ class UserController extends Controller
         );
 
         $response = [
-            'message' => 'login_successful_authentication_code_sent',
+            'message' => 'login_successful',
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
@@ -180,7 +179,7 @@ class UserController extends Controller
 
         $session = Session::where('id', $decoded->sid)->first();
 
-        $authCode = AuthCode::where('id', $session['auth_code_id'])->first();
+        $authCode = AuthCode::where('id', $session->auth_code_id)->first();
 
         if (!$authCode) {
             return response()->json([
@@ -191,9 +190,11 @@ class UserController extends Controller
             ], 400);
         }
 
-        if ($authCode->code !== $request->only('code')) {
-            if ($authCode->attempts + 1 >= 3) {
+        $authCode->update(['attempts' => $authCode->attempts + 1]);
+        if ($authCode->code !== $request->input('code')) {
+            if ($authCode->attempts >= AuthCode::MAX_ATTEMPTS) {
                 $authCode->update(['active' => false]);
+                $session->update(['active' => false]);
 
                 return response()->json([
                     'message' => 'authentication_code_attempts_exceeded',
@@ -202,13 +203,13 @@ class UserController extends Controller
                     ],
                 ], 401);
             }
-            $authCode->update(['attempts' => $authCode->attempts + 1]);
 
             return response()->json([
-                'message' => 'invalid_authentication_code',
+                'message' => 'incorrect_authentication_code',
                 'fields' => [
-                    'code' => 'invalid_authentication_code',
+                    'code' => 'incorrect_authentication_code',
                 ],
+                'attempts_left' => AuthCode::MAX_ATTEMPTS - $authCode->attempts,
             ], 400);
         }
 
