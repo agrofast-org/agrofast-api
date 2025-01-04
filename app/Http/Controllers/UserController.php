@@ -28,12 +28,12 @@ class UserController extends Controller
         $query = $request->only(['id', 'telephone', 'name']);
         $userQuery = User::query();
 
-        if (!empty($query['id'])) {
+        if (! empty($query['id'])) {
             $userQuery->where('id', $query['id']);
-        } elseif (!empty($query['telephone'])) {
+        } elseif (! empty($query['telephone'])) {
             $userQuery->where('number', $query['telephone']);
-        } elseif (!empty($query['name'])) {
-            $userQuery->where('name', 'like', '%' . $query['name'] . '%');
+        } elseif (! empty($query['name'])) {
+            $userQuery->where('name', 'like', '%'.$query['name'].'%');
         }
 
         $user = $userQuery->first();
@@ -50,7 +50,7 @@ class UserController extends Controller
         $params = User::prepareInsert($request->all());
         $validated = User::validateInsert(User::prepareInsert($params));
 
-        if (!empty($validated)) {
+        if (! empty($validated)) {
             return response()->json(['message' => 'error_creating_user', 'fields' => $validated], 400);
         }
 
@@ -105,17 +105,37 @@ class UserController extends Controller
         return response()->json($response, 201);
     }
 
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'user_not_authenticated'], 401);
+        }
+
+        $params = User::prepareInsert($request->only('name', 'surname', 'email'));
+        $validated = User::validateUpdate(User::prepareUpdate($params));
+
+        if (! empty($validated)) {
+            return response()->json(['message' => 'error_updating_user', 'fields' => $validated], 400);
+        }
+
+        $user->update($params);
+
+        return response()->json(['message' => 'user_updated_successfully'], 200);
+    }
+
     public function login(Request $request)
     {
         $params = $request->only(['number', 'password']);
-        if (!isset($params['number']) || !isset($params['password'])) {
+        if (! isset($params['number']) || ! isset($params['password'])) {
             return response()->json(['message' => 'invalid_login_credentials'], 400);
         }
 
         $params = User::prepareInsert($request->all());
         $user = User::where('number', $params['number'])->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'message' => 'user_not_found',
                 'fields' => [
@@ -124,7 +144,7 @@ class UserController extends Controller
             ], 404);
         }
 
-        if (!Hash::check($params['password'], $user->password)) {
+        if (! Hash::check($params['password'], $user->password)) {
             return response()->json(['message' => 'wrong_password'], 401);
         }
 
@@ -170,7 +190,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'user_not_authenticated'], 401);
         }
 
@@ -181,7 +201,7 @@ class UserController extends Controller
 
         $authCode = AuthCode::where('id', $session->auth_code_id)->first();
 
-        if (!$authCode) {
+        if (! $authCode) {
             return response()->json([
                 'message' => 'invalid_authentication_code',
                 'fields' => [
@@ -214,9 +234,15 @@ class UserController extends Controller
         }
 
         $authCode->update(['active' => false]);
+        $session->update(['authenticated' => true]);
 
-        $updateUser = new User();
-        $updateUser->update(['number_authenticated' => true]);
+        $updateUser = User::where('id', $user->id);
+        if (! $updateUser->number_verified) {
+            $updateUser->update([
+                'number_authenticated' => true,
+                'number_verified_at' => now(),
+            ]);
+        }
 
         $jwt = JWT::encode(
             [
@@ -251,7 +277,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'user_not_found'], 404);
         }
 
@@ -285,7 +311,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'user_not_authenticated'], 401);
         }
 
@@ -297,7 +323,7 @@ class UserController extends Controller
         if ($token) {
             $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
             $response['user'] = $user;
-            if (!isset($decoded->sid)) {
+            if (! isset($decoded->sid)) {
                 $response['user'] = [
                     'id' => $user->id,
                     'name' => $user->name,
@@ -316,7 +342,7 @@ class UserController extends Controller
     {
         $user = User::find($id, ['id', 'name', 'number', 'profile_picture']);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'user_not_found'], 404);
         }
 
@@ -348,7 +374,7 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'user_not_authenticated'], 401);
         }
 
@@ -358,7 +384,7 @@ class UserController extends Controller
 
         $file = $validated['image'];
 
-        $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $fileName = Str::uuid().'.'.$file->getClientOriginalExtension();
 
         $path = $file->storeAs(
             "uploads/pictures/{$user->id}",
@@ -366,7 +392,7 @@ class UserController extends Controller
             env('FILESYSTEM_DISK', 's3')
         );
 
-        if (!$path) {
+        if (! $path) {
             return response()->json(['message' => 'failed_to_upload_image'], 500);
         }
 
@@ -380,12 +406,12 @@ class UserController extends Controller
         ]);
 
         $appUrl = env('APP_URL');
-        $user = new User();
+        $user = User::where('id', $user->id)->first();
         $user->update([
-            'profile_picture' => "{$appUrl}uploads/pictures/{$path}",
-        ], ['id' => $user->id]);
+            'profile_picture' => "{$appUrl}/{$path}",
+        ]);
 
-        if (!$fileRecord) {
+        if (! $fileRecord) {
             Storage::disk(env('FILESYSTEM_DISK', 's3'))->delete($path);
 
             return response()->json(['message' => 'failed_to_save_image_record'], 500);
@@ -393,7 +419,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'image_uploaded_successfully',
-            'file' => $fileRecord,
+            'profile_picture' => "{$appUrl}/{$path}",
         ], 201);
     }
 
@@ -405,7 +431,7 @@ class UserController extends Controller
 
         $user = User::where('number', $validated['number'])->first();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json(['message' => 'user_not_found'], 404);
         }
 

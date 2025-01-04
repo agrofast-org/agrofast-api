@@ -7,12 +7,11 @@ use Closure;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class JwtMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    public function handle($request, Closure $next)
     {
         $token = $request->bearerToken();
         if (! $token) {

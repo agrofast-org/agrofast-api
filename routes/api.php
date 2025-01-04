@@ -35,9 +35,9 @@ Route::middleware(['db.safe'])->prefix('/user')->group(function () {
         Route::get('/me', [UserController::class, 'self']);
         Route::get('/{id}', [UserController::class, 'info']);
     });
-    Route::get('/picture', function () {
-        Route::post('/upload', [UserController::class, 'setPicture']);
-    })->middleware(['auth']);
+    Route::prefix('/picture')->middleware(['auth'])->group(function () {
+        Route::post('/upload', [UserController::class, 'postPicture']);
+    });
     Route::get('/exists', [UserController::class, 'exists']);
     Route::get('/auth', [UserController::class, 'authenticate'])->middleware(['auth.basic']);
     Route::post('/login', [UserController::class, 'login']);

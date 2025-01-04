@@ -15,5 +15,22 @@ class FilesImage extends Model
 
     protected $primaryKey = 'id';
 
-    protected $fillable = ['id', 'name', 'path', 'mime_type', 'size', 'uploaded_by', 'active', 'uploaded_at'];
+    protected $fillable = [
+        'id',
+        'name',
+        'path',
+        'mime_type',
+        'size',
+        'uploaded_by',
+        'active',
+        'uploaded_at',
+        'created_at',
+        'updated_at',
+    ];
+
+    protected $dates = [
+        'uploaded_at',
+        'created_at',
+        'updated_at',
+    ];
 }

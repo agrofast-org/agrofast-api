@@ -57,9 +57,19 @@ class User extends Authenticatable
 
     public static function prepareInsert(array $params): array
     {
-        $params['number'] = preg_replace('/\D/', '', $params['number']);
+        if (isset($params['email'])) {
+            $params['email'] = strtolower($params['email']);
+        }
+        if (isset($params['number'])) {
+            $params['number'] = preg_replace('/\D/', '', $params['number']);
+        }
 
         return $params;
+    }
+
+    public static function prepareUpdate(array $params): array
+    {
+        return self::prepareInsert($params);
     }
 
     public static function validateInsert(array $params): array
@@ -75,7 +85,7 @@ class User extends Authenticatable
             $arErr['password_confirm'][] = 'password_not_coincide';
             $arErr['password'][] = 'password_not_coincide';
         }
-        if (! empty($arErr['password'])) {
+        if (!empty($arErr['password'])) {
             $arErr['password_confirm'] = $arErr['password'];
         }
 
@@ -84,13 +94,18 @@ class User extends Authenticatable
 
     public static function validateUpdate(array $params): array
     {
-        return self::validateInsert($params);
+        $arErr = [];
+
+        $arErr = array_merge($arErr, self::validateRequiredField($params, 'name', 'name_required'));
+        $arErr = array_merge($arErr, self::validateRequiredField($params, 'surname', 'surname_required'));
+
+        return $arErr;
     }
 
     private static function validateRequiredField(array $params, string $field, string $message): array
     {
         $arErr = [];
-        if (! isset($params[$field]) || empty($params[$field])) {
+        if (!isset($params[$field]) || empty($params[$field])) {
             $arErr[$field] = $message;
         }
 
@@ -121,7 +136,7 @@ class User extends Authenticatable
         $arErr = [];
         if (empty($email)) {
             $arErr['email'][] = 'email_required';
-        } elseif (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $arErr['email'][] = 'invalid_email';
         }
 
@@ -131,11 +146,11 @@ class User extends Authenticatable
     private static function validatePassword(string|null $password = null, string $field = 'password'): array
     {
         $arErr = [];
-        if (! isset($password) || empty($password)) {
+        if (!isset($password) || empty($password)) {
             $arErr[$field][] = 'password_required';
         } elseif (strlen($password) < 8) {
             $arErr[$field][] = 'password_length';
-        } elseif (! preg_match('/[A-Za-z]/', $password) || ! preg_match('/[0-9]/', $password)) {
+        } elseif (!preg_match('/[A-Za-z]/', $password) || !preg_match('/[0-9]/', $password)) {
             $arErr[$field][] = 'password_character';
         }
 
