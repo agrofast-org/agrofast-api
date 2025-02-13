@@ -37,20 +37,24 @@ services:
 
     agrofast-postgres:
         container_name: agrofast-postgres
-        image: postgres:latest
+        image: postgres:15
         restart: always
         environment:
-            POSTGRES_DB: ${DB_DATABASE}
-            POSTGRES_USER: ${DB_USERNAME}
-            POSTGRES_PASSWORD: ${DB_PASSWORD}
-            POSTGRES_HOST_AUTH_METHOD: trust
-            PGDATA: /data/postgres
-        volumes:
-            - postgres_data:/var/lib/postgresql/data
-        ports:
-            - "5432:5432"
+            - POSTGRES_USER=${DB_USERNAME}
+            - POSTGRES_PASSWORD=${DB_PASSWORD}
+            - POSTGRES_DB=${DB_DATABASE}
+            - DB_HOST=${DB_HOST}
+            - DB_PORT=${DB_PORT}
+            - DB_SCHEMA=${DB_SCHEMA}
         networks:
             - agrofast-network
+            - mapdata-network
+        volumes:
+            - ./docker/database/init-db.sh:/usr/local/bin/init-db.sh
+        entrypoint: >
+            sh -c "
+            /usr/local/bin/init-db.sh && tail -f /dev/null
+            "
 
     agrofast-redis:
         container_name: agrofast-redis
@@ -85,3 +89,5 @@ volumes:
 networks:
     agrofast-network:
         driver: bridge
+    mapdata-network:
+        external: true
