@@ -28,6 +28,6 @@ else
     echo "Database ${DB_DATABASE} already exists."
 fi
 
-echo "Database setup completed."
+echo "Database is ready!"
 
-tail -f /dev/null
+exit 0;
