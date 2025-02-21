@@ -83,6 +83,7 @@ services:
             - agrofast-network
 
 volumes:
+    nginx-data:
     postgres_data:
     minio_data:
     cache:
