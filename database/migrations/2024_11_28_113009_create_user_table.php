@@ -47,6 +47,13 @@ return new class() extends Migration {
         Schema::create('hr.auth_email', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
+            $table->string('ip_address', 45)->nullable();
+            $table->text('user_agent')->nullable();
+            $table->foreignId('auth_code_id')->constrained('hr.auth_code')->onDelete('cascade');
+            $table->boolean('authenticated')->default(false);
+            $table->boolean('active')->default(true);
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('last_activity')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->string('code');
             $table->unsignedInteger('attempts')->default(0);
             $table->boolean('active')->default(true);

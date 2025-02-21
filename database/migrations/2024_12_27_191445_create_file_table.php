@@ -18,7 +18,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('size');
             $table->foreignId('uploaded_by')->nullable()->constrained('hr.user')->onDelete('set null');
             $table->boolean('active')->default(true);
-            $table->timestamp('uploaded_at')->useCurrent();
+            $table->timestamps();
         });
     }
 

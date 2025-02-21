@@ -27,7 +27,7 @@ Route::prefix('debug')->group(function () {
 })->middleware(['dev.env']);
 
 // User routes
-Route::prefix('/user')->group(function () {
+Route::middleware(['db.safe'])->prefix('/user')->group(function () {
     Route::get('/', [UserController::class, 'get']);
     Route::post('/', [UserController::class, 'create']);
     Route::put('/', [UserController::class, 'update'])->middleware(['auth']);
@@ -35,14 +35,14 @@ Route::prefix('/user')->group(function () {
         Route::get('/me', [UserController::class, 'self']);
         Route::get('/{id}', [UserController::class, 'info']);
     });
-    Route::get('/picture', function () {
-        Route::post('/upload', [UserController::class, 'setPicture']);
-    })->middleware(['auth']);
+    Route::prefix('/picture')->middleware(['auth'])->group(function () {
+        Route::post('/upload', [UserController::class, 'postPicture']);
+    });
     Route::get('/exists', [UserController::class, 'exists']);
     Route::get('/auth', [UserController::class, 'authenticate'])->middleware(['auth.basic']);
     Route::post('/login', [UserController::class, 'login']);
     Route::get('/resend-code', [UserController::class, 'resendCode'])->middleware(['auth.basic']);
-})->middleware(['db.safe']);
+});
 
 // Chat routes
 Route::middleware(['auth'])->group(function () {

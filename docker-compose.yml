@@ -7,10 +7,8 @@ services:
             - "80:80"
             - "443:443"
         volumes:
-            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/api.conf
-            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/console.conf
-            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/socket.conf
-            - ./docker/nginx/conf.d/:/etc/nginx/conf.d/storage.conf
+            - ../docker/config/nginx/conf.d/api.conf:/etc/nginx/conf.d/api.conf
+            - ../docker/config/nginx/conf.d/console.conf:/etc/nginx/conf.d/console.conf
         extra_hosts:
             - "host.docker.internal:host-gateway"
         networks:
@@ -31,14 +29,15 @@ services:
         depends_on:
             - agrofast-postgres
             - agrofast-nginx
-            - agrofast-data-bucket
+            - agrofast-minio
         networks:
             - agrofast-network
+            - mapdata-network
 
-    agrofast-postgres:
+    agrofast-postgres: # Only used for creating the application database
         container_name: agrofast-postgres
         image: postgres:15
-        restart: always
+        restart: on-failure
         environment:
             - POSTGRES_USER=${DB_USERNAME}
             - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -53,8 +52,26 @@ services:
             - ./docker/database/init-db.sh:/usr/local/bin/init-db.sh
         entrypoint: >
             sh -c "
-            /usr/local/bin/init-db.sh && tail -f /dev/null
+            /usr/local/bin/init-db.sh
             "
+
+    agrofast-minio: # Only used for creating the application bucket
+        container_name: agrofast-minio
+        image: minio/mc:latest
+        restart: "no"
+        environment:
+            - APP_NAME=${APP_NAME}
+        entrypoint: ["/bin/sh", "-c"]
+        command: >
+            "
+            mc config host add minio http://minio:9100 ${AWS_ACCESS_KEY_ID} ${AWS_SECRET_ACCESS_KEY};
+            mc mb -p minio/${AWS_BUCKET};
+            echo 'Minio is ready!';
+            exit 0;
+            "
+        networks:
+            - agrofast-network
+            - mapdata-network
 
     agrofast-redis:
         container_name: agrofast-redis
@@ -62,21 +79,6 @@ services:
         restart: always
         ports:
             - "6379:6379"
-        networks:
-            - agrofast-network
-
-    agrofast-data-bucket:
-        image: minio/minio:latest
-        container_name: agrofast-data-bucket
-        ports:
-            - "9100:9100" # Porta de acesso ao bucket MinIO
-            - "9101:9101" # Porta de acesso ao painel MinIO
-        environment:
-            MINIO_ROOT_USER: ${AWS_ACCESS_KEY_ID}
-            MINIO_ROOT_PASSWORD: ${AWS_SECRET_ACCESS_KEY}
-        volumes:
-            - minio_data:/data
-        command: server /data --address "0.0.0.0:9100" --console-address "0.0.0.0:9101"
         networks:
             - agrofast-network
 
