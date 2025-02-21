@@ -31,3 +31,4 @@ fi
 echo "Database is ready!"
 
 exit 0;
+

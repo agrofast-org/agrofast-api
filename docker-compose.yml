@@ -91,3 +91,5 @@ volumes:
 networks:
     agrofast-network:
         driver: bridge
+    mapdata-network:
+        external: true

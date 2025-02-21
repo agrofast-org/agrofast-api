@@ -26,5 +26,13 @@ return new class() extends Migration {
     public function down(): void
     {
         DB::statement("SET TIME ZONE 'UTC'");
+
+        DB::statement('DROP SCHEMA IF EXISTS hr CASCADE');
+        DB::statement('DROP SCHEMA IF EXISTS chat CASCADE');
+        DB::statement('DROP SCHEMA IF EXISTS transport CASCADE');
+        DB::statement('DROP SCHEMA IF EXISTS system CASCADE');
+        DB::statement('DROP SCHEMA IF EXISTS integration CASCADE');
+        DB::statement('DROP SCHEMA IF EXISTS file CASCADE');
+        DB::statement('DROP SCHEMA IF EXISTS framework CASCADE');
     }
 };
