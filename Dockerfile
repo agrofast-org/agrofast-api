@@ -1,6 +1,6 @@
 FROM php:8.3-fpm
 
-COPY composer.lock composer.json /var/www/
+COPY composer.json /var/www/
 
 EXPOSE 9000
 
