@@ -49,7 +49,7 @@ Route::middleware(['db.safe', 'fingerprint'])->group(function () {
         Route::get('/chat', [ChatController::class, 'getUserchat']);
 
         Route::prefix('/message')->group(function () {
-            Route::get('/{chatUuid}', [MessageController::class, 'getmessage']); // Get message in a chat
+            Route::get('/{chatUuid}', [MessageController::class, 'getMessage']); // Get message in a chat
             Route::post('/', [MessageController::class, 'sendMessage']); // Send a message
             Route::delete('/{id}', [MessageController::class, 'deleteMessage']); // Delete a message
         });
