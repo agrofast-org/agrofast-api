@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BrowserAgentController;
 use App\Http\Controllers\IndexController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +20,8 @@ Route::prefix('/public')->group(function () {
     });
 });
 
-Route::get('/api/fingerprint', [App\Http\Controllers\BrowserAgentController::class, 'makeFingerprint']);
-Route::middleware('fingerprint')->get('/api/fingerprint/validate', [App\Http\Controllers\BrowserAgentController::class, 'validate']);
+Route::get('/api/fingerprint', [BrowserAgentController::class, 'makeFingerprint']);
+Route::middleware('fingerprint')->get('/api/fingerprint/validate', [BrowserAgentController::class, 'validate']);
 
 Route::prefix('/console')->group(function () {
     require_once __DIR__.'/../routes/console.php';
