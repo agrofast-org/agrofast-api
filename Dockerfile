@@ -1,11 +1,5 @@
 FROM php:8.3-fpm
 
-COPY composer.json /var/www/
-
-EXPOSE 9000
-
-WORKDIR /var/www
-
 RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg62-turbo-dev \
@@ -23,17 +17,19 @@ RUN apt-get update && apt-get install -y \
     && docker-php-ext-install gd \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
+WORKDIR /var/www
+
+COPY composer.json composer.lock /var/www/
+
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN groupadd -g 1000 www \
-    && useradd -u 1000 -ms /bin/bash -g www www
+RUN composer install --no-dev --optimize-autoloader
 
-COPY --chown=www:www . /var/www/
+COPY . /var/www
 
-RUN chown -R www-data:www-data /var/www
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 755 /var/www/storage /var/www/bootstrap/cache
 
-RUN composer install
-
-USER www
+EXPOSE 9000
 
 CMD ["php-fpm"]
