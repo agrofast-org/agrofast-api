@@ -32,8 +32,8 @@ COPY --chown=www:www . /var/www/
 
 RUN chown -R www-data:www-data /var/www
 
-USER www
-
 RUN composer install
+
+USER www
 
 CMD ["php-fpm"]
