@@ -7,10 +7,30 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 
+/**
+ * Class User
+ *
+ * Represents a system user with associated attributes and logic.
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $surname
+ * @property string $number
+ * @property string $email
+ * @property string $password
+ * @property bool $number_verified
+ * @property \Carbon\Carbon|null $number_verified_at
+ * @property bool $email_verified
+ * @property \Carbon\Carbon|null $email_verified_at
+ * @property bool $active
+ * @property string|null $profile_picture
+ * @property string|null $remember_token
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
 class User extends Authenticatable
 {
-    use HasFactory;
-    use Notifiable;
+    use HasFactory, Notifiable;
 
     protected $table = 'hr.user';
 
@@ -34,7 +54,7 @@ class User extends Authenticatable
     protected $casts = [
         'number_authenticated' => 'boolean',
         'email_authenticated' => 'boolean',
-        'active' => 'boolean',
+        'active'               => 'boolean',
     ];
 
     protected $dates = [
@@ -48,13 +68,26 @@ class User extends Authenticatable
     ];
 
     /**
-     * Mutator to hash the password.
+     * Mutator for password hashing.
+     *
+     * @param string $value Plain text password.
+     * @return void
      */
-    public function setPasswordAttribute($value)
+    public function setPasswordAttribute($value): void
     {
-        $this->attributes['password'] = Hash::make($value);
+        if (Hash::needsRehash($value)) {
+            $this->attributes['password'] = Hash::make($value);
+        } else {
+            $this->attributes['password'] = $value;
+        }
     }
 
+    /**
+     * Prepares data for insertion by normalizing and sanitizing inputs.
+     *
+     * @param array $params Data received from the request.
+     * @return array Prepared data for insertion.
+     */
     public static function prepareInsert(array $params): array
     {
         if (isset($params['email'])) {
@@ -65,95 +98,5 @@ class User extends Authenticatable
         }
 
         return $params;
-    }
-
-    public static function prepareUpdate(array $params): array
-    {
-        return self::prepareInsert($params);
-    }
-
-    public static function validateInsert(array $params): array
-    {
-        $arErr = [];
-
-        $arErr = array_merge($arErr, self::validateRequiredField($params, 'name', 'name_required'));
-        $arErr = array_merge($arErr, self::validateRequiredField($params, 'surname', 'surname_required'));
-        $arErr = array_merge($arErr, self::validatePhoneNumber($params['number'] ?? null));
-        $arErr = array_merge($arErr, self::validatePassword($params['password'] ?? null, 'password'));
-
-        if (empty($arErr['password']) && empty($arErr['password_confirm']) && $params['password'] !== $params['password_confirm']) {
-            $arErr['password_confirm'][] = 'password_not_coincide';
-            $arErr['password'][] = 'password_not_coincide';
-        }
-        if (!empty($arErr['password'])) {
-            $arErr['password_confirm'] = $arErr['password'];
-        }
-
-        return $arErr;
-    }
-
-    public static function validateUpdate(array $params): array
-    {
-        $arErr = [];
-
-        $arErr = array_merge($arErr, self::validateRequiredField($params, 'name', 'name_required'));
-        $arErr = array_merge($arErr, self::validateRequiredField($params, 'surname', 'surname_required'));
-
-        return $arErr;
-    }
-
-    private static function validateRequiredField(array $params, string $field, string $message): array
-    {
-        $arErr = [];
-        if (!isset($params[$field]) || empty($params[$field])) {
-            $arErr[$field] = $message;
-        }
-
-        return $arErr;
-    }
-
-    private static function validatePhoneNumber(string|null $number = null): array
-    {
-        $arErr = [];
-        if (empty($number)) {
-            $arErr['number'][] = 'number_required';
-
-            return $arErr;
-        }
-        $cleanedNumber = preg_replace('/\D/', '', $number);
-        $length = strlen($cleanedNumber);
-        if ($length !== 13) {
-            $arErr['number'][] = 'invalid_number';
-
-            return $arErr;
-        }
-
-        return $arErr;
-    }
-
-    private static function validateEmail(string|null $email = null): array
-    {
-        $arErr = [];
-        if (empty($email)) {
-            $arErr['email'][] = 'email_required';
-        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $arErr['email'][] = 'invalid_email';
-        }
-
-        return $arErr;
-    }
-
-    private static function validatePassword(string|null $password = null, string $field = 'password'): array
-    {
-        $arErr = [];
-        if (!isset($password) || empty($password)) {
-            $arErr[$field][] = 'password_required';
-        } elseif (strlen($password) < 8) {
-            $arErr[$field][] = 'password_length';
-        } elseif (!preg_match('/[A-Za-z]/', $password) || !preg_match('/[0-9]/', $password)) {
-            $arErr[$field][] = 'password_character';
-        }
-
-        return $arErr;
     }
 }

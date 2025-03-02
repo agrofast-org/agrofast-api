@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'vonage' => [
+        'key'   => env('SMS_SERVICE_KEY'),
+        'secret'=> env('SMS_SERVICE_SECRET'),
+        'from'  => env('SMS_SERVICE_FROM', 'Agrofast'),
+    ],
+
 ];

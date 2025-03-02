@@ -56,7 +56,6 @@ return new class() extends Migration {
             $table->timestamp('last_activity')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->string('code');
             $table->unsignedInteger('attempts')->default(0);
-            $table->boolean('active')->default(true);
             $table->timestamps();
         });
 
