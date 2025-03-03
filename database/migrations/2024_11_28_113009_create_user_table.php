@@ -5,7 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration {
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -23,57 +23,18 @@ return new class() extends Migration {
             $table->timestamp('number_verified_at')->nullable();
             $table->boolean('email_verified')->default(false);
             $table->timestamp('email_verified_at')->nullable();
-            $table->boolean('active')->default(true);
             $table->string('profile_picture')->nullable();
             $table->rememberToken();
-            $table->timestamps();
+            $table->boolean('active')->default(true);
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('inactivated_at')->nullable();
         });
 
         Schema::create('hr.password_reset_token', function (Blueprint $table) {
             $table->string('email')->primary();
             $table->string('token');
             $table->timestamp('created_at')->nullable();
-        });
-
-        Schema::create('hr.auth_sms', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
-            $table->string('code');
-            $table->unsignedInteger('attempts')->default(0);
-            $table->boolean('active')->default(true);
-            $table->timestamps();
-        });
-
-        Schema::create('hr.auth_email', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
-            $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->foreignId('auth_code_id')->constrained('hr.auth_code')->onDelete('cascade');
-            $table->boolean('authenticated')->default(false);
-            $table->boolean('active')->default(true);
-            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamp('last_activity')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->string('code');
-            $table->unsignedInteger('attempts')->default(0);
-            $table->timestamps();
-        });
-
-        Schema::create('hr.timeout', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
-            $table->string('reason')->nullable();
-            $table->timestamp('timeout_start');
-            $table->timestamp('timeout_end')->nullable();
-            $table->timestamps();
-        });
-
-        Schema::create('hr.banned', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
-            $table->string('reason')->nullable();
-            $table->timestamp('banned_at')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->timestamps();
         });
     }
 
@@ -84,9 +45,5 @@ return new class() extends Migration {
     {
         Schema::dropIfExists('hr.user');
         Schema::dropIfExists('hr.password_reset_token');
-        Schema::dropIfExists('hr.auth_sms');
-        Schema::dropIfExists('hr.auth_email');
-        Schema::dropIfExists('hr.timeout');
-        Schema::dropIfExists('hr.banned');
     }
 };
