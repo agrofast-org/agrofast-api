@@ -5,21 +5,18 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('system.developer_auth', function (Blueprint $table) {
+        Schema::create('hr.banned', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->string('token')->unique();
-            $table->text('permissions')->nullable();
-            $table->timestamp('token_expires_at')->nullable();
-            $table->timestamp('last_used_at')->nullable();
-            $table->ipAddress('last_used_ip')->nullable();
+            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
+            $table->string('reason')->nullable();
+            $table->timestamp('banned_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
@@ -32,6 +29,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('system.developer_auth');
+        Schema::dropIfExists('hr.banned');
     }
 };

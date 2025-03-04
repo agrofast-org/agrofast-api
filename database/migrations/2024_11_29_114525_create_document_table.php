@@ -2,9 +2,10 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class() extends Migration {
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('hr.document', function (Blueprint $table) {
@@ -13,8 +14,9 @@ return new class() extends Migration {
             $table->integer('document_type');
             $table->string('document')->unique();
             $table->boolean('active')->default(true);
-            $table->timestamps();
-            $table->timestamp('inactivated_in')->nullable();
+            $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('inactivated_at')->nullable();
         });
     }
 
