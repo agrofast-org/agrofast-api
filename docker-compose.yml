@@ -32,12 +32,6 @@ services:
             file: ../docker-compose.yml
             service: agrofast-minio
 
-    agrofast-redis:
-        container_name: agrofast-redis
-        extends:
-            file: ../docker-compose.yml
-            service: agrofast-redis
-
 volumes:
     nginx-data:
     postgres_data:
