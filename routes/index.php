@@ -4,9 +4,9 @@ use App\Http\Controllers\BrowserAgentController;
 use App\Http\Controllers\IndexController;
 use Illuminate\Support\Facades\Route;
 
-// Route::fallback(function () {
-//     return response()->json(['message' => 'Endpoint not found'], 404);
-// });
+Route::fallback(function () {
+    return response()->json(['message' => 'Endpoint not found'], 404);
+});
 
 Route::get('/', function () {
     return response()->json(['message' => "Welcome to Agrofast's services"], 200);

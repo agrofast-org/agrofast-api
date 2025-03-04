@@ -28,7 +28,7 @@ return new class extends Migration {
             $table->string('ip_address', 45)->nullable();
             $table->foreignId('browser_agent_id')->constrained('hr.browser_agent')->nullable();
             $table->enum('auth_type', ['auth_sms', 'auth_email']);
-            $table->bigInteger('auth_code_id')->comment('Made to store the id from auth_sms_id or auth_email_id');
+            $table->foreignId('auth_code_id')->constrained('hr.auth_code')->onDelete('cascade');
             $table->boolean('authenticated')->default(false);
             $table->timestamp('last_activity')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->boolean('active')->default(true);

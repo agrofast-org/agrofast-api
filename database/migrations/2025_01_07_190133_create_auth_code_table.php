@@ -11,12 +11,12 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('hr.auth_sms', function (Blueprint $table) {
+        Schema::create('hr.auth_code', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
-            $table->foreignId('auth_code_id')->constrained('hr.auth_code')->onDelete('cascade');
+            $table->enum('auth_type', ['auth_email', 'auth_sms']);
             $table->boolean('authenticated')->default(false);
             $table->string('code');
             $table->unsignedInteger('attempts')->default(0);
@@ -32,6 +32,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('hr.auth_sms');
+        Schema::dropIfExists('hr.auth_code');
     }
 };

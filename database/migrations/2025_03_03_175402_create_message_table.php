@@ -5,8 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -16,9 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('chat_id');
-            $table->foreignId('answer_to')->constrained('chat.message')->nullable();
             $table->text('message');
-            $table->foreign('answer_to')->references('id')->on('chat.message')->onDelete('cascade');
+            $table->foreignId('answer_to')->nullable()->constrained('chat.message')->onDelete('cascade');
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));

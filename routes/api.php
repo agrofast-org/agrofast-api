@@ -16,7 +16,7 @@ Route::get('/', [IndexController::class, 'index']);
 // Debug routes
 Route::middleware(['dev.env'])->prefix('/debug')->group(function () {
     Route::get('/', [DebugController::class, 'showEnvironment']);
-    Route::prefix('env')->group(function () {
+    Route::prefix('/env')->group(function () {
         Route::get('/', [DebugController::class, 'getEnvironmentInstructions']);
         Route::get('/{variable}', [DebugController::class, 'getEnvironmentVariable']);
     });
@@ -24,6 +24,11 @@ Route::middleware(['dev.env'])->prefix('/debug')->group(function () {
     Route::get('/dir', [DebugController::class, 'mapProjectFiles']);
     Route::get('/file', [DebugController::class, 'getFileContent']);
     Route::post('/body', [DebugController::class, 'showBody']);
+
+    Route::prefix('/test')->group(function () {
+        Route::get('/email', [DebugController::class, 'sendEmail']);
+        // Route::get('/sms', [DebugController::class, 'sendSms']);
+    });
 });
 
 // User routes

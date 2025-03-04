@@ -14,6 +14,7 @@
         "laravel/framework": "^11.31",
         "laravel/tinker": "^2.9",
         "league/flysystem-aws-s3-v3": "^3.29",
+        "vladimir-yuldashev/laravel-queue-rabbitmq": "^14.1",
         "vonage/client": "^4.1"
     },
     "require-dev": {
