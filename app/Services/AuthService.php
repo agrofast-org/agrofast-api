@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Models\AuthEmail;
+use App\Models\AuthCode;
 use App\Models\BrowserAgent;
 use App\Models\RememberBrowser;
 use App\Models\Session;
@@ -34,7 +34,7 @@ class AuthService
             return ['error' => ['password' => 'wrong_password']];
         }
 
-        $authCode = AuthEmail::createCode($user->id);
+        $authCode = AuthCode::createCode($user->id, AuthCode::SMS);
         $browserAgent = BrowserAgent::where('fingerprint', $request->header('Browser-Agent'))->first();
 
         $sessionData = [
@@ -93,7 +93,7 @@ class AuthService
         $token = $request->bearerToken();
         $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
         $session = Session::where('id', $decoded->sid)->first();
-        $authCode = AuthEmail::where('id', $session->auth_code_id)->first();
+        $authCode = AuthCode::where(['id' => $session->auth_code_id, 'auth_type' => AuthCode::SMS])->first();
 
         if (! $authCode) {
             return ['error' => ['code' => 'invalid_authentication_code']];

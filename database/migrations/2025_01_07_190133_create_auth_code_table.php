@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
-            $table->enum('auth_type', ['auth_email', 'auth_sms']);
+            $table->enum('auth_type', ['sms', 'email']);
             $table->boolean('authenticated')->default(false);
             $table->string('code');
             $table->unsignedInteger('attempts')->default(0);
