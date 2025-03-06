@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\SendMail;
+use App\Jobs\SendSms;
 use App\Mail\FirstLoginMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -121,6 +122,13 @@ class DebugController extends Controller
     public function sendEmail()
     {
         $job = SendMail::dispatch('murilo7456@gmail.com', FirstLoginMail::class, ['user' => ['name' => 'Murilo'], 'info' => ['code' => '1234', 'expires' => now()->addMinutes(10)]]);
+
+        return response()->json(['message' => 'Email job created', 'job_info' => $job->getJob()]);
+    }
+
+    public function sendSms()
+    {
+        $job = SendSms::dispatch('+5564996020731', 'Seu código de autenticação para o mdxfy é: Apenas um teste');
 
         return response()->json(['message' => 'Email job created', 'job_info' => $job->getJob()]);
     }
