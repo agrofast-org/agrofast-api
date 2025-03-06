@@ -30,6 +30,7 @@ class AuthCode extends Model
     use Notifiable;
 
     public const SMS = 'sms';
+
     public const EMAIL = 'email';
 
     protected $table = 'hr.auth_code';
