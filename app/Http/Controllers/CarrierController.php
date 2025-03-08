@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,7 +17,7 @@ class CarrierController extends Controller
      */
     public function listTransports(): JsonResponse
     {
-        $user = Auth::user();
+        $user = User::auth();
         $carriers = Carrier::where('user_id', $user->id)->get();
 
         return response()->json(['data' => $carriers], 200);
@@ -31,7 +32,7 @@ class CarrierController extends Controller
      */
     public function createTransport(Request $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = User::auth();
 
         $validated = $request->validate([
             'name'  => 'required|string|max:255',
@@ -62,7 +63,7 @@ class CarrierController extends Controller
      */
     public function updateTransport(Request $request): JsonResponse
     {
-        $user = Auth::user();
+        $user = User::auth();
 
         $validated = $request->validate([
             'id'    => 'required|exists:carriers,id',

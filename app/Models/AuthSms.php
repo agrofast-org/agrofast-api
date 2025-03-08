@@ -68,7 +68,7 @@ class AuthSms extends Model
         if (! self::validatePhoneNumber($user->number)) {
             throw new \Exception('Invalid phone number');
         }
-        $code = (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development') ? '1111' : rand(1000, 9999);
+        $code = (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development') ? '111111' : rand(100000, 999999);
         self::where('user_id', $userId)->update(['active' => false]);
         $authCode = self::create([
             'user_id' => $userId,
@@ -78,7 +78,7 @@ class AuthSms extends Model
         $smsEnabled = env('SMS_SERVICE_ENABLED', false);
         // Added this verification to avoid sending SMS in local environment. It's really expensive XD.
         if ($smsEnabled || $smsEnabled === 'true') {
-            SendSms::dispatch($user->number, "Seu código de autenticação para o mdxfy é: {$code}");
+            SendSms::dispatch($user->number, "Seu código de autenticação para o Agrofast é: {$code}");
         }
 
         return $authCode;

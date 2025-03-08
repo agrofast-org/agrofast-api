@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UserCreateRequest extends FormRequest
+class UserUpdateRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -17,7 +17,7 @@ class UserCreateRequest extends FormRequest
             'name'             => 'required|string|max:255',
             'surname'          => 'required|string|max:255',
             'number'           => ['required', 'regex:/^\d{13}$/'],
-            'email'            => 'required|email|max:255',
+            'email'            => 'email|max:255',
             'password'         => [
                 'required',
                 'string',
@@ -36,7 +36,6 @@ class UserCreateRequest extends FormRequest
             'surname.required'          => 'surname_required',
             'number.required'           => 'number_required',
             'number.regex'              => 'invalid_number',
-            'email.required'            => 'email_required',
             'email.email'               => 'invalid_email',
             'password.required'         => 'password_required',
             'password.min'              => 'password_length',

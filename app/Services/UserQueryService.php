@@ -48,15 +48,4 @@ class UserQueryService
     {
         return User::where('number', $number)->first();
     }
-
-    /**
-     * Returns the user's role.
-     *
-     * @param User $user
-     * @return string|null
-     */
-    public function getRole(User $user)
-    {
-        return $user->role ?? null;
-    }
 }

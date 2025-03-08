@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserCreateRequest;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateRequest;
+use App\Models\User;
 use App\Services\AuthService;
 use App\Services\PictureService;
 use App\Services\UserQueryService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -32,7 +33,19 @@ class UserController extends Controller
         $this->pictureService = $pictureService;
     }
 
-    public function create(UserCreateRequest $request)
+    public function index(Request $request)
+    {
+        $query = $request->only(['id', 'telephone', 'name']);
+        $user = $this->userQueryService->getUser($query);
+
+        if ($user) {
+            return response()->json(['data' => $user], 200);
+        }
+
+        return response()->json(['message' => 'user_not_found'], 404);
+    }
+
+    public function store(UserStoreRequest $request)
     {
         $data = $request->validated();
         $result = $this->userService->createUser($data, $request);
@@ -57,10 +70,10 @@ class UserController extends Controller
         ], 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(UserUpdateRequest $request, $id)
     {
         $data = $request->only(['id', 'name', 'password', 'email']);
-        $user = \App\Models\User::find($id);
+        $user = User::find($id);
 
         if (! $user) {
             return response()->json(['message' => 'user_not_found'], 404);
@@ -69,18 +82,6 @@ class UserController extends Controller
         $user->update($data);
 
         return response()->json(['message' => 'user_updated_successfully'], 200);
-    }
-
-    public function get(Request $request)
-    {
-        $query = $request->only(['id', 'telephone', 'name']);
-        $user = $this->userQueryService->getUser($query);
-
-        if ($user) {
-            return response()->json(['data' => $user], 200);
-        }
-
-        return response()->json(['message' => 'user_not_found'], 404);
     }
 
     public function login(Request $request)
@@ -134,7 +135,7 @@ class UserController extends Controller
 
     public function self()
     {
-        $user = Auth::user();
+        $user = User::auth();
 
         if (! $user) {
             return response()->json(['message' => 'user_not_authenticated'], 401);
@@ -157,20 +158,6 @@ class UserController extends Controller
         return response()->json(['data' => $user], 200);
     }
 
-    public function role()
-    {
-        $user = Auth::user();
-
-        if (! $user) {
-            return response()->json(['message' => 'user_not_authenticated'], 401);
-        }
-
-        return response()->json([
-            'message' => 'user_found',
-            'role'    => $this->userQueryService->getRole($user),
-        ], 200);
-    }
-
     public function picture($userId, $pictureUuid = null)
     {
         $result = $this->pictureService->getPicture($userId, $pictureUuid);
@@ -184,7 +171,7 @@ class UserController extends Controller
 
     public function postPicture(Request $request)
     {
-        $user = Auth::user();
+        $user = User::auth();
 
         if (! $user) {
             return response()->json(['message' => 'user_not_authenticated'], 401);

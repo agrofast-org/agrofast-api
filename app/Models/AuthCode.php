@@ -30,6 +30,7 @@ class AuthCode extends Model
     use Notifiable;
 
     public const SMS = 'sms';
+
     public const EMAIL = 'email';
 
     protected $table = 'hr.auth_code';
@@ -59,7 +60,7 @@ class AuthCode extends Model
      * @param int $userId
      * @param self::SMS | self::EMAIL $userId
      *
-     * @return AuthSms
+     * @return AuthEmail | AuthSms
      *
      * @throws \Exception
      */

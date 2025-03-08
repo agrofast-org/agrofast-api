@@ -49,8 +49,8 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth' => Middleware\JwtMiddleware::class,
-        'auth.basic' => Middleware\BasicAuthMiddleware::class,
+        'auth' => Middleware\AuthMiddleware::class,
+        'auth.basic' => Middleware\AuthBasicMiddleware::class,
         'fingerprint' => Middleware\BrowserAgentMiddleware::class,
         'dev.env' => Middleware\DevelopmentEnvironmentMiddleware::class,
         'dev.auth' => Middleware\DeveloperAuthMiddleware::class,
