@@ -2,12 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\FilesImage;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AssetController extends Controller
 {
