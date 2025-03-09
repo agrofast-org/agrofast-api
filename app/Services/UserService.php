@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\AuthEmail;
-use App\Models\BrowserAgent;
-use App\Models\RememberBrowser;
-use App\Models\Session;
-use App\Models\User;
+use App\Models\Hr\AuthEmail;
+use App\Models\Hr\BrowserAgent;
+use App\Models\Hr\RememberBrowser;
+use App\Models\Hr\Session;
+use App\Models\Hr\User;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Illuminate\Http\Request;

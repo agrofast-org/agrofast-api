@@ -13,12 +13,13 @@ return new class extends Migration {
     {
         Schema::create('hr.user', function (Blueprint $table) {
             $table->id();
+            $table->uuid('uuid');
             $table->string('name');
             $table->string('surname');
             $table->string('number')->unique();
             $table->string('email')->unique()->nullable();
             $table->string('password');
-            $table->string('language', 10)->default('pt-br');
+            $table->string('language', 10)->default('pt-BR');
             $table->boolean('number_verified')->default(false);
             $table->timestamp('number_verified_at')->nullable();
             $table->boolean('email_verified')->default(false);

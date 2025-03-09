@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Transport;
 
+use App\Models\Hr\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Carrier extends Model
+class TransportRequest extends Model
 {
     use HasFactory;
 
-    protected $table = 'transport.carrier';
+    protected $table = 'transport.request';
 
     protected $fillable = [
         'user_id',
-        'name',
-        'model',
-        'plate',
+        'origin',
+        'destination',
         'active',
     ];
 

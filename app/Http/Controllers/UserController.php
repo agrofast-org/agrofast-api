@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserStoreRequest;
 use App\Http\Requests\UserUpdateRequest;
-use App\Models\User;
+use App\Models\Hr\User;
 use App\Services\AuthService;
 use App\Services\PictureService;
 use App\Services\UserQueryService;

@@ -1,0 +1,91 @@
+<?php
+
+namespace App\Models\Hr;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
+
+/**
+ * Class BrowserAgent
+ *
+ * Represents a browser agent with associated attributes and relationships.
+ *
+ * @property int $id
+ * @property string $fingerprint
+ * @property string $user_agent
+ * @property string $ip_address
+ * @property bool $active
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon|null $inactivated_at
+ */
+class BrowserAgent extends Model
+{
+    protected $table = 'hr.browser_agent';
+
+    protected $fillable = [
+        'user_agent',
+        'fingerprint',
+        'ip_address',
+        'active',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
+    ];
+
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'inactivated_at',
+    ];
+
+    /**
+     * Create a new browser agent for the user.
+     *
+     * @return self
+     */
+    public static function createBrowserAgent(): self
+    {
+        return self::create([
+            'user_agent' => request()->header('User-Agent'),
+            'fingerprint' => Str::uuid(),
+            'ip_address' => request()->ip(),
+            'active' => true,
+        ]);
+    }
+
+    /**
+     * Get the sessions associated with this browser agent.
+     *
+     * @return HasMany
+     */
+    public function sessions(): HasMany
+    {
+        return $this->hasMany(Session::class);
+    }
+
+    /**
+     * Get the remembered browsers associated with this browser agent.
+     *
+     * @return HasMany
+     */
+    public function rememberedBrowsers(): HasMany
+    {
+        return $this->hasMany(RememberBrowser::class);
+    }
+
+    /**
+     * Deactivate the browser agent.
+     *
+     * @return bool
+     */
+    public function deactivate(): bool
+    {
+        $this->active = false;
+        $this->inactivated_at = now();
+
+        return $this->save();
+    }
+}

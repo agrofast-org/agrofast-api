@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\User;
+use App\Models\Hr\User;
 use Closure;
 
 class AuthBasicMiddleware

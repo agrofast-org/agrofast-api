@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Carrier;
-use App\Models\User;
+use App\Models\Hr\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

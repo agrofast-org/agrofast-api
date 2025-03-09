@@ -13,11 +13,6 @@ Route::get('/', function () {
 Route::get('/favicon.ico', function () {
     return response()->file(public_path('favicon.ico'));
 });
-Route::prefix('/public')->group(function () {
-    Route::get('/{file}', function () {
-        return response()->file(public_path('assets/'.request()->file));
-    });
-});
 
 Route::get('/api/fingerprint', [BrowserAgentController::class, 'makeFingerprint']);
 Route::middleware('fingerprint')->get('/api/fingerprint/validate', [BrowserAgentController::class, 'validate']);
@@ -42,4 +37,15 @@ Route::prefix('/storage')->group(function () {
 
 Route::prefix('/api')->group(function () {
     require_once __DIR__.'/../routes/api.php';
+});
+
+Route::prefix('/')->group(function () {
+    Route::get('/{type}/{file}', function ($type = null, $file = null) {
+        $path = public_path("{$type}/".$file);
+        if (file_exists($path)) {
+            return response()->file($path);
+        }
+
+        return response()->json(['message' => 'File not found'], 404);
+    });
 });

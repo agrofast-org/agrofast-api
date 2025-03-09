@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Hr;
 
 use App\Enums\UserError;
+use App\Models\DynamicQuery;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,6 +23,7 @@ use stdClass;
  * @property string $number
  * @property string $email
  * @property string $password
+ * @property string $language
  * @property bool $number_verified
  * @property \Carbon\Carbon|null $number_verified_at
  * @property bool $email_verified
@@ -51,6 +53,7 @@ class User extends DynamicQuery
         'number',
         'email',
         'password',
+        'language',
         'number_verified',
         'number_verified_at',
         'email_verified',

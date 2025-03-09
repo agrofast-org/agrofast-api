@@ -1,16 +1,14 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Hr;
 
-use App\Jobs\SendMail;
-use App\Mail\AuthenticationMail;
-use App\Mail\FirstLoginMail;
+use App\Jobs\SendSms;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
 /**
- * Class AuthEmail
+ * Class AuthSms
  *
  * @property int $id
  * @property int $user_id
@@ -25,7 +23,7 @@ use Illuminate\Notifications\Notifiable;
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon|null $inactivated_at
  */
-class AuthEmail extends Model
+class AuthSms extends Model
 {
     use HasFactory;
     use Notifiable;
@@ -56,7 +54,7 @@ class AuthEmail extends Model
      *
      * @param int $userId
      *
-     * @return AuthEmail
+     * @return AuthSms
      *
      * @throws \Exception
      */
@@ -67,42 +65,34 @@ class AuthEmail extends Model
         if (! $user) {
             throw new \Exception('User not found');
         }
-        if (! self::validateEmail($user->email)) {
-            throw new \Exception('Invalid Email');
+        if (! self::validatePhoneNumber($user->number)) {
+            throw new \Exception('Invalid phone number');
         }
-        $code = (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development') ? '1111' : rand(1000, 9999);
+        $code = (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development') ? '111111' : rand(100000, 999999);
         self::where('user_id', $userId)->update(['active' => false]);
         $authCode = self::create([
             'user_id' => $userId,
             'code' => $code,
         ]);
 
-        $mailData = [
-            'user' => $user,
-            'info' => [
-                'code' => $code,
-                'expires' => now()->addMinutes(10),
-            ],
-        ];
-
-        if (! $user->email_verified) {
-            SendMail::dispatch($user->email, FirstLoginMail::class, $mailData);
-        } else {
-            SendMail::dispatch($user->email, AuthenticationMail::class, $mailData);
+        $smsEnabled = env('SMS_SERVICE_ENABLED', false);
+        // Added this verification to avoid sending SMS in local environment. It's really expensive XD.
+        if ($smsEnabled || $smsEnabled === 'true') {
+            SendSms::dispatch($user->number, "Seu código de autenticação para o Agrofast é: {$code}");
         }
 
         return $authCode;
     }
 
     /**
-     * Validate a phone Email (simple example).
+     * Validate a phone number (simple example).
      *
-     * @param string $Email
+     * @param string $number
      *
      * @return bool
      */
-    private static function validateEmail(string $email): bool
+    private static function validatePhoneNumber(string $number): bool
     {
-        return ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL);
+        return ! empty($number);
     }
 }

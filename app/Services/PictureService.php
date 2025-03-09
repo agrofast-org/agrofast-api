@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\FilesImage;
-use App\Models\User;
+use App\Models\File\FilesImage;
+use App\Models\Hr\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
