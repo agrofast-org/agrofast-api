@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BrowserAgent;
+use App\Models\Hr\BrowserAgent;
 use Illuminate\Http\JsonResponse;
 
 class BrowserAgentController extends Controller

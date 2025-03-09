@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\BrowserAgent;
+use App\Models\Hr\BrowserAgent;
 use Closure;
 use Symfony\Component\HttpFoundation\Response;
 

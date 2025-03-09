@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\ErrorLog;
+use App\Models\System\ErrorLog;
 use Closure;
 use Illuminate\Support\Facades\DB;
 use Throwable;
