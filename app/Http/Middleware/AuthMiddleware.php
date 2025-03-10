@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Hr\Session;
 use App\Models\Hr\User;
 use Closure;
 
@@ -16,6 +17,14 @@ class AuthMiddleware
         }
 
         $decodedToken = User::getDecodedToken();
+
+        $session = Session::where([
+            'id' => $decodedToken->sid,
+        ])->first();
+
+        if ($session->authenticated === false) {
+            return response()->json(['message' => 'unauthenticated'], 401);
+        }
 
         return $next($request);
     }

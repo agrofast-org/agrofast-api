@@ -12,7 +12,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('integration.application', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->string('name');
             $table->string('client_id')->unique();
             $table->string('client_secret');
@@ -25,7 +25,7 @@ return new class extends Migration {
         });
 
         Schema::create('integration.user_connections', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->foreignId('application_id')->constrained('integration.application')->onDelete('cascade');
             $table->string('provider');

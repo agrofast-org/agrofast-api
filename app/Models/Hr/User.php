@@ -40,6 +40,8 @@ class User extends DynamicQuery
 
     protected static User $user;
 
+    protected static Session $session;
+
     protected static stdClass $decodedToken;
 
     protected $table = 'hr.user';
@@ -127,6 +129,26 @@ class User extends DynamicQuery
         } catch (\Throwable) {
             return UserError::INVALID_TOKEN;
         }
+    }
+
+    public static function session(): Session | UserError
+    {
+        if (self::$session) {
+            return self::$session;
+        }
+        $decoded = self::getDecodedToken();
+
+        if (typeof($decoded) === 'enum') {
+            return $decoded;
+        }
+
+        $session = Session::where('id', $decoded->sid)->first();
+        self::$session = $session;
+        if (! $session) {
+            return UserError::SESSION_NOT_FOUND;
+        }
+
+        return $session;
     }
 
     /**

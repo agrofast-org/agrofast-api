@@ -12,7 +12,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('transport.offers', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->foreignId('request_id')->constrained('transport.requests')->onDelete('cascade');
             $table->foreignId('carrier_id')->constrained('transport.carriers')->onDelete('cascade');

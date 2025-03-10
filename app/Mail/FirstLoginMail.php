@@ -20,7 +20,7 @@ class FirstLoginMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Bem-vindo(a) ao NomeDaAplicação! Confirme seu primeiro acesso',
+            subject: __('email.first_login.subject'),
         );
     }
 

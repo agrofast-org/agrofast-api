@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Hr\AuthEmail;
+use App\Http\Requests\User\UserStoreRequest;
+use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\Session;
 use App\Models\Hr\User;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
-use Illuminate\Http\Request;
 
 class UserService
 {
@@ -17,11 +17,11 @@ class UserService
      * Creates a new user and starts a session.
      *
      * @param array   $data    user data to be inserted
-     * @param Request $request request instance
+     * @param UserStoreRequest $request request instance
      *
      * @return array result with user and token or errors
      */
-    public function createUser(array $data, Request $request): array
+    public function createUser(array $data, UserStoreRequest $request): array
     {
         $params = User::prepareInsert($data);
         $validated = User::validateInsert(User::prepareInsert($params));
@@ -41,7 +41,7 @@ class UserService
 
         $user = User::create($params);
 
-        $authCode = AuthEmail::createCode($user->id);
+        $authCode = AuthCode::createCode($user->id, AuthCode::SMS);
         $browserAgent = BrowserAgent::where('fingerprint', $request->header('Browser-Agent'))->first();
 
         $sessionData = [
@@ -50,7 +50,7 @@ class UserService
             'user_agent' => $request->userAgent(),
             'browser_agent_id' => $browserAgent->id,
             'auth_code_id' => $authCode->id,
-            'auth_type' => 'auth_email',
+            'auth_type' => 'email',
             'last_activity' => Carbon::now()->timestamp,
         ];
         $session = Session::create($sessionData);
@@ -67,7 +67,7 @@ class UserService
                 'iss' => env('APP_URL'),
                 'sub' => $user->id,
                 'sid' => $session->id,
-                'aud' => 'mdxfy-app-services',
+                'aud' => 'agrofast-app-services',
                 'iat' => now()->timestamp,
                 'jti' => uniqid(),
             ],

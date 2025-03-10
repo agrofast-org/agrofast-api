@@ -26,6 +26,10 @@ Route::middleware(['dev.env'])->prefix('/debug')->group(function () {
     Route::post('/body', [DebugController::class, 'showBody']);
 
     Route::prefix('/test')->group(function () {
+        Route::prefix('/job')->group(function () {
+            Route::get('/email', [DebugController::class, 'sendEmailJob']);
+            // Route::get('/sms', [DebugController::class, 'sendSmsJob']);
+        });
         Route::get('/email', [DebugController::class, 'sendEmail']);
         // Route::get('/sms', [DebugController::class, 'sendSms']);
     });
@@ -45,7 +49,10 @@ Route::middleware(['db.safe', 'fingerprint'])->group(function () {
             Route::post('/upload', [UserController::class, 'postPicture']);
         });
         Route::get('/exists', [UserController::class, 'exists']);
-        Route::get('/auth', [UserController::class, 'authenticate'])->middleware(['auth.basic']);
+        Route::middleware(['auth.basic'])->prefix('/auth')->group(function () {
+            Route::get('/', [UserController::class, 'authenticate']);
+            Route::get('/methods', [UserController::class, 'authenticationMethods']);
+        });
         Route::post('/login', [UserController::class, 'login']);
         Route::get('/resend-code', [UserController::class, 'resendCode'])->middleware(['auth.basic']);
     });

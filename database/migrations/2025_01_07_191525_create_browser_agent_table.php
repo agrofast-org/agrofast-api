@@ -12,7 +12,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('hr.browser_agent', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->string('fingerprint')->unique();
             $table->string('user_agent');
             $table->string('ip_address');
@@ -23,12 +23,11 @@ return new class extends Migration {
         });
 
         Schema::create('hr.session', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->foreignId('browser_agent_id')->constrained('hr.browser_agent')->nullable();
-            $table->enum('auth_type', ['auth_sms', 'auth_email']);
-            $table->foreignId('auth_code_id')->constrained('hr.auth_code')->onDelete('cascade');
+            $table->foreignId('auth_code_id')->nullable()->constrained('hr.auth_code')->onDelete('cascade');
             $table->boolean('authenticated')->default(false);
             $table->timestamp('last_activity')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->boolean('active')->default(true);
@@ -38,7 +37,7 @@ return new class extends Migration {
         });
 
         Schema::create('hr.remember_browser', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->foreignId('browser_agent_id')->constrained('hr.browser_agent')->onDelete('cascade');
             $table->boolean('active')->default(true);
@@ -48,7 +47,7 @@ return new class extends Migration {
         });
 
         Schema::create('hr.request_history', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->foreignId('session_id')->constrained('hr.session')->onDelete('cascade');
             $table->string('route');
             $table->string('method');

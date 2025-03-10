@@ -12,7 +12,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('file.image', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id()->primary();
+            $table->uuid();
             $table->string('name');
             $table->string('path');
             $table->string('mime_type');

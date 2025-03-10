@@ -11,7 +11,6 @@ use Illuminate\Notifications\Notifiable;
  * Class AuthSms
  *
  * @property int $id
- * @property int $user_id
  * @property string $ip_address
  * @property string $user_agent
  * @property string $auth_type
@@ -31,7 +30,6 @@ class AuthSms extends Model
     protected $table = 'hr.auth_code';
 
     protected $fillable = [
-        'user_id',
         'ip_address',
         'user_agent',
         'auth_type',
@@ -77,8 +75,8 @@ class AuthSms extends Model
 
         $smsEnabled = env('SMS_SERVICE_ENABLED', false);
         // Added this verification to avoid sending SMS in local environment. It's really expensive XD.
-        if ($smsEnabled || $smsEnabled === 'true') {
-            SendSms::dispatch($user->number, "Seu código de autenticação para o Agrofast é: {$code}");
+        if ($smsEnabled === true || $smsEnabled === 'true') {
+            SendSms::dispatch($user->number, __('sms.authentication.message', ['code' => $code]));
         }
 
         return $authCode;

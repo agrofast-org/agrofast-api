@@ -39,7 +39,7 @@ class AuthService
 
         $sessionData = [
             'user_id'          => $user->id,
-            'auth_type'        => 'auth_email',
+            'auth_type'        => 'email',
             'ip_address'       => $request->ip(),
             'user_agent'       => $request->userAgent(),
             'browser_agent_id' => $browserAgent->id,
@@ -61,7 +61,7 @@ class AuthService
                 'iss' => env('APP_URL'),
                 'sub' => $user->id,
                 'sid' => $session->id,
-                'aud' => 'mdxfy-app-services',
+                'aud' => 'agrofast-app-services',
                 'iat' => now()->timestamp,
                 'jti' => uniqid(),
             ],
@@ -90,9 +90,7 @@ class AuthService
             return ['error' => 'user_not_authenticated'];
         }
 
-        $token = $request->bearerToken();
-        $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
-        $session = Session::where('id', $decoded->sid)->first();
+        $session = User::session();
         $authCode = AuthCode::where(['id' => $session->auth_code_id, 'auth_type' => AuthCode::SMS])->first();
 
         if (! $authCode) {
@@ -119,7 +117,7 @@ class AuthService
                 'iss' => env('APP_URL'),
                 'sub' => $user->id,
                 'sid' => $session->id,
-                'aud' => 'mdxfy-app-services',
+                'aud' => 'agrofast-app-services',
                 'iat' => now()->timestamp,
                 'jti' => uniqid(),
             ],

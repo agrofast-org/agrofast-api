@@ -12,7 +12,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('hr.suspicious_browser_agent', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->foreignId('browser_agent_id')->constrained('hr.browser_agent');
             $table->string('reason');
             $table->boolean('active')->default(true);
@@ -22,7 +22,7 @@ return new class extends Migration {
         });
 
         Schema::create('hr.banned_browser_agent', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->foreignId('browser_agent_id')->constrained('hr.browser_agent');
             $table->string('reason');
             $table->boolean('active')->default(true);

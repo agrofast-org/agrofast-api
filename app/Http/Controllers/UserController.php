@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UserStoreRequest;
-use App\Http\Requests\UserUpdateRequest;
+use App\Http\Requests\User\UserStoreRequest;
+use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\Hr\User;
 use App\Services\AuthService;
 use App\Services\PictureService;
@@ -66,7 +66,7 @@ class UserController extends Controller
                 'number'  => $result['user']->number,
             ],
             'token'   => $result['token'],
-            'action'  => 'auth',
+            'action'  => $result['auth'],
         ], 201);
     }
 
@@ -108,6 +108,7 @@ class UserController extends Controller
                 'profile_picture' => $result['user']->profile_picture,
             ],
             'token'   => $result['token'],
+            'action'  => $result['auth'],
         ], 200);
     }
 
@@ -133,6 +134,24 @@ class UserController extends Controller
         ], 200);
     }
 
+    public function authenticationMethods()
+    {
+        $user = User::auth();
+        $methods = [];
+
+        if ($user->number_verified === true) {
+            $methods[] = 'sms';
+        }
+
+        if ($user->email_verified === true) {
+            $methods[] = 'email';
+        }
+
+        return response()->json([
+            'methods' => $methods,
+        ], 200);
+    }
+
     public function self()
     {
         $user = User::auth();
@@ -141,9 +160,12 @@ class UserController extends Controller
             return response()->json(['message' => 'user_not_authenticated'], 401);
         }
 
+        $session = User::session();
+
         return response()->json([
             'message' => 'user_found',
             'user'    => $user,
+            'authenticated' => $session->authenticated,
         ], 200);
     }
 

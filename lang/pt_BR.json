@@ -1,38 +1,49 @@
 {
+    "sms.authentication.message": "Seu código de autenticação para o Agrofast é: :code",
+
+    "email.account_inactivation_confirmation.subject": "Exclusão de Conta",
     "email.account_inactivation_confirmation.title": "Confirmação de Exclusão de Conta",
     "email.account_inactivation_confirmation.farewell": "Lamentamos pela sua saída, estaremos aqui sempre que precisar.",
     "email.account_inactivation_confirmation.message": "Recebemos sua solicitação para excluir sua conta. Caso essa ação tenha sido intencional, não é necessária nenhuma ação adicional. Se não for o caso, entre em contato imediatamente com nosso suporte.",
 
+    "email.authentication.subject": "Código de autenticação",
     "email.authentication.welcome": "Bem-vindo, :name!",
     "email.authentication.verification_instructions": "Utilize o código de verificação abaixo para confirmar seu login:",
     "email.authentication.session_verification": "Clique no botão abaixo para verificar sua sessão:",
     "email.authentication.verify_button": "Verificar Sessão",
     "email.authentication.expiration_notice": "Este link expira em :expires.",
 
+    "email.email_change_confirmation.subject": "Troca de E-mail",
     "email.email_change_confirmation.title": "Confirmação de Alteração de E-mail",
     "email.email_change_confirmation.message": "Você solicitou a alteração do seu endereço de e-mail. Para confirmar essa mudança, utilize o código abaixo:",
     "email.email_change_confirmation.button": "Confirmar E-mail",
     "email.email_change_confirmation.expiration": "Este link expira em :expires.",
 
+    "email.first_login.subject": "Confirme seu primeiro acesso",
     "email.first_login.title": "Bem-vindo à Agrofast!",
     "email.first_login.message": "Obrigado por se cadastrar! Para confirmar seu primeiro acesso, utilize o código de verificação abaixo:",
     "email.first_login.confirm_button": "Confirmar Acesso",
     "email.first_login.expiration": "Este link expira em :expires.",
 
+    "email.new_device_login_notification.subject": "Novo Login em Dispositivo",
     "email.new_device_login_notification.title": "Novo Login em Dispositivo Não Reconhecido",
     "email.new_device_login_notification.message": "Detectamos um login em sua conta a partir de um dispositivo ou localização que não reconhecemos. Se foi você, desconsidere esta mensagem. Caso contrário, recomendamos que você altere sua senha imediatamente e entre em contato com nosso suporte.",
 
+    "email.password_change_notification.subject": "Alteração de Senha",
     "email.password_change_notification.title": "Notificação de Alteração de Senha",
     "email.password_change_notification.message": "Sua senha foi alterada com sucesso. Se você não realizou essa alteração, entre em contato com nosso suporte imediatamente.",
 
+    "email.password_recover.subject": "Recuperação de Senha",
     "email.password_recover.title": "Recuperação de Senha",
     "email.password_recover.message": "Você solicitou a recuperação de sua senha. Utilize o código abaixo para redefinir sua senha:",
     "email.password_recover.reset_button": "Redefinir Senha",
     "email.password_recover.expiration": "Este link expira em :expires.",
 
+    "email.suspicious_activity_notification.subject": "Atividade Suspeita",
     "email.suspicious_activity_notification.title": "Atividade Suspeita Detectada",
     "email.suspicious_activity_notification.message": "Detectamos uma atividade suspeita em sua conta. Se você não reconhece essa ação, recomendamos alterar sua senha e entrar em contato com o suporte.",
 
+    "email.two_factor_setup_notification.subject": "Autenticação de Dois Fatores",
     "email.two_factor_setup_notification.title": "Configuração de Autenticação de Dois Fatores",
     "email.two_factor_setup_notification.message": "Você solicitou ativar a autenticação de dois fatores para aumentar a segurança de sua conta. Para concluir a configuração, utilize o código de verificação abaixo:",
     "email.two_factor_setup_notification.expiration": "Este código expira em :expires."

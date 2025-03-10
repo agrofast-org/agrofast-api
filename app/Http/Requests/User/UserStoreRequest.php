@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -25,6 +25,7 @@ class UserStoreRequest extends FormRequest
                 'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/',
             ],
             'password_confirm' => 'required|same:password',
+            'terms_and_privacy_agreement' => 'required|accepted',
             'remember'         => 'nullable|string',
         ];
     }
@@ -42,6 +43,8 @@ class UserStoreRequest extends FormRequest
             'password.regex'            => 'password_character',
             'password_confirm.required' => 'password_confirm_required',
             'password_confirm.same'     => 'password_not_coincide',
+            'terms_and_privacy_agreement.required' => 'terms_and_privacy_agreement_required',
+            'terms_and_privacy_agreement.accepted' => 'terms_and_privacy_agreement_not_accepted',
         ];
     }
 }

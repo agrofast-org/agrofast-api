@@ -9,36 +9,30 @@ use Throwable;
 
 class DatabaseTransaction
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Closure  $next
-     * @return mixed
-     */
     public function handle($request, Closure $next)
     {
-        DB::beginTransaction();
         try {
-            $response = $next($request);
+            return DB::transaction(function () use ($request, $next) {
+                $response = $next($request);
 
-            DB::commit();
+                if (isset($response->exception)) {
+                    throw $response->exception;
+                }
 
-            return $response;
+                return $response;
+            });
         } catch (Throwable $e) {
-            DB::rollBack();
-
             ErrorLog::create([
-                'url' => $request->url(),
+                'url'          => $request->url(),
                 'error_message' => $e->getMessage(),
-                'stack_trace' => $e->getTraceAsString(),
+                'stack_trace'  => $e->getTraceAsString(),
                 'request_data' => $request->all(),
             ]);
             logger()->error($e);
 
             return response()->json([
                 'message' => 'An error occurred',
-                'error' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
+                'error'   => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
             ], 500);
         }
     }

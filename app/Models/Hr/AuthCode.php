@@ -12,7 +12,6 @@ use Illuminate\Notifications\Notifiable;
  * Represents an authentication code with associated attributes and logic.
  *
  * @property int $id
- * @property int $user_id
  * @property string $ip_address
  * @property string $user_agent
  * @property string $auth_type
@@ -36,7 +35,6 @@ class AuthCode extends Model
     protected $table = 'hr.auth_code';
 
     protected $fillable = [
-        'user_id',
         'ip_address',
         'user_agent',
         'auth_type',

@@ -12,7 +12,7 @@ return new class extends Migration {
     public function up()
     {
         Schema::create('system.error_log', function (Blueprint $table) {
-            $table->id();
+            $table->id()->primary();
             $table->string('url')->nullable();
             $table->text('error_message');
             $table->text('stack_trace')->nullable();
