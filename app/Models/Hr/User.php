@@ -9,6 +9,7 @@ use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use stdClass;
 
 /**
@@ -152,18 +153,19 @@ class User extends DynamicQuery
     }
 
     /**
-     * Mutator for password hashing.
+     * Save a new model and return the instance.
      *
-     * @param string $value Plain text password.
-     * @return void
+     * @param  array  $attributes
+     * @return User
      */
-    public function setPasswordAttribute($value): void
+    public static function create(array $attributes = []): self
     {
-        if (Hash::needsRehash($value)) {
-            $this->attributes['password'] = Hash::make($value);
-        } else {
-            $this->attributes['password'] = $value;
-        }
+        $attributes['password'] = Hash::make($attributes['password']);
+        $attributes['uuid'] = Str::uuid();
+
+        $user = parent::create($attributes);
+
+        return $user;
     }
 
     /**

@@ -10,6 +10,7 @@ use App\Models\Hr\Session;
 use App\Models\Hr\User;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -23,23 +24,20 @@ class UserService
      */
     public function createUser(array $data, UserStoreRequest $request): array
     {
-        $params = User::prepareInsert($data);
-        $validated = User::validateInsert(User::prepareInsert($params));
-
         if (! empty($validated)) {
             return ['error' => $validated];
         }
 
-        $existingUser = User::where('email', $params['email'])->first();
+        $existingUser = User::where('number', $data['number'])->first();
         if ($existingUser) {
             return [
                 'error' => [
-                    'email' => 'user_already_exists',
+                    'number' => 'user_already_exists',
                 ],
             ];
         }
 
-        $user = User::create($params);
+        $user = User::create($data);
 
         $authCode = AuthCode::createCode($user->id, AuthCode::SMS);
         $browserAgent = BrowserAgent::where('fingerprint', $request->header('Browser-Agent'))->first();
@@ -55,7 +53,7 @@ class UserService
         ];
         $session = Session::create($sessionData);
 
-        if (! empty($params['remember']) && $params['remember'] === 'true') {
+        if (! empty($data['remember']) && $data['remember'] === 'true') {
             RememberBrowser::create([
                 'user_id' => $user->id,
                 'browser_agent_id' => $browserAgent->id,
