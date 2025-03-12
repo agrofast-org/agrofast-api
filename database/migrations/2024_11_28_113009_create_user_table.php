@@ -16,8 +16,8 @@ return new class extends Migration {
             $table->uuid()->unique();
             $table->string('name');
             $table->string('surname');
-            $table->string('number')->unique();
-            $table->string('email')->unique()->nullable();
+            $table->string('number')->unique()->nullable();
+            $table->string('email')->unique();
             $table->string('password');
             $table->string('language', 10)->default('pt-BR');
             $table->boolean('number_verified')->default(false);
