@@ -39,7 +39,7 @@ class UserService
 
         $user = User::create($data);
 
-        $authCode = AuthCode::createCode($user->id, AuthCode::SMS);
+        $authCode = AuthCode::createCode($user->id, AuthCode::EMAIL);
         $browserAgent = BrowserAgent::where('fingerprint', $request->header('Browser-Agent'))->first();
 
         $sessionData = [
@@ -48,7 +48,7 @@ class UserService
             'user_agent' => $request->userAgent(),
             'browser_agent_id' => $browserAgent->id,
             'auth_code_id' => $authCode->id,
-            'auth_type' => 'email',
+            'auth_type' => AuthCode::EMAIL,
             'last_activity' => Carbon::now()->timestamp,
         ];
         $session = Session::create($sessionData);

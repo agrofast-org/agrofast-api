@@ -7,7 +7,7 @@
     "email.account_inactivation_confirmation.message": "Recebemos sua solicitação para excluir sua conta. Caso essa ação tenha sido intencional, não é necessária nenhuma ação adicional. Se não for o caso, entre em contato imediatamente com nosso suporte.",
 
     "email.authentication.subject": "Código de autenticação",
-    "email.authentication.welcome": "Bem-vindo, :name!",
+    "email.authentication.welcome": "Bem-vindo de volta, :name!",
     "email.authentication.verification_instructions": "Utilize o código de verificação abaixo para confirmar seu login:",
     "email.authentication.session_verification": "Clique no botão abaixo para verificar sua sessão:",
     "email.authentication.verify_button": "Verificar Sessão",
