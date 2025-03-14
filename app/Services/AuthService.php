@@ -17,16 +17,15 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
     /**
-     * Logs in the user.
+     * Realiza o login do usuário.
      *
-     * @param array   $credentials Authentication data (email, password, remember)
-     * @param Request $request     Request instance
-     * @return array Result with user, token, and session or error
+     * @param array   $credentials Dados de autenticação (email, password, remember)
+     * @param Request $request     Instância da requisição
+     * @return array Resultado contendo usuário, token, sessão ou erro
      */
     public function login(array $credentials, Request $request): array
     {
         $user = User::where('email', $credentials['email'])->first();
-
         if (! $user) {
             return ['error' => ['email' => 'user_not_found']];
         }
@@ -35,22 +34,31 @@ class AuthService
             return ['error' => ['password' => 'wrong_password']];
         }
 
+        $browserFingerprint = $request->header('Browser-Agent');
+        if (!$browserFingerprint) {
+            return ['error' => 'browser_agent_missing'];
+        }
 
-        $browserAgent = BrowserAgent::where('fingerprint', $request->header('Browser-Agent'))->first();
-        $remember = RememberBrowser::where([
-            'user_id' => $user->id,
-            'browser_agent_id' => $browserAgent->id,
-            ['created_at', '>=', Carbon::now()->subDays(30)],
-        ])->first();
+        $browserAgent = BrowserAgent::where('fingerprint', $browserFingerprint)->first();
+        if (!$browserAgent) {
+            return ['error' => 'browser_agent_not_found'];
+        }
 
-        $authCode = $remember ? null : AuthCode::createCode($user->id, AuthCode::EMAIL);
+        $remember = RememberBrowser::where('user_id', $user->id)
+            ->where('browser_agent_id', $browserAgent->id)
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->first();
+
+        $authType = AuthCode::EMAIL;
+        $authCode = $remember ? null : AuthCode::createCode($user->id, $authType);
+
         $session = SessionFactory::create($user, $request, $browserAgent, $authCode);
 
         if ($remember) {
             $session->update(['authenticated' => true]);
         }
 
-        if (! empty($credentials['remember']) && $credentials['remember'] === 'true' && ! $remember) {
+        if (! empty($credentials['remember']) && $credentials['remember'] === 'true' && !$remember) {
             RememberBrowser::create([
                 'user_id'          => $user->id,
                 'browser_agent_id' => $browserAgent->id,
@@ -63,26 +71,31 @@ class AuthService
             'user'    => $user,
             'token'   => $jwt,
             'session' => $session,
-            'auth' => $remember ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
+            'auth'    => $remember ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
         ];
     }
 
     /**
-     * Authenticates the user using a verification code.
+     * Realiza a autenticação do usuário utilizando o código de verificação.
      *
-     * @param Request $request Request instance
-     * @return array Result with user and new token or error
+     * @param Request $request Instância da requisição
+     * @return array Resultado contendo usuário e novo token ou erro
      */
     public function authenticate(Request $request): array
     {
         $user = User::auth();
-
         if (! $user) {
             return ['error' => 'user_not_authenticated'];
         }
 
         $session = User::session();
-        $authCode = AuthCode::where(['id' => $session->auth_code_id, 'auth_type' => AuthCode::SMS])->first();
+        if (!$session) {
+            return ['error' => 'session_not_found'];
+        }
+
+        $authCode = AuthCode::where('id', $session->auth_code_id)
+            ->where('auth_type', AuthCode::EMAIL)
+            ->first();
 
         if (! $authCode) {
             return ['error' => ['code' => 'invalid_authentication_code']];
@@ -92,11 +105,9 @@ class AuthService
         if ($authCode->code !== $codeInput) {
             if ($authCode->attempts + 1 >= 3) {
                 $authCode->update(['active' => false]);
-
                 return ['error' => ['code' => 'authentication_code_attempts_exceeded']];
             }
             $authCode->update(['attempts' => $authCode->attempts + 1]);
-
             return ['error' => ['code' => 'invalid_authentication_code']];
         }
 
