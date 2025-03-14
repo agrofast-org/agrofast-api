@@ -35,7 +35,7 @@ class UserQueryService
      */
     public function getInfo(int $id)
     {
-        return User::find($id, ['id', 'name', 'number', 'profile_picture']);
+        return User::find($id, ['id', 'name', 'number', 'profile_picture'])->first();
     }
 
     /**

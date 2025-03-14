@@ -44,7 +44,7 @@
 - `data`: Contains the user data.
 - `file`: Contains the file data.
 - `token`: Contains the JWT token.
-- `fields`: Contains the validation error fields.
+- `errors`: Contains the validation error errors.
 - `message`: Contains the response message.
 - `error`: Contains the error message.
 - `user`: Contains the user information.

@@ -53,7 +53,7 @@ class UserController extends Controller
         if (isset($result['error'])) {
             return response()->json([
                 'message' => 'error_creating_user',
-                'fields'  => $result['error'],
+                'errors'  => $result['error'],
             ], 400);
         }
 

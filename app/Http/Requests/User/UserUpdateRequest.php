@@ -16,8 +16,8 @@ class UserUpdateRequest extends FormRequest
         return [
             'name'             => 'required|string|max:255',
             'surname'          => 'required|string|max:255',
-            'number'           => ['required', 'regex:/^\d{13}$/'],
-            'email'            => 'email|max:255',
+            'number'           => 'regex:/^\d{13}$/',
+            // 'email'            => 'required|email|exists:pgsql.hr.user|max:255',
             'password'         => [
                 'required',
                 'string',

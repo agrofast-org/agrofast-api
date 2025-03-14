@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
+use App\Enums\UserAction;
+use App\Factories\SessionFactory;
+use App\Factories\TokenFactory;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\Session;
 use App\Models\Hr\User;
 use Carbon\Carbon;
-use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,45 +35,35 @@ class AuthService
             return ['error' => ['password' => 'wrong_password']];
         }
 
-        $authCode = AuthCode::createCode($user->id, AuthCode::SMS);
+
         $browserAgent = BrowserAgent::where('fingerprint', $request->header('Browser-Agent'))->first();
-
-        $sessionData = [
-            'user_id'          => $user->id,
-            'auth_type'        => 'email',
-            'ip_address'       => $request->ip(),
-            'user_agent'       => $request->userAgent(),
+        $remember = RememberBrowser::where([
+            'user_id' => $user->id,
             'browser_agent_id' => $browserAgent->id,
-            'auth_code_id'     => $authCode->id,
-            'last_activity'    => Carbon::now()->timestamp,
-        ];
+            ['created_at', '>=', Carbon::now()->subDays(30)],
+        ])->first();
 
-        $session = Session::create($sessionData);
+        $authCode = $remember ? null : AuthCode::createCode($user->id, AuthCode::EMAIL);
+        $session = SessionFactory::create($user, $request, $browserAgent, $authCode);
 
-        if (! empty($credentials['remember']) && $credentials['remember'] === 'true') {
+        if ($remember) {
+            $session->update(['authenticated' => true]);
+        }
+
+        if (! empty($credentials['remember']) && $credentials['remember'] === 'true' && ! $remember) {
             RememberBrowser::create([
                 'user_id'          => $user->id,
                 'browser_agent_id' => $browserAgent->id,
             ]);
         }
 
-        $jwt = JWT::encode(
-            [
-                'iss' => env('APP_URL'),
-                'sub' => $user->id,
-                'sid' => $session->id,
-                'aud' => 'agrofast-app-services',
-                'iat' => now()->timestamp,
-                'jti' => uniqid(),
-            ],
-            env('APP_KEY'),
-            'HS256'
-        );
+        $jwt = TokenFactory::create($user, $session);
 
         return [
             'user'    => $user,
             'token'   => $jwt,
             'session' => $session,
+            'auth' => $remember ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
         ];
     }
 
@@ -110,20 +101,13 @@ class AuthService
         }
 
         $authCode->update(['active' => false]);
-        $user->update(['number_authenticated' => true]);
+        if ($authCode->auth_type === AuthCode::SMS) {
+            $user->update(['number_authenticated' => true]);
+        } else {
+            $user->update(['email_authenticated' => true]);
+        }
 
-        $jwt = JWT::encode(
-            [
-                'iss' => env('APP_URL'),
-                'sub' => $user->id,
-                'sid' => $session->id,
-                'aud' => 'agrofast-app-services',
-                'iat' => now()->timestamp,
-                'jti' => uniqid(),
-            ],
-            env('APP_KEY'),
-            'HS256'
-        );
+        $jwt = TokenFactory::create($user, $session);
 
         return [
             'user'  => $user,
