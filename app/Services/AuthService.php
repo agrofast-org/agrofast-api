@@ -17,11 +17,11 @@ use Illuminate\Support\Facades\Hash;
 class AuthService
 {
     /**
-     * Realiza o login do usuário.
+     * Logs in the user.
      *
-     * @param array   $credentials Dados de autenticação (email, password, remember)
-     * @param Request $request     Instância da requisição
-     * @return array Resultado contendo usuário, token, sessão ou erro
+     * @param array   $credentials Authentication data (email, password, remember)
+     * @param Request $request     Request instance
+     * @return array Result containing user, token, session, or error
      */
     public function login(array $credentials, Request $request): array
     {
@@ -76,10 +76,10 @@ class AuthService
     }
 
     /**
-     * Realiza a autenticação do usuário utilizando o código de verificação.
+     * Performs user authentication using the verification code.
      *
-     * @param Request $request Instância da requisição
-     * @return array Resultado contendo usuário e novo token ou erro
+     * @param Request $request Request instance
+     * @return array Result containing user and new token, or error
      */
     public function authenticate(Request $request): array
     {
