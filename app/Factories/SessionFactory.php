@@ -2,26 +2,28 @@
 
 namespace App\Factories;
 
-use App\Models\Hr\AuthEmail;
-use App\Models\Hr\AuthSms;
+use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\Session;
 use App\Models\Hr\User;
 use Carbon\Carbon;
-use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 
 class SessionFactory
 {
-    public static function create(User $user, FormRequest $request, BrowserAgent $browserAgent, AuthEmail | AuthSms | null $authCode): Session
+    public static function create(User $user, Request $request, BrowserAgent $browserAgent, AuthCode | null $authCode): Session
     {
-        return Session::create([
+        $attributes = [
             'user_id' => $user->id,
             'ip_address' => $request->ip(),
             'user_agent' => $request->userAgent(),
             'browser_agent_id' => $browserAgent->id,
-            $authCode && 'auth_code_id' => $authCode->id,
-            $authCode && 'auth_type' => $authCode->auth_type,
             'last_activity' => Carbon::now()->timestamp,
-        ]);
+        ];
+        if ($authCode) {
+            $attributes['auth_code_id'] = $authCode->id;
+            $attributes['auth_type'] = $authCode->auth_type;
+        }
+        return Session::create($attributes);
     }
 }

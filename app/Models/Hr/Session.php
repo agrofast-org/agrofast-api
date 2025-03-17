@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $user_id
  * @property string $ip_address
  * @property int $browser_agent_id
- * @property string $auth_type
  * @property int|null $auth_code_id
  * @property bool $authenticated
  * @property bool $active
@@ -39,7 +38,6 @@ class Session extends Model
         'user_id',
         'ip_address',
         'browser_agent_id',
-        'auth_type',
         'auth_code_id',
         'authenticated',
         'active',

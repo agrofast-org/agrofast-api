@@ -11,7 +11,7 @@ class AuthBasicMiddleware
     {
         $user = User::auth();
 
-        if (typeof($user) === 'enum') {
+        if (gettype($user) === 'enum') {
             return response()->json(['message' => $user->value], 401);
         }
 

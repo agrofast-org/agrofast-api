@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
+use App\Models\Hr\AuthCode;
 use App\Models\Hr\User;
 use App\Services\AuthService;
 use App\Services\PictureService;
@@ -61,8 +62,10 @@ class UserController extends Controller
             'message' => 'user_created_successfully',
             'user'    => [
                 'id'      => $result['user']->id,
+                'uuid'      => $result['user']->uuid,
                 'name'    => $result['user']->name,
                 'surname' => $result['user']->surname,
+                'email'   => $result['user']->email,
                 'number'  => $result['user']->number,
             ],
             'token'   => $result['token'],
@@ -102,9 +105,11 @@ class UserController extends Controller
             'message' => 'login_successful_authentication_code_sent',
             'user'    => [
                 'id'              => $result['user']->id,
+                'uuid'            => $result['user']->uuid,
                 'name'            => $result['user']->name,
                 'surname'         => $result['user']->surname,
                 'email'           => $result['user']->email,
+                'number'          => $result['user']->number,
                 'profile_picture' => $result['user']->profile_picture,
             ],
             'token'   => $result['token'],
@@ -124,10 +129,11 @@ class UserController extends Controller
             'message' => 'user_authenticated_successfully',
             'user'    => [
                 'id'              => $result['user']->id,
+                'uuid'      => $result['user']->uuid,
                 'name'            => $result['user']->name,
-                'number'          => $result['user']->number,
                 'surname'         => $result['user']->surname,
                 'email'           => $result['user']->email,
+                'number'          => $result['user']->number,
                 'profile_picture' => $result['user']->profile_picture,
             ],
             'token'   => $result['token'],
@@ -164,7 +170,15 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'user_found',
-            'user'    => $user,
+            'user'    => [
+                'id'              => $user->id,
+                'uuid'            => $user->uuid,
+                'name'            => $user->name,
+                'surname'         => $user->surname,
+                'email'           => $user->email,
+                'number'          => $user->number,
+                'profile_picture' => $user->profile_picture,
+            ],
             'authenticated' => $session->authenticated,
         ], 200);
     }
@@ -226,6 +240,14 @@ class UserController extends Controller
         return response()->json([
             'message' => 'user_found',
             'data'    => $user,
+        ], 200);
+    }
+
+    public function codeLength()
+    {
+        return response()->json([
+            'message' => 'code_length',
+            'length'  => AuthCode::LENGTH,
         ], 200);
     }
 }

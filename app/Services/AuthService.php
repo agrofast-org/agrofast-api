@@ -8,7 +8,6 @@ use App\Factories\TokenFactory;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
-use App\Models\Hr\Session;
 use App\Models\Hr\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -35,12 +34,12 @@ class AuthService
         }
 
         $browserFingerprint = $request->header('Browser-Agent');
-        if (!$browserFingerprint) {
+        if (! $browserFingerprint) {
             return ['error' => 'browser_agent_missing'];
         }
 
         $browserAgent = BrowserAgent::where('fingerprint', $browserFingerprint)->first();
-        if (!$browserAgent) {
+        if (! $browserAgent) {
             return ['error' => 'browser_agent_not_found'];
         }
 
@@ -58,7 +57,7 @@ class AuthService
             $session->update(['authenticated' => true]);
         }
 
-        if (! empty($credentials['remember']) && $credentials['remember'] === 'true' && !$remember) {
+        if (! empty($credentials['remember']) && $credentials['remember'] === 'true' && ! $remember) {
             RememberBrowser::create([
                 'user_id'          => $user->id,
                 'browser_agent_id' => $browserAgent->id,
@@ -89,7 +88,7 @@ class AuthService
         }
 
         $session = User::session();
-        if (!$session) {
+        if (! $session) {
             return ['error' => 'session_not_found'];
         }
 
@@ -105,9 +104,11 @@ class AuthService
         if ($authCode->code !== $codeInput) {
             if ($authCode->attempts + 1 >= 3) {
                 $authCode->update(['active' => false]);
+
                 return ['error' => ['code' => 'authentication_code_attempts_exceeded']];
             }
             $authCode->update(['attempts' => $authCode->attempts + 1]);
+
             return ['error' => ['code' => 'invalid_authentication_code']];
         }
 

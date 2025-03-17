@@ -12,6 +12,8 @@ use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\Session;
 use App\Models\Hr\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class UserService
 {
@@ -29,6 +31,8 @@ class UserService
             return ['error' => $validated];
         }
 
+        $data['password'] = Hash::make($data['password']);
+        $data['uuid'] = Str::uuid()->toString();
         $user = User::create($data);
 
         $authCode = AuthCode::createCode($user->id, AuthCode::EMAIL);

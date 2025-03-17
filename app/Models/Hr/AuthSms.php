@@ -3,60 +3,20 @@
 namespace App\Models\Hr;
 
 use App\Jobs\SendSms;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
-/**
- * Class AuthSms
- *
- * @property int $id
- * @property string $ip_address
- * @property string $user_agent
- * @property string $auth_type
- * @property bool $authenticated
- * @property string $code
- * @property int $attempts
- * @property bool $active
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $inactivated_at
- */
 class AuthSms extends Model
 {
-    use HasFactory;
-    use Notifiable;
-
-    protected $table = 'hr.auth_code';
-
-    protected $fillable = [
-        'ip_address',
-        'user_agent',
-        'auth_type',
-        'authenticated',
-        'code',
-        'attempts',
-        'active',
-        'created_at',
-        'updated_at',
-        'inactivated_at',
-    ];
-
-    protected $attributes = [
-        'attempts' => 0,
-        'active' => true,
-    ];
-
     /**
      * Generate a new authentication code for the user.
      *
      * @param int $userId
      *
-     * @return AuthSms
+     * @return AuthCode
      *
      * @throws \Exception
      */
-    public static function createCode(int $userId): self
+    public static function createCode(int $userId): AuthCode
     {
         $user = User::find($userId);
 
@@ -66,12 +26,17 @@ class AuthSms extends Model
         if (! self::validatePhoneNumber($user->number)) {
             throw new \Exception('Invalid phone number');
         }
-        $code = (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development') ? '111111' : rand(100000, 999999);
+        $code = AuthCode::generateCode();
         self::where('user_id', $userId)->update(['active' => false]);
-        $authCode = self::create([
+
+        $authCodeParams = [
             'user_id' => $userId,
+            'ip_address' => request()->ip(),
+            'user_agent' => request()->userAgent(),
+            'auth_type' => AuthCode::EMAIL,
             'code' => $code,
-        ]);
+        ];
+        $authCode = AuthCode::create($authCodeParams);
 
         $smsEnabled = env('SMS_SERVICE_ENABLED', false);
         // Added this verification to avoid sending SMS in local environment. It's really expensive XD.

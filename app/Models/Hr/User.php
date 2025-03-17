@@ -84,7 +84,7 @@ class User extends DynamicQuery
 
     public static function getDecodedToken(): stdClass | UserError
     {
-        if (self::$decodedToken) {
+        if (! empty(self::$decodedToken)) {
             return self::$decodedToken;
         }
 
@@ -106,14 +106,14 @@ class User extends DynamicQuery
      */
     public static function auth(): self | UserError
     {
-        if (self::$user) {
+        if (! empty(self::$user)) {
             return self::$user;
         }
 
         try {
             $decoded = self::getDecodedToken();
 
-            if (typeof($decoded) === 'enum') {
+            if (gettype($decoded) === 'enum') {
                 return $decoded;
             }
 
@@ -134,12 +134,12 @@ class User extends DynamicQuery
 
     public static function session(): Session | UserError
     {
-        if (self::$session) {
+        if (! empty(self::$session)) {
             return self::$session;
         }
         $decoded = self::getDecodedToken();
 
-        if (typeof($decoded) === 'enum') {
+        if (gettype($decoded) === 'enum') {
             return $decoded;
         }
 
@@ -150,22 +150,6 @@ class User extends DynamicQuery
         }
 
         return $session;
-    }
-
-    /**
-     * Save a new model and return the instance.
-     *
-     * @param  array  $attributes
-     * @return User
-     */
-    public static function create(array $attributes = []): self
-    {
-        $attributes['password'] = Hash::make($attributes['password']);
-        $attributes['uuid'] = Str::uuid();
-
-        $user = parent::create($attributes);
-
-        return $user;
     }
 
     /**

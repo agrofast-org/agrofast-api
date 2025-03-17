@@ -32,9 +32,12 @@ class AuthCode extends Model
 
     public const EMAIL = 'email';
 
+    public const LENGTH = 6;
+
     protected $table = 'hr.auth_code';
 
     protected $fillable = [
+        'user_id',
         'ip_address',
         'user_agent',
         'auth_type',
@@ -58,11 +61,11 @@ class AuthCode extends Model
      * @param int $userId
      * @param self::SMS | self::EMAIL $userId
      *
-     * @return AuthEmail | AuthSms
+     * @return AuthCode
      *
      * @throws \Exception
      */
-    public static function createCode(int $userId, string $authType): AuthEmail | AuthSms
+    public static function createCode(int $userId, string $authType): self
     {
         $authCode = null;
 
@@ -73,5 +76,17 @@ class AuthCode extends Model
         }
 
         return $authCode;
+    }
+
+    /**
+     * Craft a random code.
+     *
+     * @return string
+     */
+    public static function generateCode(): string
+    {
+        return (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development')
+            ? '111111'
+            : str_pad(rand(pow(10, self::LENGTH - 1), pow(10, self::LENGTH) - 1), self::LENGTH, '0', STR_PAD_LEFT);
     }
 }
