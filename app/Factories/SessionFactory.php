@@ -24,6 +24,7 @@ class SessionFactory
             $attributes['auth_code_id'] = $authCode->id;
             $attributes['auth_type'] = $authCode->auth_type;
         }
+
         return Session::create($attributes);
     }
 }

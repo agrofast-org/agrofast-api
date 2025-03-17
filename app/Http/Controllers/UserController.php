@@ -129,7 +129,7 @@ class UserController extends Controller
             'message' => 'user_authenticated_successfully',
             'user'    => [
                 'id'              => $result['user']->id,
-                'uuid'      => $result['user']->uuid,
+                'uuid'            => $result['user']->uuid,
                 'name'            => $result['user']->name,
                 'surname'         => $result['user']->surname,
                 'email'           => $result['user']->email,
@@ -183,9 +183,9 @@ class UserController extends Controller
         ], 200);
     }
 
-    public function info($id)
+    public function info($uuid)
     {
-        $user = $this->userQueryService->getInfo($id);
+        $user = $this->userQueryService->getInfo($uuid);
 
         if (! $user) {
             return response()->json(['message' => 'user_not_found'], 404);

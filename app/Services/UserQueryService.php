@@ -30,12 +30,12 @@ class UserQueryService
     /**
      * Returns summarized user information.
      *
-     * @param int $id
+     * @param string $uuid
      * @return User|null
      */
-    public function getInfo(int $id)
+    public function getInfo(string $uuid)
     {
-        return User::find($id, ['id', 'name', 'number', 'profile_picture'])->first();
+        return User::where(['uuid' => $uuid])->first();
     }
 
     /**
