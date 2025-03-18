@@ -1,7 +1,8 @@
 <?php
 
-return [
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
+return [
     /*
     |--------------------------------------------------------------------------
     | Default Queue Connection Name
@@ -29,7 +30,6 @@ return [
     */
 
     'connections' => [
-
         'sync' => [
             'driver' => 'sync',
         ],
@@ -73,29 +73,29 @@ return [
         ],
 
         'rabbitmq' => [
-            'driver'          => 'rabbitmq',
-            'queue'           => env('RABBITMQ_QUEUE', 'default'),
-            'connection'      => PhpAmqpLib\Connection\AMQPStreamConnection::class,
-            'hosts'           => [
+            'driver' => 'rabbitmq',
+            'queue' => env('RABBITMQ_QUEUE', 'default'),
+            'connection' => AMQPStreamConnection::class,
+            'hosts' => [
                 [
-                    'host'     => env('RABBITMQ_HOST', '127.0.0.1'),
-                    'port'     => env('RABBITMQ_PORT', 5672),
-                    'user'     => env('RABBITMQ_USER', 'guest'),
+                    'host' => env('RABBITMQ_HOST', '127.0.0.1'),
+                    'port' => env('RABBITMQ_PORT', 5672),
+                    'user' => env('RABBITMQ_USER', 'guest'),
                     'password' => env('RABBITMQ_PASSWORD', 'guest'),
-                    'vhost'    => env('RABBITMQ_VHOST', '/'),
+                    'vhost' => env('RABBITMQ_VHOST', '/'),
                 ],
             ],
-            'options'         => [
+            'options' => [
                 'ssl_options' => [
-                    'cafile'      => env('RABBITMQ_SSL_CAFILE', null),
-                    'local_cert'  => env('RABBITMQ_SSL_LOCALCERT', null),
-                    'local_key'   => env('RABBITMQ_SSL_LOCALKEY', null),
+                    'cafile' => env('RABBITMQ_SSL_CAFILE', null),
+                    'local_cert' => env('RABBITMQ_SSL_LOCALCERT', null),
+                    'local_key' => env('RABBITMQ_SSL_LOCALKEY', null),
                     'verify_peer' => env('RABBITMQ_SSL_VERIFY_PEER', true),
                 ],
-                'read_timeout'       => env('RABBITMQ_READ_TIMEOUT', 60),
+                'read_timeout' => env('RABBITMQ_READ_TIMEOUT', 60),
                 'connection_timeout' => env('RABBITMQ_CONNECTION_TIMEOUT', 60),
             ],
-            'worker'          => env('QUEUE_WORKER', 'default'),
+            'worker' => env('QUEUE_WORKER', 'default'),
         ],
     ],
 
@@ -133,5 +133,4 @@ return [
         'database' => env('DB_CONNECTION', 'sqlite'),
         'table' => 'failed_jobs',
     ],
-
 ];

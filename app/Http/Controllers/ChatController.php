@@ -10,8 +10,6 @@ class ChatController extends Controller
 {
     /**
      * Retrieve chat for the authenticated user.
-     *
-     * @return JsonResponse
      */
     public function getUserchat(): JsonResponse
     {

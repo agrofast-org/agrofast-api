@@ -20,33 +20,35 @@ class AuthService
      *
      * @param array   $credentials Authentication data (email, password, remember)
      * @param Request $request     Request instance
+     *
      * @return array Result containing user, token, session, or error
      */
     public function login(array $credentials, Request $request): array
     {
         $user = User::where('email', $credentials['email'])->first();
-        if (! $user) {
+        if (!$user) {
             return ['error' => ['email' => 'user_not_found']];
         }
 
-        if (! Hash::check($credentials['password'], $user->password)) {
+        if (!Hash::check($credentials['password'], $user->password)) {
             return ['error' => ['password' => 'wrong_password']];
         }
 
         $browserFingerprint = $request->header('Browser-Agent');
-        if (! $browserFingerprint) {
+        if (!$browserFingerprint) {
             return ['error' => 'browser_agent_missing'];
         }
 
         $browserAgent = BrowserAgent::where('fingerprint', $browserFingerprint)->first();
-        if (! $browserAgent) {
+        if (!$browserAgent) {
             return ['error' => 'browser_agent_not_found'];
         }
 
         $remember = RememberBrowser::where('user_id', $user->id)
             ->where('browser_agent_id', $browserAgent->id)
             ->where('created_at', '>=', Carbon::now()->subDays(30))
-            ->first();
+            ->first()
+        ;
 
         $authType = AuthCode::EMAIL;
         $authCode = $remember ? null : AuthCode::createCode($user->id, $authType);
@@ -57,9 +59,9 @@ class AuthService
             $session->update(['authenticated' => true]);
         }
 
-        if (! empty($credentials['remember']) && $credentials['remember'] === 'true' && ! $remember) {
+        if (!empty($credentials['remember']) && $credentials['remember'] === 'true' && !$remember) {
             RememberBrowser::create([
-                'user_id'          => $user->id,
+                'user_id' => $user->id,
                 'browser_agent_id' => $browserAgent->id,
             ]);
         }
@@ -67,10 +69,10 @@ class AuthService
         $jwt = TokenFactory::create($user, $session);
 
         return [
-            'user'    => $user,
-            'token'   => $jwt,
+            'user' => $user,
+            'token' => $jwt,
             'session' => $session,
-            'auth'    => $remember ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
+            'auth' => $remember ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
         ];
     }
 
@@ -78,25 +80,27 @@ class AuthService
      * Performs user authentication using the verification code.
      *
      * @param Request $request Request instance
+     *
      * @return array Result containing user and new token, or error
      */
     public function authenticate(Request $request): array
     {
         $user = User::auth();
-        if (! $user) {
+        if (!$user) {
             return ['error' => 'user_not_authenticated'];
         }
 
         $session = User::session();
-        if (! $session) {
+        if (!$session) {
             return ['error' => 'session_not_found'];
         }
 
         $authCode = AuthCode::where('id', $session->auth_code_id)
             ->where('auth_type', AuthCode::EMAIL)
-            ->first();
+            ->first()
+        ;
 
-        if (! $authCode) {
+        if (!$authCode) {
             return ['error' => ['code' => 'invalid_authentication_code']];
         }
 
@@ -122,7 +126,7 @@ class AuthService
         $jwt = TokenFactory::create($user, $session);
 
         return [
-            'user'  => $user,
+            'user' => $user,
             'token' => $jwt,
         ];
     }

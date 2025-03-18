@@ -3,22 +3,22 @@
 namespace App\Http\Middleware;
 
 use App\Models\System\ErrorLog;
-use Closure;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Throwable;
 
 class DatabaseTransaction
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Closure  $next
+     * @param Request $request
+     *
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, \Closure $next)
     {
         DB::beginTransaction();
+
         try {
             $response = $next($request);
 
@@ -29,7 +29,7 @@ class DatabaseTransaction
             }
 
             return $response;
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
 
             ErrorLog::create([

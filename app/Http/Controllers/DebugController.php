@@ -16,12 +16,12 @@ class DebugController extends Controller
     {
         return response()->json([
             'message' => ['ping' => 'pong'],
-            'data'    => ['request' => $GLOBALS],
+            'data' => ['request' => $GLOBALS],
             'request' => [
                 'request_method' => $request->method(),
-                'params'         => $request->route()->parameters(),
-                'body'           => $request->all(),
-                'query'          => $request->query(),
+                'params' => $request->route()->parameters(),
+                'body' => $request->all(),
+                'query' => $request->query(),
             ],
             'raw_data' => $request->getContent(),
         ]);
@@ -32,7 +32,7 @@ class DebugController extends Controller
         return response()->json([
             'request' => [
                 'params' => $request->route()->parameters(),
-                'query'  => $request->query(),
+                'query' => $request->query(),
             ],
         ]);
     }
@@ -50,9 +50,8 @@ class DebugController extends Controller
     {
         return response()->json([
             'message' => 'This functionality will not return values.',
-            'data'    => [
+            'data' => [
                 'requested_var' => $variable,
-
             ],
         ]);
     }
@@ -101,25 +100,6 @@ class DebugController extends Controller
         return response()->json(['data' => null]);
     }
 
-    private function readDirectory($directory)
-    {
-        $items = [];
-        foreach (scandir($directory) as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-
-            $path = $directory.DIRECTORY_SEPARATOR.$item;
-            $items[] = [
-                'name' => $item,
-                'type' => is_dir($path) ? 'directory' : 'file',
-                'path' => $path,
-            ];
-        }
-
-        return $items;
-    }
-
     public function sendEmail()
     {
         $mailable = new FirstLoginMail(['user' => ['name' => 'Murilo'], 'info' => ['code' => '123456', 'expires' => now()->addMinutes(10)]]);
@@ -147,5 +127,24 @@ class DebugController extends Controller
         $job = SendSms::dispatch('+5564996020731', 'Seu código de autenticação para o agrofast é: Apenas um teste');
 
         return response()->json(['message' => 'Email job created', 'job_info' => $job->getJob()]);
+    }
+
+    private function readDirectory($directory)
+    {
+        $items = [];
+        foreach (scandir($directory) as $item) {
+            if ($item === '.' || $item === '..') {
+                continue;
+            }
+
+            $path = $directory.DIRECTORY_SEPARATOR.$item;
+            $items[] = [
+                'name' => $item,
+                'type' => is_dir($path) ? 'directory' : 'file',
+                'path' => $path,
+            ];
+        }
+
+        return $items;
     }
 }

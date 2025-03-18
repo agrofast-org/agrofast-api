@@ -11,20 +11,16 @@ class AuthEmail
     /**
      * Generate a new authentication code for the user.
      *
-     * @param int $userId
-     *
-     * @return AuthCode
-     *
      * @throws \Exception
      */
     public static function createCode(int $userId): AuthCode
     {
         $user = User::find($userId);
 
-        if (! $user) {
+        if (!$user) {
             throw new \Exception('User not found');
         }
-        if (! self::validateEmail($user->email)) {
+        if (!self::validateEmail($user->email)) {
             throw new \Exception('Invalid Email');
         }
         $code = AuthCode::generateCode();
@@ -47,7 +43,7 @@ class AuthEmail
             ],
         ];
 
-        if (! $user->email_verified) {
+        if (!$user->email_verified) {
             SendMail::dispatch($user->email, FirstLoginMail::class, $mailData);
         } else {
             SendMail::dispatch($user->email, AuthenticationMail::class, $mailData);
@@ -58,13 +54,9 @@ class AuthEmail
 
     /**
      * Validate a phone Email (simple example).
-     *
-     * @param string $Email
-     *
-     * @return bool
      */
     private static function validateEmail(string $email): bool
     {
-        return ! empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL);
+        return !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL);
     }
 }

@@ -54,22 +54,22 @@ class UserController extends Controller
         if (isset($result['error'])) {
             return response()->json([
                 'message' => 'error_creating_user',
-                'errors'  => $result['error'],
+                'errors' => $result['error'],
             ], 400);
         }
 
         return response()->json([
             'message' => 'user_created_successfully',
-            'user'    => [
-                'id'      => $result['user']->id,
-                'uuid'      => $result['user']->uuid,
-                'name'    => $result['user']->name,
+            'user' => [
+                'id' => $result['user']->id,
+                'uuid' => $result['user']->uuid,
+                'name' => $result['user']->name,
                 'surname' => $result['user']->surname,
-                'email'   => $result['user']->email,
-                'number'  => $result['user']->number,
+                'email' => $result['user']->email,
+                'number' => $result['user']->number,
             ],
-            'token'   => $result['token'],
-            'action'  => $result['auth'],
+            'token' => $result['token'],
+            'action' => $result['auth'],
         ], 201);
     }
 
@@ -78,7 +78,7 @@ class UserController extends Controller
         $data = $request->only(['id', 'name', 'password', 'email']);
         $user = User::find($id);
 
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'user_not_found'], 404);
         }
 
@@ -91,7 +91,7 @@ class UserController extends Controller
     {
         $credentials = $request->only(['email', 'password', 'remember']);
 
-        if (! isset($credentials['email']) || ! isset($credentials['password'])) {
+        if (!isset($credentials['email']) || !isset($credentials['password'])) {
             return response()->json(['message' => 'invalid_login_credentials'], 400);
         }
 
@@ -103,17 +103,17 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'login_successful_authentication_code_sent',
-            'user'    => [
-                'id'              => $result['user']->id,
-                'uuid'            => $result['user']->uuid,
-                'name'            => $result['user']->name,
-                'surname'         => $result['user']->surname,
-                'email'           => $result['user']->email,
-                'number'          => $result['user']->number,
+            'user' => [
+                'id' => $result['user']->id,
+                'uuid' => $result['user']->uuid,
+                'name' => $result['user']->name,
+                'surname' => $result['user']->surname,
+                'email' => $result['user']->email,
+                'number' => $result['user']->number,
                 'profile_picture' => $result['user']->profile_picture,
             ],
-            'token'   => $result['token'],
-            'action'  => $result['auth'],
+            'token' => $result['token'],
+            'action' => $result['auth'],
         ], 200);
     }
 
@@ -127,16 +127,16 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'user_authenticated_successfully',
-            'user'    => [
-                'id'              => $result['user']->id,
-                'uuid'            => $result['user']->uuid,
-                'name'            => $result['user']->name,
-                'surname'         => $result['user']->surname,
-                'email'           => $result['user']->email,
-                'number'          => $result['user']->number,
+            'user' => [
+                'id' => $result['user']->id,
+                'uuid' => $result['user']->uuid,
+                'name' => $result['user']->name,
+                'surname' => $result['user']->surname,
+                'email' => $result['user']->email,
+                'number' => $result['user']->number,
                 'profile_picture' => $result['user']->profile_picture,
             ],
-            'token'   => $result['token'],
+            'token' => $result['token'],
         ], 200);
     }
 
@@ -162,7 +162,7 @@ class UserController extends Controller
     {
         $user = User::auth();
 
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'user_not_authenticated'], 401);
         }
 
@@ -170,13 +170,13 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'user_found',
-            'user'    => [
-                'id'              => $user->id,
-                'uuid'            => $user->uuid,
-                'name'            => $user->name,
-                'surname'         => $user->surname,
-                'email'           => $user->email,
-                'number'          => $user->number,
+            'user' => [
+                'id' => $user->id,
+                'uuid' => $user->uuid,
+                'name' => $user->name,
+                'surname' => $user->surname,
+                'email' => $user->email,
+                'number' => $user->number,
                 'profile_picture' => $user->profile_picture,
             ],
             'authenticated' => $session->authenticated,
@@ -187,7 +187,7 @@ class UserController extends Controller
     {
         $user = $this->userQueryService->getInfo($uuid);
 
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'user_not_found'], 404);
         }
 
@@ -209,7 +209,7 @@ class UserController extends Controller
     {
         $user = User::auth();
 
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'user_not_authenticated'], 401);
         }
 
@@ -221,7 +221,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'image_uploaded_successfully',
-            'file'    => $result['file'],
+            'file' => $result['file'],
         ], 201);
     }
 
@@ -233,13 +233,13 @@ class UserController extends Controller
 
         $user = $this->userQueryService->exists($validated['number']);
 
-        if (! $user) {
+        if (!$user) {
             return response()->json(['message' => 'user_not_found'], 404);
         }
 
         return response()->json([
             'message' => 'user_found',
-            'data'    => $user,
+            'data' => $user,
         ], 200);
     }
 
@@ -247,7 +247,7 @@ class UserController extends Controller
     {
         return response()->json([
             'message' => 'code_length',
-            'length'  => AuthCode::LENGTH,
+            'length' => AuthCode::LENGTH,
         ], 200);
     }
 }

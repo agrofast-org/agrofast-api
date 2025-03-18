@@ -2,23 +2,24 @@
 
 namespace App\Models\Hr;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 
 /**
- * Class BrowserAgent
+ * Class BrowserAgent.
  *
  * Represents a browser agent with associated attributes and relationships.
  *
- * @property int $id
- * @property string $fingerprint
- * @property string $user_agent
- * @property string $ip_address
- * @property bool $active
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $inactivated_at
+ * @property int         $id
+ * @property string      $fingerprint
+ * @property string      $user_agent
+ * @property string      $ip_address
+ * @property bool        $active
+ * @property Carbon      $created_at
+ * @property Carbon      $updated_at
+ * @property null|Carbon $inactivated_at
  */
 class BrowserAgent extends Model
 {
@@ -43,8 +44,6 @@ class BrowserAgent extends Model
 
     /**
      * Create a new browser agent for the user.
-     *
-     * @return self
      */
     public static function createBrowserAgent(): self
     {
@@ -58,8 +57,6 @@ class BrowserAgent extends Model
 
     /**
      * Get the sessions associated with this browser agent.
-     *
-     * @return HasMany
      */
     public function sessions(): HasMany
     {
@@ -68,8 +65,6 @@ class BrowserAgent extends Model
 
     /**
      * Get the remembered browsers associated with this browser agent.
-     *
-     * @return HasMany
      */
     public function rememberedBrowsers(): HasMany
     {
@@ -78,8 +73,6 @@ class BrowserAgent extends Model
 
     /**
      * Deactivate the browser agent.
-     *
-     * @return bool
      */
     public function deactivate(): bool
     {

@@ -11,8 +11,6 @@ class OfferController extends Controller
 {
     /**
      * List all offers for the authenticated user.
-     *
-     * @return JsonResponse
      */
     public function listOffers(): JsonResponse
     {
@@ -24,10 +22,6 @@ class OfferController extends Controller
 
     /**
      * Create a new offer.
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
      */
     public function makeOffer(Request $request): JsonResponse
     {
@@ -36,13 +30,14 @@ class OfferController extends Controller
         $validated = $request->validate([
             'request_id' => 'required|exists:transport_requests,id',
             'carrier_id' => 'required|exists:carriers,id',
-            'float'      => 'required|numeric|min:0',
+            'float' => 'required|numeric|min:0',
         ]);
 
         // Ensure user doesn't have an active offer
         $existingOffer = Offer::where('user_id', $user->id)
-          ->where('active', true)
-          ->first();
+            ->where('active', true)
+            ->first()
+        ;
 
         if ($existingOffer) {
             return response()->json(['message' => 'Cannot make more than one offer at a time'], 400);
@@ -50,10 +45,10 @@ class OfferController extends Controller
 
         try {
             Offer::create([
-                'user_id'    => $user->id,
+                'user_id' => $user->id,
                 'request_id' => $validated['request_id'],
                 'carrier_id' => $validated['carrier_id'],
-                'float'      => $validated['float'],
+                'float' => $validated['float'],
             ]);
 
             return response()->json(['message' => 'Offer created'], 201);
@@ -64,25 +59,21 @@ class OfferController extends Controller
 
     /**
      * Update an existing offer.
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
      */
     public function updateOffer(Request $request): JsonResponse
     {
         $user = Auth::user();
 
         $validated = $request->validate([
-            'id'         => 'required|exists:offers,id',
+            'id' => 'required|exists:offers,id',
             'request_id' => 'required|exists:transport_requests,id',
             'carrier_id' => 'required|exists:carriers,id',
-            'float'      => 'required|numeric|min:0',
+            'float' => 'required|numeric|min:0',
         ]);
 
         $offer = Offer::where('id', $validated['id'])->where('user_id', $user->id)->first();
 
-        if (! $offer) {
+        if (!$offer) {
             return response()->json(['message' => 'Offer not found'], 404);
         }
 
@@ -90,7 +81,7 @@ class OfferController extends Controller
             $offer->update([
                 'request_id' => $validated['request_id'],
                 'carrier_id' => $validated['carrier_id'],
-                'float'      => $validated['float'],
+                'float' => $validated['float'],
             ]);
 
             return response()->json(['message' => 'Offer updated'], 200);
@@ -101,10 +92,6 @@ class OfferController extends Controller
 
     /**
      * Cancel an offer.
-     *
-     * @param Request $request
-     *
-     * @return JsonResponse
      */
     public function cancelOffer(Request $request): JsonResponse
     {
@@ -116,7 +103,7 @@ class OfferController extends Controller
 
         $offer = Offer::where('id', $validated['id'])->where('user_id', $user->id)->first();
 
-        if (! $offer) {
+        if (!$offer) {
             return response()->json(['message' => 'Offer not found'], 404);
         }
 

@@ -3,23 +3,31 @@
 namespace App\Models\Hr;
 
 use App\Models\DynamicQuery;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * Class RequestHistory
+ * Class RequestHistory.
  *
  * Represents a request history record with associated attributes and relationships.
  *
- * @property int $id
- * @property int $session_id
- * @property string $route
- * @property string $method
- * @property string|null $payload
- * @property \Carbon\Carbon $created_at
- * @property-read Session $session
+ * @property int         $id
+ * @property int         $session_id
+ * @property string      $route
+ * @property string      $method
+ * @property null|string $payload
+ * @property Carbon      $created_at
+ * @property Session     $session
  */
 class RequestHistory extends DynamicQuery
 {
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
+
     /**
      * The table associated with the model.
      *
@@ -56,16 +64,7 @@ class RequestHistory extends DynamicQuery
     ];
 
     /**
-     * Indicates if the model should be timestamped.
-     *
-     * @var bool
-     */
-    public $timestamps = false;
-
-    /**
      * Get the session that owns the request history.
-     *
-     * @return BelongsTo
      */
     public function session(): BelongsTo
     {
@@ -74,12 +73,6 @@ class RequestHistory extends DynamicQuery
 
     /**
      * Log a new request history entry.
-     *
-     * @param int $sessionId
-     * @param string $route
-     * @param string $method
-     * @param string|null $payload
-     * @return self
      */
     public static function logRequest(int $sessionId, string $route, string $method, ?string $payload = null): self
     {

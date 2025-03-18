@@ -10,20 +10,16 @@ class AuthSms extends Model
     /**
      * Generate a new authentication code for the user.
      *
-     * @param int $userId
-     *
-     * @return AuthCode
-     *
      * @throws \Exception
      */
     public static function createCode(int $userId): AuthCode
     {
         $user = User::find($userId);
 
-        if (! $user) {
+        if (!$user) {
             throw new \Exception('User not found');
         }
-        if (! self::validatePhoneNumber($user->number)) {
+        if (!self::validatePhoneNumber($user->number)) {
             throw new \Exception('Invalid phone number');
         }
         $code = AuthCode::generateCode();
@@ -49,13 +45,9 @@ class AuthSms extends Model
 
     /**
      * Validate a phone number (simple example).
-     *
-     * @param string $number
-     *
-     * @return bool
      */
     private static function validatePhoneNumber(string $number): bool
     {
-        return ! empty($number);
+        return !empty($number);
     }
 }

@@ -13,8 +13,6 @@ class PictureService
     /**
      * Returns the user's image from Storage.
      *
-     * @param int         $userId
-     * @param string|null $pictureUuid
      * @return array ['file' => content, 'mime' => type] or error
      */
     public function getPicture(int $userId, ?string $pictureUuid = null): array
@@ -26,7 +24,7 @@ class PictureService
 
         if ($pictureUuid) {
             $filePath = "uploads/pictures/{$userId}/{$pictureUuid}";
-            if (! Storage::exists($filePath)) {
+            if (!Storage::exists($filePath)) {
                 return ['error' => 'image_not_found'];
             }
             $file = Storage::get($filePath);
@@ -45,8 +43,6 @@ class PictureService
     /**
      * Uploads an image and updates the user's record.
      *
-     * @param Request $request
-     * @param User    $user
      * @return array Result with the file record or error
      */
     public function uploadPicture(Request $request, User $user): array
@@ -60,16 +56,16 @@ class PictureService
         $disk = env('FILESYSTEM_DISK', 's3');
 
         $path = $file->storeAs("uploads/pictures/{$user->id}", $fileName, $disk);
-        if (! $path) {
+        if (!$path) {
             return ['error' => 'failed_to_upload_image'];
         }
 
         $fileRecord = FilesImage::create([
-            'id'          => Str::uuid(),
-            'name'        => $file->getClientOriginalName(),
-            'path'        => $path,
-            'mime_type'   => $file->getMimeType(),
-            'size'        => $file->getSize(),
+            'id' => Str::uuid(),
+            'name' => $file->getClientOriginalName(),
+            'path' => $path,
+            'mime_type' => $file->getMimeType(),
+            'size' => $file->getSize(),
             'uploaded_by' => $user->id,
         ]);
 
@@ -78,7 +74,7 @@ class PictureService
             'profile_picture' => "{$appUrl}uploads/pictures/{$path}",
         ]);
 
-        if (! $fileRecord) {
+        if (!$fileRecord) {
             Storage::disk($disk)->delete($path);
 
             return ['error' => 'failed_to_save_image_record'];

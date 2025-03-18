@@ -11,7 +11,7 @@ use Illuminate\Http\Request;
 
 class SessionFactory
 {
-    public static function create(User $user, Request $request, BrowserAgent $browserAgent, AuthCode | null $authCode): Session
+    public static function create(User $user, Request $request, BrowserAgent $browserAgent, ?AuthCode $authCode): Session
     {
         $attributes = [
             'user_id' => $user->id,

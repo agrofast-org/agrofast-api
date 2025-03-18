@@ -4,46 +4,45 @@ namespace App\Models\Hr;
 
 use App\Enums\UserError;
 use App\Models\DynamicQuery;
+use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use stdClass;
 
 /**
- * Class User
+ * Class User.
  *
  * Represents a system user with associated attributes and logic.
  *
- * @property int $id
- * @property int $uuid
- * @property string $name
- * @property string $surname
- * @property string $number
- * @property string $email
- * @property string $password
- * @property string $language
- * @property bool $number_verified
- * @property \Carbon\Carbon|null $number_verified_at
- * @property bool $email_verified
- * @property \Carbon\Carbon|null $email_verified_at
- * @property bool $active
- * @property string|null $profile_picture
- * @property string|null $remember_token
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property int         $id
+ * @property int         $uuid
+ * @property string      $name
+ * @property string      $surname
+ * @property string      $number
+ * @property string      $email
+ * @property string      $password
+ * @property string      $language
+ * @property bool        $number_verified
+ * @property null|Carbon $number_verified_at
+ * @property bool        $email_verified
+ * @property null|Carbon $email_verified_at
+ * @property bool        $active
+ * @property null|string $profile_picture
+ * @property null|string $remember_token
+ * @property Carbon      $created_at
+ * @property Carbon      $updated_at
  */
 class User extends DynamicQuery
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
+    use Notifiable;
 
     protected static User $user;
 
     protected static Session $session;
 
-    protected static stdClass $decodedToken;
+    protected static \stdClass $decodedToken;
 
     protected $table = 'hr.user';
 
@@ -69,7 +68,7 @@ class User extends DynamicQuery
     protected $casts = [
         'number_authenticated' => 'boolean',
         'email_authenticated' => 'boolean',
-        'active'               => 'boolean',
+        'active' => 'boolean',
     ];
 
     protected $dates = [
@@ -82,9 +81,9 @@ class User extends DynamicQuery
         'remember_token',
     ];
 
-    public static function getDecodedToken(): stdClass | UserError
+    public static function getDecodedToken(): \stdClass|UserError
     {
-        if (! empty(self::$decodedToken)) {
+        if (!empty(self::$decodedToken)) {
             return self::$decodedToken;
         }
 
@@ -101,12 +100,10 @@ class User extends DynamicQuery
 
     /**
      * Authenticates the user based on the provided token.
-     *
-     * @return User|UserError
      */
-    public static function auth(): self | UserError
+    public static function auth(): self|UserError
     {
-        if (! empty(self::$user)) {
+        if (!empty(self::$user)) {
             return self::$user;
         }
 
@@ -117,11 +114,11 @@ class User extends DynamicQuery
                 return $decoded;
             }
 
-            if (! isset($decoded->sub)) {
+            if (!isset($decoded->sub)) {
                 return UserError::INVALID_TOKEN;
             }
             $user = self::where('id', $decoded->sub)->first();
-            if (! $user) {
+            if (!$user) {
                 return UserError::USER_NOT_FOUND;
             }
             self::$user = $user;
@@ -132,9 +129,9 @@ class User extends DynamicQuery
         }
     }
 
-    public static function session(): Session | UserError
+    public static function session(): Session|UserError
     {
-        if (! empty(self::$session)) {
+        if (!empty(self::$session)) {
             return self::$session;
         }
         $decoded = self::getDecodedToken();
@@ -145,7 +142,7 @@ class User extends DynamicQuery
 
         $session = Session::where('id', $decoded->sid)->first();
         self::$session = $session;
-        if (! $session) {
+        if (!$session) {
             return UserError::SESSION_NOT_FOUND;
         }
 
@@ -155,8 +152,9 @@ class User extends DynamicQuery
     /**
      * Prepares data for insertion by normalizing and sanitizing inputs.
      *
-     * @param array $params Data received from the request.
-     * @return array Prepared data for insertion.
+     * @param array $params data received from the request
+     *
+     * @return array prepared data for insertion
      */
     public static function prepareInsert(array $params): array
     {

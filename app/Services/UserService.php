@@ -11,7 +11,6 @@ use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\Session;
 use App\Models\Hr\User;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -20,14 +19,14 @@ class UserService
     /**
      * Creates a new user and starts a session.
      *
-     * @param array   $data    user data to be inserted
+     * @param array            $data    user data to be inserted
      * @param UserStoreRequest $request request instance
      *
      * @return array result with user and token or errors
      */
     public function createUser(array $data, UserStoreRequest $request): array
     {
-        if (! empty($validated)) {
+        if (!empty($validated)) {
             return ['error' => $validated];
         }
 
@@ -40,7 +39,7 @@ class UserService
 
         $session = SessionFactory::create($user, $request, $browserAgent, $authCode);
 
-        if (! empty($data['remember']) && $data['remember'] === 'true') {
+        if (!empty($data['remember']) && $data['remember'] === 'true') {
             RememberBrowser::create([
                 'user_id' => $user->id,
                 'browser_agent_id' => $browserAgent->id,

@@ -3,11 +3,10 @@
 namespace App\Http\Middleware;
 
 use App\Models\Hr\User;
-use Closure;
 
 class AuthBasicMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle($request, \Closure $next)
     {
         $user = User::auth();
 

@@ -4,13 +4,12 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class IndexController extends Controller
 {
     /**
      * Handle the API index request.
-     *
-     * @return JsonResponse
      */
     public function index(): JsonResponse
     {
@@ -22,13 +21,13 @@ class IndexController extends Controller
     /**
      * Serve the favicon.ico file.
      *
-     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return BinaryFileResponse
      */
     public function favicon()
     {
         $path = public_path('img/favicon.ico');
 
-        if (! file_exists($path)) {
+        if (!file_exists($path)) {
             abort(404, 'Favicon not found.');
         }
 

@@ -11,7 +11,7 @@ class DynamicQuery extends Model
     {
         $search = Request::get('search');
 
-        if (! $search) {
+        if (!$search) {
             return $query;
         }
 

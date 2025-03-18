@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Default Mailer
@@ -36,7 +35,6 @@ return [
     */
 
     'mailers' => [
-
         'smtp' => [
             'transport' => 'smtp',
             'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
@@ -66,12 +64,12 @@ return [
 
         'sendmail' => [
             'transport' => 'sendmail',
-            'path'      => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
+            'path' => env('MAIL_SENDMAIL_PATH', '/usr/sbin/sendmail -bs -i'),
         ],
 
         'log' => [
             'transport' => 'log',
-            'channel'   => env('MAIL_LOG_CHANNEL'),
+            'channel' => env('MAIL_LOG_CHANNEL'),
         ],
 
         'array' => [
@@ -80,7 +78,7 @@ return [
 
         'failover' => [
             'transport' => 'failover',
-            'mailers'   => [
+            'mailers' => [
                 'smtp',
                 'log',
             ],
@@ -88,12 +86,11 @@ return [
 
         'roundrobin' => [
             'transport' => 'roundrobin',
-            'mailers'   => [
+            'mailers' => [
                 'ses',
                 'postmark',
             ],
         ],
-
     ],
 
     /*
@@ -109,7 +106,6 @@ return [
 
     'from' => [
         'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name'    => env('MAIL_FROM_NAME', 'Example'),
+        'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
-
 ];
