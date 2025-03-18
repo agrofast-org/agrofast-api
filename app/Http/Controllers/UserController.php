@@ -89,17 +89,16 @@ class UserController extends Controller
         $credentials = $request->only(['email', 'password', 'remember']);
 
         if (!isset($credentials['email']) || !isset($credentials['password'])) {
-            return response()->json(['message' => 'invalid_login_credentials'], 400);
+            return ResponseFactory::error('invalid_login_credentials', null, 400);
         }
 
         $result = $this->authService->login($credentials, $request);
 
         if (isset($result['error'])) {
-            return response()->json(['message' => $result['error']], 400);
+            return ResponseFactory::error($result['error'], null, 400);
         }
 
-        return response()->json([
-            'message' => 'login_authentication_code_sent',
+        return ResponseFactory::success('login_authentication_code_sent', [
             'user' => [
                 'id' => $result['user']->id,
                 'uuid' => $result['user']->uuid,
@@ -111,7 +110,13 @@ class UserController extends Controller
             ],
             'token' => $result['token'],
             'action' => $result['auth'],
-        ], 200);
+        ]);
+    }
+
+    public function resendCode()
+    {
+        // $result = $this->authService->resendCode();
+        return ResponseFactory::error('not_implemented', null, 501);
     }
 
     public function authenticate(Request $request)
@@ -119,11 +124,10 @@ class UserController extends Controller
         $result = $this->authService->authenticate($request);
 
         if (isset($result['error'])) {
-            return response()->json(['message' => $result['error']], 400);
+            return ResponseFactory::error($result['error']);
         }
 
-        return response()->json([
-            'message' => 'user_authenticated_successfully',
+        return ResponseFactory::success('user_authenticated_successfully', [
             'user' => [
                 'id' => $result['user']->id,
                 'uuid' => $result['user']->uuid,
@@ -134,7 +138,7 @@ class UserController extends Controller
                 'profile_picture' => $result['user']->profile_picture,
             ],
             'token' => $result['token'],
-        ], 200);
+        ]);
     }
 
     public function authenticationMethods()
@@ -150,9 +154,7 @@ class UserController extends Controller
             $methods[] = 'email';
         }
 
-        return response()->json([
-            'methods' => $methods,
-        ], 200);
+        return ResponseFactory::success('available_authentication_methods', ['methods' => $methods]);
     }
 
     public function self()
@@ -160,13 +162,12 @@ class UserController extends Controller
         $user = User::auth();
 
         if (!$user) {
-            return response()->json(['message' => 'user_not_authenticated'], 401);
+            return ResponseFactory::error('user_not_authenticated', null, 401);
         }
 
         $session = User::session();
 
-        return response()->json([
-            'message' => 'user_found',
+        return ResponseFactory::success('user_found', [
             'user' => [
                 'id' => $user->id,
                 'uuid' => $user->uuid,
@@ -177,7 +178,7 @@ class UserController extends Controller
                 'profile_picture' => $user->profile_picture,
             ],
             'authenticated' => $session->authenticated,
-        ], 200);
+        ]);
     }
 
     public function info($uuid)

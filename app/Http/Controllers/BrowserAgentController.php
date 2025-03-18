@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\ResponseFactory;
 use App\Models\Hr\BrowserAgent;
 use Illuminate\Http\JsonResponse;
 
@@ -12,22 +13,17 @@ class BrowserAgentController extends Controller
         $browserAgent = BrowserAgent::createBrowserAgent();
 
         if ($browserAgent) {
-            return response()->json([
-                'message' => 'fingerprint_created',
+            return ResponseFactory::success('fingerprint_created', [
                 'fingerprint' => $browserAgent->fingerprint,
             ], 201);
         }
 
-        return response()->json([
-            'message' => 'fingerprint_not_created',
-        ], 500);
+        return ResponseFactory::error('fingerprint_not_created', null, 500);
     }
 
     public function validate(): JsonResponse
     {
         // This is a middleware, so if it reaches this point, the fingerprint is valid
-        return response()->json([
-            'message' => 'valid_fingerprint',
-        ], 200);
+        return ResponseFactory::success('valid_fingerprint');
     }
 }

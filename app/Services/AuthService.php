@@ -77,6 +77,16 @@ class AuthService
     }
 
     /**
+     * @return array the result of the resend operation, containing either a success or an error message
+     */
+    public function resendCode()
+    {
+        // TODO: Implement resendCode() method.
+
+        return [];
+    }
+
+    /**
      * Performs user authentication using the verification code.
      *
      * @param Request $request Request instance

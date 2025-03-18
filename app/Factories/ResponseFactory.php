@@ -13,7 +13,7 @@ class ResponseFactory
      * @param mixed  $payload Data to be returned
      * @param int    $code    HTTP status code (default 200)
      */
-    public static function success(string $message, $payload, int $code = 200): JsonResponse
+    public static function success(string $message, $payload = null, int $code = 200): JsonResponse
     {
         $response = ['success' => true];
 
