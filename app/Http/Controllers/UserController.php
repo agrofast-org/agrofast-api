@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\ResponseFactory;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Models\Hr\AuthCode;
@@ -40,10 +41,10 @@ class UserController extends Controller
         $user = $this->userQueryService->getUser($query);
 
         if ($user) {
-            return response()->json(['data' => $user], 200);
+            return ResponseFactory::success('user_found', $user);
         }
 
-        return response()->json(['message' => 'user_not_found'], 404);
+        return ResponseFactory::error('user_not_found', null, 404);
     }
 
     public function store(UserStoreRequest $request)
@@ -52,14 +53,10 @@ class UserController extends Controller
         $result = $this->userService->createUser($data, $request);
 
         if (isset($result['error'])) {
-            return response()->json([
-                'message' => 'error_creating_user',
-                'errors' => $result['error'],
-            ], 400);
+            return ResponseFactory::error('error_creating_user', $result['error']);
         }
 
-        return response()->json([
-            'message' => 'user_created_successfully',
+        return ResponseFactory::success('user_created_successfully', [
             'user' => [
                 'id' => $result['user']->id,
                 'uuid' => $result['user']->uuid,
@@ -79,12 +76,12 @@ class UserController extends Controller
         $user = User::find($id);
 
         if (!$user) {
-            return response()->json(['message' => 'user_not_found'], 404);
+            return ResponseFactory::error('user_not_found', null, 404);
         }
 
         $user->update($data);
 
-        return response()->json(['message' => 'user_updated_successfully'], 200);
+        return ResponseFactory::success('user_updated', $user);
     }
 
     public function login(Request $request)
@@ -102,7 +99,7 @@ class UserController extends Controller
         }
 
         return response()->json([
-            'message' => 'login_successful_authentication_code_sent',
+            'message' => 'login_authentication_code_sent',
             'user' => [
                 'id' => $result['user']->id,
                 'uuid' => $result['user']->uuid,
@@ -188,10 +185,10 @@ class UserController extends Controller
         $user = $this->userQueryService->getInfo($uuid);
 
         if (!$user) {
-            return response()->json(['message' => 'user_not_found'], 404);
+            return ResponseFactory::error('user_not_found', null, 404);
         }
 
-        return response()->json(['data' => $user], 200);
+        return ResponseFactory::success('user_found', $user);
     }
 
     public function picture($userId, $pictureUuid = null)
@@ -199,7 +196,7 @@ class UserController extends Controller
         $result = $this->pictureService->getPicture($userId, $pictureUuid);
 
         if (isset($result['error'])) {
-            return response()->json(['message' => $result['error']], 404);
+            return ResponseFactory::error('error_getting_picture', $result['error']);
         }
 
         return response($result['file'], 200)->header('Content-Type', $result['mime']);
@@ -210,19 +207,16 @@ class UserController extends Controller
         $user = User::auth();
 
         if (!$user) {
-            return response()->json(['message' => 'user_not_authenticated'], 401);
+            return ResponseFactory::error('user_not_authenticated', null, 401);
         }
 
         $result = $this->pictureService->uploadPicture($request, $user);
 
         if (isset($result['error'])) {
-            return response()->json(['message' => $result['error']], 500);
+            return ResponseFactory::error('error_uploading_image', $result['error']);
         }
 
-        return response()->json([
-            'message' => 'image_uploaded_successfully',
-            'file' => $result['file'],
-        ], 201);
+        return ResponseFactory::success('image_uploaded_successfully', ['file' => $result['file']], 201);
     }
 
     public function exists(Request $request)
@@ -234,20 +228,14 @@ class UserController extends Controller
         $user = $this->userQueryService->exists($validated['number']);
 
         if (!$user) {
-            return response()->json(['message' => 'user_not_found'], 404);
+            return ResponseFactory::error('user_not_found', null, 404);
         }
 
-        return response()->json([
-            'message' => 'user_found',
-            'data' => $user,
-        ], 200);
+        return ResponseFactory::success('user_found', $user);
     }
 
     public function codeLength()
     {
-        return response()->json([
-            'message' => 'code_length',
-            'length' => AuthCode::LENGTH,
-        ], 200);
+        return ResponseFactory::success('code_length', ['length' => AuthCode::LENGTH]);
     }
 }
