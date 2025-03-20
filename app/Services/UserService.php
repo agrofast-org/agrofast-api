@@ -6,11 +6,12 @@ use App\Enums\UserAction;
 use App\Factories\SessionFactory;
 use App\Factories\TokenFactory;
 use App\Http\Requests\User\UserStoreRequest;
+use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
-use App\Models\Hr\Session;
 use App\Models\Hr\User;
+use App\Models\Success;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -22,12 +23,12 @@ class UserService
      * @param array            $data    user data to be inserted
      * @param UserStoreRequest $request request instance
      *
-     * @return array result with user and token or errors
+     * @return Error|Success result with user and token or error
      */
-    public function createUser(array $data, UserStoreRequest $request): array
+    public function createUser(array $data, UserStoreRequest $request): Error|Success
     {
         if (!empty($validated)) {
-            return ['error' => $validated];
+            return new Error('validation_failed', $validated);
         }
 
         $data['password'] = Hash::make($data['password']);
@@ -48,11 +49,11 @@ class UserService
 
         $jwt = TokenFactory::create($user, $session);
 
-        return [
+        return new Success('user_created', [
             'user' => $user,
             'token' => $jwt,
             'session' => $session,
             'auth' => UserAction::AUTHENTICATE->value,
-        ];
+        ]);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Factories\ResponseFactory;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
+use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\User;
 use App\Services\AuthService;
@@ -52,22 +53,11 @@ class UserController extends Controller
         $data = $request->validated();
         $result = $this->userService->createUser($data, $request);
 
-        if (isset($result['error'])) {
-            return ResponseFactory::error('error_creating_user', $result['error']);
+        if ($result instanceof Error) {
+            return ResponseFactory::create($result);
         }
 
-        return ResponseFactory::success('user_created_successfully', [
-            'user' => [
-                'id' => $result['user']->id,
-                'uuid' => $result['user']->uuid,
-                'name' => $result['user']->name,
-                'surname' => $result['user']->surname,
-                'email' => $result['user']->email,
-                'number' => $result['user']->number,
-            ],
-            'token' => $result['token'],
-            'action' => $result['auth'],
-        ], 201);
+        return ResponseFactory::success('user_created_successfully', $result, 201);
     }
 
     public function update(UserUpdateRequest $request, $id)
@@ -94,23 +84,11 @@ class UserController extends Controller
 
         $result = $this->authService->login($credentials, $request);
 
-        if (isset($result['error'])) {
-            return ResponseFactory::error($result['error'], null, 400);
+        if ($result instanceof Error) {
+            return ResponseFactory::create($result);
         }
 
-        return ResponseFactory::success('login_authentication_code_sent', [
-            'user' => [
-                'id' => $result['user']->id,
-                'uuid' => $result['user']->uuid,
-                'name' => $result['user']->name,
-                'surname' => $result['user']->surname,
-                'email' => $result['user']->email,
-                'number' => $result['user']->number,
-                'profile_picture' => $result['user']->profile_picture,
-            ],
-            'token' => $result['token'],
-            'action' => $result['auth'],
-        ]);
+        return ResponseFactory::success('login_authentication_code_sent', $result);
     }
 
     public function resendCode()
@@ -123,22 +101,11 @@ class UserController extends Controller
     {
         $result = $this->authService->authenticate($request);
 
-        if (isset($result['error'])) {
-            return ResponseFactory::error($result['error']);
+        if ($result instanceof Error) {
+            return ResponseFactory::create($result);
         }
 
-        return ResponseFactory::success('user_authenticated_successfully', [
-            'user' => [
-                'id' => $result['user']->id,
-                'uuid' => $result['user']->uuid,
-                'name' => $result['user']->name,
-                'surname' => $result['user']->surname,
-                'email' => $result['user']->email,
-                'number' => $result['user']->number,
-                'profile_picture' => $result['user']->profile_picture,
-            ],
-            'token' => $result['token'],
-        ]);
+        return ResponseFactory::success('user_authenticated_successfully', $result);
     }
 
     public function authenticationMethods()
@@ -196,8 +163,8 @@ class UserController extends Controller
     {
         $result = $this->pictureService->getPicture($userId, $pictureUuid);
 
-        if (isset($result['error'])) {
-            return ResponseFactory::error('error_getting_picture', $result['error']);
+        if ($result instanceof Error) {
+            return ResponseFactory::create($result);
         }
 
         return response($result['file'], 200)->header('Content-Type', $result['mime']);

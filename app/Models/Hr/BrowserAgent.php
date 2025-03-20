@@ -55,6 +55,14 @@ class BrowserAgent extends Model
         ]);
     }
 
+    public static function validateFingerprint(string $fingerprint): ?self
+    {
+        return self::where('fingerprint', $fingerprint)
+            ->where('active', true)
+            ->first()
+        ;
+    }
+
     /**
      * Get the sessions associated with this browser agent.
      */

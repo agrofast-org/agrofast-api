@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Enums\UserAction;
 use App\Factories\SessionFactory;
 use App\Factories\TokenFactory;
+use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\User;
+use App\Models\Success;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -21,27 +23,27 @@ class AuthService
      * @param array   $credentials Authentication data (email, password, remember)
      * @param Request $request     Request instance
      *
-     * @return array Result containing user, token, session, or error
+     * @return Error|Success Result containing user, token, session, or error
      */
-    public function login(array $credentials, Request $request): array
+    public function login(array $credentials, Request $request): Error|Success
     {
         $user = User::where('email', $credentials['email'])->first();
         if (!$user) {
-            return ['error' => ['email' => 'user_not_found']];
+            return new Error('user_not_found');
         }
 
         if (!Hash::check($credentials['password'], $user->password)) {
-            return ['error' => ['password' => 'wrong_password']];
+            return new Error('wrong_password');
         }
 
         $browserFingerprint = $request->header('Browser-Agent');
         if (!$browserFingerprint) {
-            return ['error' => 'browser_agent_missing'];
+            return new Error('browser_agent_missing');
         }
 
         $browserAgent = BrowserAgent::where('fingerprint', $browserFingerprint)->first();
         if (!$browserAgent) {
-            return ['error' => 'browser_agent_not_found'];
+            return new Error('browser_agent_not_found');
         }
 
         $remember = RememberBrowser::where('user_id', $user->id)
@@ -68,22 +70,21 @@ class AuthService
 
         $jwt = TokenFactory::create($user, $session);
 
-        return [
+        return new Success('login_success', [
             'user' => $user,
             'token' => $jwt,
             'session' => $session,
             'auth' => $remember ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
-        ];
+        ]);
     }
 
     /**
-     * @return array the result of the resend operation, containing either a success or an error message
+     * @return Error|Success the result of the resend operation
      */
-    public function resendCode()
+    public function resendCode(): Error|Success
     {
         // TODO: Implement resendCode() method.
-
-        return [];
+        return new Error('not_implemented');
     }
 
     /**
@@ -91,18 +92,18 @@ class AuthService
      *
      * @param Request $request Request instance
      *
-     * @return array Result containing user and new token, or error
+     * @return Error|Success Result containing user and new token, or error
      */
-    public function authenticate(Request $request): array
+    public function authenticate(Request $request): Error|Success
     {
         $user = User::auth();
         if (!$user) {
-            return ['error' => 'user_not_authenticated'];
+            return new Error('user_not_authenticated');
         }
 
         $session = User::session();
         if (!$session) {
-            return ['error' => 'session_not_found'];
+            return new Error('session_not_found');
         }
 
         $authCode = AuthCode::where('id', $session->auth_code_id)
@@ -111,7 +112,7 @@ class AuthService
         ;
 
         if (!$authCode) {
-            return ['error' => ['code' => 'invalid_authentication_code']];
+            return new Error('invalid_authentication_code');
         }
 
         $codeInput = $request->input('code');
@@ -119,11 +120,11 @@ class AuthService
             if ($authCode->attempts + 1 >= 3) {
                 $authCode->update(['active' => false]);
 
-                return ['error' => ['code' => 'authentication_code_attempts_exceeded']];
+                return new Error('authentication_code_attempts_exceeded');
             }
             $authCode->update(['attempts' => $authCode->attempts + 1]);
 
-            return ['error' => ['code' => 'invalid_authentication_code']];
+            return new Error('invalid_authentication_code');
         }
 
         $authCode->update(['active' => false]);
@@ -135,9 +136,9 @@ class AuthService
 
         $jwt = TokenFactory::create($user, $session);
 
-        return [
+        return new Success('authentication_success', [
             'user' => $user,
             'token' => $jwt,
-        ];
+        ]);
     }
 }

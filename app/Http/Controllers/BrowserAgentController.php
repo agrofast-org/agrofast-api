@@ -10,10 +10,18 @@ class BrowserAgentController extends Controller
 {
     public function makeFingerprint(): JsonResponse
     {
+        $fingerprint = request()->header('Browser-Agent');
+        if ($fingerprint) {
+            $browserAgent = BrowserAgent::validateFingerprint($fingerprint);
+            if ($browserAgent) {
+                return ResponseFactory::success('valid_fingerprint');
+            }
+        }
+
         $browserAgent = BrowserAgent::createBrowserAgent();
 
         if ($browserAgent) {
-            return ResponseFactory::success('fingerprint_created', [
+            return ResponseFactory::success('new_fingerprint', [
                 'fingerprint' => $browserAgent->fingerprint,
             ], 201);
         }

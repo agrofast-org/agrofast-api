@@ -12,6 +12,7 @@ $rules = [
     'increment_style' => ['style' => 'post'],
     'yoda_style' => false,
     'concat_space' => true,
+    'method_chaining_indentation' => true,
 ];
 
 $finder = Finder::create()
@@ -26,10 +27,12 @@ $finder = Finder::create()
     ->name('*.php')
     ->notName('*.blade.php')
     ->ignoreDotFiles(true)
-    ->ignoreVCS(true);
+    ->ignoreVCS(true)
+;
 
-return (new Config)
+return (new Config())
     ->setFinder($finder)
     ->setRules($rules)
     ->setRiskyAllowed(true)
-    ->setUsingCache(true);
+    ->setUsingCache(true)
+;
