@@ -3,12 +3,11 @@
 namespace App\Http\Middleware;
 
 use App\Models\Hr\BrowserAgent;
-use Closure;
 use Symfony\Component\HttpFoundation\Response;
 
 class BrowserAgentMiddleware
 {
-    public function handle($request, Closure $next)
+    public function handle($request, \Closure $next)
     {
         $browserAgent = $request->header('Browser-Agent');
 
@@ -16,13 +15,13 @@ class BrowserAgentMiddleware
             return $next($request);
         }
 
-        if (! $browserAgent) {
+        if (!$browserAgent) {
             return response()->json(['message' => 'no_browser_agent_provided', 'code' => 'browser_agent'], Response::HTTP_UNAUTHORIZED);
         }
 
         $storedBrowserAgent = BrowserAgent::where('fingerprint', $browserAgent)->first();
 
-        if (! $storedBrowserAgent) {
+        if (!$storedBrowserAgent) {
             return response()->json(['message' => 'invalid_browser_agent', 'code' => 'browser_agent'], Response::HTTP_UNAUTHORIZED);
         }
 

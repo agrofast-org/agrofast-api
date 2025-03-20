@@ -11,7 +11,10 @@ use Illuminate\Queue\SerializesModels;
 
 class SendSms implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Dispatchable;
+    use InteractsWithQueue;
+    use Queueable;
+    use SerializesModels;
 
     public string $phoneNumber;
 
@@ -21,10 +24,6 @@ class SendSms implements ShouldQueue
 
     /**
      * Create a new job instance.
-     *
-     * @param string $phoneNumber
-     * @param string $message
-     * @param int $tries
      */
     public function __construct(string $phoneNumber, string $message, int $tries = 1)
     {
@@ -35,8 +34,6 @@ class SendSms implements ShouldQueue
 
     /**
      * Execute the job to send the SMS.
-     *
-     * @return void
      */
     public function handle(): void
     {

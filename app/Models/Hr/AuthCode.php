@@ -2,26 +2,27 @@
 
 namespace App\Models\Hr;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
 /**
- * Class AuthCode
+ * Class AuthCode.
  *
  * Represents an authentication code with associated attributes and logic.
  *
- * @property int $id
- * @property string $ip_address
- * @property string $user_agent
- * @property string $auth_type
- * @property bool $authenticated
- * @property string $code
- * @property int $attempts
- * @property bool $active
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $inactivated_at
+ * @property int         $id
+ * @property string      $ip_address
+ * @property string      $user_agent
+ * @property string      $auth_type
+ * @property bool        $authenticated
+ * @property string      $code
+ * @property int         $attempts
+ * @property bool        $active
+ * @property Carbon      $created_at
+ * @property Carbon      $updated_at
+ * @property null|Carbon $inactivated_at
  */
 class AuthCode extends Model
 {
@@ -32,9 +33,12 @@ class AuthCode extends Model
 
     public const EMAIL = 'email';
 
+    public const LENGTH = 6;
+
     protected $table = 'hr.auth_code';
 
     protected $fillable = [
+        'user_id',
         'ip_address',
         'user_agent',
         'auth_type',
@@ -55,14 +59,11 @@ class AuthCode extends Model
     /**
      * Generate a new authentication code for the user.
      *
-     * @param int $userId
-     * @param self::SMS | self::EMAIL $userId
-     *
-     * @return AuthEmail | AuthSms
+     * @param self::EMAIL|self::SMS $userId
      *
      * @throws \Exception
      */
-    public static function createCode(int $userId, string $authType): AuthEmail | AuthSms
+    public static function createCode(int $userId, string $authType): self
     {
         $authCode = null;
 
@@ -73,5 +74,15 @@ class AuthCode extends Model
         }
 
         return $authCode;
+    }
+
+    /**
+     * Craft a random code.
+     */
+    public static function generateCode(): string
+    {
+        return (env('APP_ENV') === 'local' || env('ENVIRONMENT') === 'development')
+            ? '111111'
+            : str_pad(rand(pow(10, self::LENGTH - 1), pow(10, self::LENGTH) - 1), self::LENGTH, '0', STR_PAD_LEFT);
     }
 }

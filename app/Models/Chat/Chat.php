@@ -2,18 +2,20 @@
 
 namespace App\Models\Chat;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Chat extends Model
 {
     use HasFactory;
 
+    public $incrementing = false;
+
     protected $table = 'chat.chat';
 
     protected $primaryKey = 'uuid';
-
-    public $incrementing = false;
 
     protected $keyType = 'string';
 
@@ -27,9 +29,7 @@ class Chat extends Model
     /**
      * Get the message for the chat.
      *
-     * @param string $chatUuid
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return Collection
      */
     public function getmessage(string $chatUuid)
     {
@@ -37,13 +37,14 @@ class Chat extends Model
             ->where('uuid', $chatUuid)
             ->orderBy('created_at', 'ASC')
             ->take(50)
-            ->get();
+            ->get()
+        ;
     }
 
     /**
      * Define a relação com o modelo Message.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     * @return HasMany
      */
     public function message()
     {

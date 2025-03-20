@@ -10,17 +10,18 @@ class UserQueryService
      * Returns the first user that matches the search criteria.
      *
      * @param array $query Search data (id, telephone, name)
-     * @return User|null
+     *
+     * @return null|User
      */
     public function getUser(array $query)
     {
         $userQuery = User::query();
 
-        if (! empty($query['id'])) {
+        if (!empty($query['id'])) {
             $userQuery->where('id', $query['id']);
-        } elseif (! empty($query['telephone'])) {
+        } elseif (!empty($query['telephone'])) {
             $userQuery->where('number', $query['telephone']);
-        } elseif (! empty($query['name'])) {
+        } elseif (!empty($query['name'])) {
             $userQuery->where('name', 'like', '%'.$query['name'].'%');
         }
 
@@ -30,19 +31,17 @@ class UserQueryService
     /**
      * Returns summarized user information.
      *
-     * @param int $id
-     * @return User|null
+     * @return null|User
      */
-    public function getInfo(int $id)
+    public function getInfo(string $uuid)
     {
-        return User::find($id, ['id', 'name', 'number', 'profile_picture']);
+        return User::where(['uuid' => $uuid])->first();
     }
 
     /**
      * Checks if a user exists by number.
      *
-     * @param string $number
-     * @return User|null
+     * @return null|User
      */
     public function exists(string $number)
     {

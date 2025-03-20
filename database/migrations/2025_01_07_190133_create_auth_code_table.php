@@ -13,6 +13,7 @@ return new class extends Migration {
     {
         Schema::create('hr.auth_code', function (Blueprint $table) {
             $table->id()->primary();
+            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();
             $table->text('user_agent')->nullable();
             $table->enum('auth_type', ['sms', 'email']);

@@ -28,7 +28,6 @@ class SmsService
      *
      * @param string $phoneNumber Destination phone number
      * @param string $message     Message to be sent
-     * @return void
      */
     public function to(string $phoneNumber, string $message): void
     {

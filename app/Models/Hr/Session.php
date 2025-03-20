@@ -2,30 +2,31 @@
 
 namespace App\Models\Hr;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Session
+ * Class Session.
  *
  * Represents a user session with associated information about device, authentication status and activity.
  *
- * @property int $id
- * @property int $user_id
- * @property string $ip_address
- * @property int $browser_agent_id
- * @property string $auth_type
- * @property int|null $auth_code_id
- * @property bool $authenticated
- * @property bool $active
- * @property \Carbon\Carbon|null $last_activity
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon|null $inactivated_at
- * @property-read User $user
- * @property-read BrowserAgent $browserAgent
- * @property-read AuthCode|null $authCode
- * @property-read \Illuminate\Database\Eloquent\Collection|RequestHistory[] $requestHistory
+ * @property int                         $id
+ * @property int                         $user_id
+ * @property string                      $ip_address
+ * @property int                         $browser_agent_id
+ * @property null|int                    $auth_code_id
+ * @property bool                        $authenticated
+ * @property bool                        $active
+ * @property null|Carbon                 $last_activity
+ * @property Carbon                      $created_at
+ * @property Carbon                      $updated_at
+ * @property null|Carbon                 $inactivated_at
+ * @property User                        $user
+ * @property BrowserAgent                $browserAgent
+ * @property null|AuthCode               $authCode
+ * @property Collection|RequestHistory[] $requestHistory
  */
 class Session extends Model
 {
@@ -39,7 +40,6 @@ class Session extends Model
         'user_id',
         'ip_address',
         'browser_agent_id',
-        'auth_type',
         'auth_code_id',
         'authenticated',
         'active',

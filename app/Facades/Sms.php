@@ -8,8 +8,6 @@ class Sms extends Facade
 {
     /**
      * Retorna o nome do registro no container.
-     *
-     * @return string
      */
     protected static function getFacadeAccessor(): string
     {

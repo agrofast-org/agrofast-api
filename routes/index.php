@@ -14,9 +14,6 @@ Route::get('/favicon.ico', function () {
     return response()->file(public_path('favicon.ico'));
 });
 
-Route::get('/api/fingerprint', [BrowserAgentController::class, 'makeFingerprint']);
-Route::middleware('fingerprint')->get('/api/fingerprint/validate', [BrowserAgentController::class, 'validate']);
-
 Route::middleware(['dev.env'])->group(function () {
     Route::prefix('/console')->group(function () {
         require_once __DIR__.'/../routes/console.php';
@@ -36,6 +33,11 @@ Route::prefix('/storage')->group(function () {
 });
 
 Route::prefix('/api')->group(function () {
+    Route::prefix('fingerprint')->group(function () {
+        Route::get('/', [BrowserAgentController::class, 'makeFingerprint']);
+        Route::middleware('fingerprint')->get('/validate', [BrowserAgentController::class, 'validate']);
+    });
+
     require_once __DIR__.'/../routes/api.php';
 });
 

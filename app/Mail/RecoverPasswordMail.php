@@ -13,9 +13,7 @@ class RecoverPasswordMail extends Mailable
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public array $user)
-    {
-    }
+    public function __construct(public array $user) {}
 
     public function envelope(): Envelope
     {

@@ -37,13 +37,17 @@ Route::middleware(['dev.env'])->prefix('/debug')->group(function () {
 
 // User routes
 Route::middleware(['db.safe', 'fingerprint'])->group(function () {
+    Route::prefix('/auth')->group(function () {
+        Route::get('/code-length', [UserController::class, 'codeLength']);
+    });
+
     Route::prefix('/user')->group(function () {
         Route::get('/', [UserController::class, 'index']);
         Route::post('/', [UserController::class, 'store']);
         Route::put('/', [UserController::class, 'update'])->middleware(['auth']);
         Route::prefix('/info')->middleware(['auth.basic'])->group(function () {
             Route::get('/me', [UserController::class, 'self']);
-            Route::get('/{id}', [UserController::class, 'info']);
+            Route::get('/{uuid}', [UserController::class, 'info']);
         });
         Route::prefix('/picture')->middleware(['auth'])->group(function () {
             Route::post('/upload', [UserController::class, 'postPicture']);

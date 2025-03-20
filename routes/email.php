@@ -17,9 +17,8 @@ Route::get('/{screen?}/{locale?}', function ($screen = 'authentication', $locale
                     'expires' => '30',
                 ],
             ]);
-        } else {
-            abort(404);
         }
+        abort(404);
     }
 });
 

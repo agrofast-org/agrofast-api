@@ -12,9 +12,7 @@ class SendMail implements ShouldQueue
     use Queueable;
 
     /**
-     * @param array|string           $to
      * @param class-string<Mailable> $mailableClass
-     * @param array                  $data
      * @param mixed                  $tries
      */
     public function __construct(
@@ -22,8 +20,7 @@ class SendMail implements ShouldQueue
         public string $mailableClass,
         public array $data = [],
         public $tries = 1
-    ) {
-    }
+    ) {}
 
     public function handle(): void
     {

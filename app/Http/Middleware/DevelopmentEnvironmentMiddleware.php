@@ -2,23 +2,23 @@
 
 namespace App\Http\Middleware;
 
-use Closure;
+use Illuminate\Http\Request;
 
 class DevelopmentEnvironmentMiddleware
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Closure  $next
+     * @param Request $request
+     *
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle($request, \Closure $next)
     {
         if (env('APP_ENV') !== 'local') {
             return response()->json(['message' => 'Not allowed environment'], 404);
-        } else {
-            return $next($request);
         }
+
+        return $next($request);
     }
 }
