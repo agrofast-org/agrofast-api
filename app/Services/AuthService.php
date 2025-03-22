@@ -29,11 +29,11 @@ class AuthService
     {
         $user = User::where('email', $credentials['email'])->first();
         if (!$user) {
-            return new Error('user_not_found');
+            return new Error('user_not_found', ['email' => 'user_not_found']);
         }
 
         if (!Hash::check($credentials['password'], $user->password)) {
-            return new Error('wrong_password');
+            return new Error('wrong_password', ['password' => 'wrong_password']);
         }
 
         $browserFingerprint = $request->header('Browser-Agent');

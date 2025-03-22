@@ -78,10 +78,6 @@ class UserController extends Controller
     {
         $credentials = $request->only(['email', 'password', 'remember']);
 
-        if (!isset($credentials['email']) || !isset($credentials['password'])) {
-            return ResponseFactory::error('invalid_login_credentials', null, 400);
-        }
-
         $result = $this->authService->login($credentials, $request);
 
         if ($result instanceof Error) {
