@@ -140,11 +140,9 @@ class AuthService
         $session->update(['authenticated' => true]);
 
         if ($authCode->auth_type === AuthCode::EMAIL) {
-            $user->update(['email_authenticated' => true]);
-            $user->update(['email_authenticated_in' => Carbon::now()]);
+            $user->update(['email_verified' => true, 'email_verified_at' => Carbon::now()]);
         } elseif ($authCode->auth_type === AuthCode::SMS) {
-            $user->update(['number_authenticated' => true]);
-            $user->update(['number_authenticated_in' => Carbon::now()]);
+            $user->update(['number_verified' => true, 'number_verified_at' => Carbon::now()]);
         }
 
         $jwt = TokenFactory::create($user, $session);
