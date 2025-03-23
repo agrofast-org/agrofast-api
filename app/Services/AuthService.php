@@ -37,10 +37,6 @@ class AuthService
         }
 
         $browserFingerprint = $request->header('Browser-Agent');
-        if (!$browserFingerprint) {
-            return new Error('browser_agent_missing');
-        }
-
         $browserAgent = BrowserAgent::where('fingerprint', $browserFingerprint)->first();
         if (!$browserAgent) {
             return new Error('browser_agent_not_found');
@@ -53,11 +49,11 @@ class AuthService
         ;
 
         $authType = AuthCode::EMAIL;
-        $authCode = $remember ? null : AuthCode::createCode($user->id, $authType);
+        $authCode = ($user->email_verified && $remember) ? null : AuthCode::createCode($user->id, $authType);
 
         $session = SessionFactory::create($user, $request, $browserAgent, $authCode);
 
-        if ($remember) {
+        if ($user->email_verified && $remember) {
             $session->update(['authenticated' => true]);
         }
 
@@ -71,10 +67,17 @@ class AuthService
         $jwt = TokenFactory::create($user, $session);
 
         return new Success('login_success', [
-            'user' => $user,
+            'user' => [
+                'id' => $user->id,
+                'uuid' => $user->uuid,
+                'name' => $user->name,
+                'surname' => $user->surname,
+                'email' => $user->email,
+                'number' => $user->number,
+                'profile_picture' => $user->profile_picture,
+            ],
             'token' => $jwt,
-            'session' => $session,
-            'auth' => $remember ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
+            'auth' => ($user->email_verified && $remember) ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
         ]);
     }
 
@@ -117,21 +120,31 @@ class AuthService
 
         $codeInput = $request->input('code');
         if ($authCode->code !== $codeInput) {
-            if ($authCode->attempts + 1 >= 3) {
-                $authCode->update(['active' => false]);
+            $updatedAttempts = $authCode->attempts + 1;
+            if ($updatedAttempts >= AuthCode::MAX_ATTEMPTS) {
+                $authCode->update(['attempts' => $updatedAttempts, 'active' => false]);
+                $session->update(['authenticated' => false, 'active' => false]);
 
-                return new Error('authentication_code_attempts_exceeded');
+                return new Error('authentication_code_attempts_exceeded', null, null, 401);
             }
-            $authCode->update(['attempts' => $authCode->attempts + 1]);
+            $authCode->update(['attempts' => $updatedAttempts]);
 
-            return new Error('invalid_authentication_code');
+            return new Error('incorrect_authentication_code', [
+                'code' => 'incorrect_authentication_code',
+            ], [
+                'attempts' => AuthCode::MAX_ATTEMPTS - $updatedAttempts,
+            ], 400);
         }
 
         $authCode->update(['active' => false]);
-        if ($authCode->auth_type === AuthCode::SMS) {
-            $user->update(['number_authenticated' => true]);
-        } else {
+        $session->update(['authenticated' => true]);
+
+        if ($authCode->auth_type === AuthCode::EMAIL) {
             $user->update(['email_authenticated' => true]);
+            $user->update(['email_authenticated_in' => Carbon::now()]);
+        } elseif ($authCode->auth_type === AuthCode::SMS) {
+            $user->update(['number_authenticated' => true]);
+            $user->update(['number_authenticated_in' => Carbon::now()]);
         }
 
         $jwt = TokenFactory::create($user, $session);

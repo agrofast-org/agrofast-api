@@ -26,7 +26,7 @@ class ResponseFactory
             return self::success($result->message, $result->data, $code ?? 200);
         }
         if ($result instanceof Error) {
-            return self::error($result->message, $result->errors, $code ?? 400);
+            return self::error($result->message, $result->data, $result->errors, $code ?? $result->code ?? 400);
         }
 
         return response()->json(['success' => false, 'message' => 'Invalid response type'], 500);
@@ -60,16 +60,20 @@ class ResponseFactory
     /**
      * Returns a standardized error response.
      *
-     * @param string $message Error message
-     * @param int    $code    HTTP status code (default 400)
-     * @param mixed  $errors  Additional error details
+     * @param string     $message Error message
+     * @param int        $code    HTTP status code (default 400)
+     * @param mixed      $errors  Additional error details
+     * @param null|mixed $payload Additional data returned
      */
-    public static function error(string $message, $errors = null, int $code = 400): JsonResponse
+    public static function error(string $message, $payload = null, $errors = null, int $code = 400): JsonResponse
     {
         $response = ['success' => false];
 
         if (!empty($message)) {
             $response['message'] = $message;
+        }
+        if (!empty($payload)) {
+            $response['data'] = $payload;
         }
         if (!empty($errors)) {
             if ($errors instanceof Error) {

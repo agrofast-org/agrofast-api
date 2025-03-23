@@ -33,6 +33,8 @@ class AuthCode extends Model
 
     public const EMAIL = 'email';
 
+    public const MAX_ATTEMPTS = 3;
+
     public const LENGTH = 6;
 
     protected $table = 'hr.auth_code';

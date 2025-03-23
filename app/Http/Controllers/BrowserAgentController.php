@@ -26,7 +26,7 @@ class BrowserAgentController extends Controller
             ], 201);
         }
 
-        return ResponseFactory::error('fingerprint_not_created', null, 500);
+        return ResponseFactory::error('fingerprint_not_created', null, null, 500);
     }
 
     public function validate(): JsonResponse

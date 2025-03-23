@@ -45,7 +45,7 @@ class UserController extends Controller
             return ResponseFactory::success('user_found', $user);
         }
 
-        return ResponseFactory::error('user_not_found', null, 404);
+        return ResponseFactory::error('user_not_found', null, null, 404);
     }
 
     public function store(UserStoreRequest $request)
@@ -66,7 +66,7 @@ class UserController extends Controller
         $user = User::find($id);
 
         if (!$user) {
-            return ResponseFactory::error('user_not_found', null, 404);
+            return ResponseFactory::error('user_not_found', null, null, 404);
         }
 
         $user->update($data);
@@ -90,7 +90,7 @@ class UserController extends Controller
     public function resendCode()
     {
         // $result = $this->authService->resendCode();
-        return ResponseFactory::error('not_implemented', null, 501);
+        return ResponseFactory::error('not_implemented', null, null, 501);
     }
 
     public function authenticate(Request $request)
@@ -125,7 +125,7 @@ class UserController extends Controller
         $user = User::auth();
 
         if (!$user) {
-            return ResponseFactory::error('user_not_authenticated', null, 401);
+            return ResponseFactory::error('user_not_authenticated', null, null, 401);
         }
 
         $session = User::session();
@@ -149,7 +149,7 @@ class UserController extends Controller
         $user = $this->userQueryService->getInfo($uuid);
 
         if (!$user) {
-            return ResponseFactory::error('user_not_found', null, 404);
+            return ResponseFactory::error('user_not_found', null, null, 404);
         }
 
         return ResponseFactory::success('user_found', $user);
@@ -171,13 +171,13 @@ class UserController extends Controller
         $user = User::auth();
 
         if (!$user) {
-            return ResponseFactory::error('user_not_authenticated', null, 401);
+            return ResponseFactory::error('user_not_authenticated', null, null, 401);
         }
 
         $result = $this->pictureService->uploadPicture($request, $user);
 
         if (isset($result['error'])) {
-            return ResponseFactory::error('error_uploading_image', $result['error']);
+            return ResponseFactory::error('error_uploading_image', null, $result['error']);
         }
 
         return ResponseFactory::success('image_uploaded_successfully', ['file' => $result['file']], 201);
@@ -192,7 +192,7 @@ class UserController extends Controller
         $user = $this->userQueryService->exists($validated['number']);
 
         if (!$user) {
-            return ResponseFactory::error('user_not_found', null, 404);
+            return ResponseFactory::error('user_not_found', null, null, 404);
         }
 
         return ResponseFactory::success('user_found', $user);

@@ -37,6 +37,7 @@ class Session extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
+        'id',
         'user_id',
         'ip_address',
         'browser_agent_id',
