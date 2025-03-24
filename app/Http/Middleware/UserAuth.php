@@ -2,17 +2,19 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserError;
+use App\Factories\ResponseFactory;
 use App\Models\Hr\Session;
 use App\Models\Hr\User;
 
-class AuthMiddleware
+class UserAuth
 {
     public function handle($request, \Closure $next)
     {
         $user = User::auth();
 
-        if (typeof($user) === 'enum') {
-            return response()->json(['message' => $user->value], 401);
+        if ($user instanceof UserError) {
+            return ResponseFactory::error($user->value, ['code' => 'invalid_token'], null, 401);
         }
 
         $decodedToken = User::getDecodedToken();
@@ -22,7 +24,7 @@ class AuthMiddleware
         ])->first();
 
         if ($session->authenticated === false) {
-            return response()->json(['message' => 'unauthenticated'], 401);
+            return ResponseFactory::error('unauthenticated', ['code' => 'invalid_token'], null, 401);
         }
 
         return $next($request);

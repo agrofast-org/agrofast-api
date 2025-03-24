@@ -62,11 +62,11 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth' => Middleware\AuthMiddleware::class,
-        'auth.basic' => Middleware\AuthBasicMiddleware::class,
-        'fingerprint' => Middleware\BrowserAgentMiddleware::class,
-        'dev.env' => Middleware\DevelopmentEnvironmentMiddleware::class,
-        'dev.auth' => Middleware\DeveloperAuthMiddleware::class,
+        'auth' => Middleware\UserAuth::class,
+        'auth.basic' => Middleware\SessionAuth::class,
+        'fingerprint' => Middleware\BrowserFingerprint::class,
+        'dev.env' => Middleware\DevelopmentEnvironment::class,
+        'dev.auth' => Middleware\DeveloperAuth::class,
         'db.safe' => Middleware\DatabaseTransaction::class,
         'cache.headers' => SetCacheHeaders::class,
         'can' => Authorize::class,

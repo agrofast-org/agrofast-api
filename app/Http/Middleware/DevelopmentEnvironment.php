@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 
-class DevelopmentEnvironmentMiddleware
+class DevelopmentEnvironment
 {
     /**
      * Handle an incoming request.

@@ -42,19 +42,6 @@ class BrowserAgent extends Model
         'inactivated_at',
     ];
 
-    /**
-     * Create a new browser agent for the user.
-     */
-    public static function createBrowserAgent(): self
-    {
-        return self::create([
-            'user_agent' => request()->header('User-Agent'),
-            'fingerprint' => Str::uuid(),
-            'ip_address' => request()->ip(),
-            'active' => true,
-        ]);
-    }
-
     public static function validateFingerprint(string $fingerprint): ?self
     {
         return self::where('fingerprint', $fingerprint)

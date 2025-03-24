@@ -4,9 +4,9 @@ namespace App\Enums;
 
 enum UserError: string
 {
-    case INVALID_TOKEN = 'token_invalid';
-
     case MISSING_TOKEN = 'missing_token';
+
+    case INVALID_TOKEN = 'invalid_token';
 
     case USER_NOT_FOUND = 'user_not_found';
 

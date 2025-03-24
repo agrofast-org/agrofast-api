@@ -4,7 +4,7 @@ namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
 
-class DeveloperAuthMiddleware
+class DeveloperAuth
 {
     /**
      * Handle an incoming request.

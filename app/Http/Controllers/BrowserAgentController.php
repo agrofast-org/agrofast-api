@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\BrowserAgentFactory;
 use App\Factories\ResponseFactory;
 use App\Models\Hr\BrowserAgent;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +19,7 @@ class BrowserAgentController extends Controller
             }
         }
 
-        $browserAgent = BrowserAgent::createBrowserAgent();
+        $browserAgent = BrowserAgentFactory::create();
 
         if ($browserAgent) {
             return ResponseFactory::success('new_fingerprint', [
