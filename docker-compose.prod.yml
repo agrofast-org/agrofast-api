@@ -1,4 +1,19 @@
 services:
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        restart: unless-stopped
+        tty: true
+        ports:
+            - "9010:80"
+        volumes:
+            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+            - .:/var/www:delegated
+        depends_on:
+            - php
+        networks:
+            - laravel
+
     php:
         build:
             context: .
@@ -7,7 +22,7 @@ services:
         restart: unless-stopped
         tty: true
         expose:
-            - "9010:9000"
+            - "9000"
         volumes:
             - .:/var/www:delegated
         networks:
