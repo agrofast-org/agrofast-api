@@ -155,15 +155,15 @@ class UserController extends Controller
         return ResponseFactory::success('user_found', $user);
     }
 
-    public function picture($userId, $pictureUuid = null)
+    public function picture($userUuid, $pictureUuid = null)
     {
-        $result = $this->pictureService->getPicture($userId, $pictureUuid);
+        $result = $this->pictureService->getPicture($userUuid, $pictureUuid);
 
         if ($result instanceof Error) {
             return ResponseFactory::create($result);
         }
 
-        return response($result['file'], 200)->header('Content-Type', $result['mime']);
+        return response($result->data['file'], 200)->header('Content-Type', $result->data['mime']);
     }
 
     public function postPicture(Request $request)
@@ -176,11 +176,11 @@ class UserController extends Controller
 
         $result = $this->pictureService->uploadPicture($request, $user);
 
-        if (isset($result['error'])) {
-            return ResponseFactory::error('error_uploading_image', null, $result['error']);
+        if ($result instanceof Error) {
+            return ResponseFactory::error('error_uploading_image', null, $result);
         }
 
-        return ResponseFactory::success('image_uploaded_successfully', ['file' => $result['file']], 201);
+        return ResponseFactory::success('image_uploaded_successfully', $result, 201);
     }
 
     public function exists(Request $request)

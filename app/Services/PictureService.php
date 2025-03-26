@@ -14,18 +14,16 @@ class PictureService
 {
     /**
      * Returns the user's image from Storage.
-     *
-     * @return array ['file' => content, 'mime' => type] or error
      */
-    public function getPicture(int $userId, ?string $pictureUuid = null): Error|Success
+    public function getPicture(string $userUuid, ?string $pictureUuid = null): Error|Success
     {
-        $files = Storage::files("uploads/pictures/{$userId}");
+        $files = Storage::files("uploads/pictures/{$userUuid}");
         if (empty($files)) {
             return new Error('no_images_found');
         }
 
         if ($pictureUuid) {
-            $filePath = "uploads/pictures/{$userId}/{$pictureUuid}";
+            $filePath = "uploads/pictures/{$userUuid}/{$pictureUuid}";
             if (!Storage::exists($filePath)) {
                 return new Error('no_images_found');
             }
@@ -53,17 +51,19 @@ class PictureService
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
+        $uuid = Str::uuid();
+
         $file = $validated['image'];
-        $fileName = Str::uuid().'.'.$file->getClientOriginalExtension();
+        $fileName = $uuid.'.'.$file->getClientOriginalExtension();
         $disk = env('FILESYSTEM_DISK', 's3');
 
-        $path = $file->storeAs("uploads/pictures/{$user->id}", $fileName, $disk);
+        $path = $file->storeAs("uploads/pictures/{$user->uuid}", $fileName, $disk);
         if (!$path) {
             return new Error('failed_to_upload_image');
         }
 
         $fileRecord = FilesImage::create([
-            'id' => Str::uuid(),
+            'uuid' => $uuid,
             'name' => $file->getClientOriginalName(),
             'path' => $path,
             'mime_type' => $file->getMimeType(),
@@ -73,7 +73,7 @@ class PictureService
 
         $appUrl = env('APP_URL');
         $user->update([
-            'profile_picture' => "{$appUrl}uploads/pictures/{$path}",
+            'profile_picture' => "{$appUrl}/{$path}",
         ]);
 
         if (!$fileRecord) {
@@ -82,6 +82,14 @@ class PictureService
             return new Error('failed_to_save_image_record');
         }
 
-        return new Success('image_found', ['file' => $fileRecord]);
+        return new Success('image_found', ['user' => [
+            'id' => $user->id,
+            'uuid' => $user->uuid,
+            'name' => $user->name,
+            'surname' => $user->surname,
+            'email' => $user->email,
+            'number' => $user->number,
+            'profile_picture' => $user->profile_picture,
+        ]]);
     }
 }

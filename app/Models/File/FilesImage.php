@@ -6,6 +6,21 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Class FileImage.
+ *
+ * @property int    $id
+ * @property string $uuid
+ * @property string $name
+ * @property string $path
+ * @property string $mime_type
+ * @property string $size
+ * @property int    $uploaded_by
+ * @property bool   $active
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon $inactivated_at
+ */
 class FilesImage extends Model
 {
     use HasFactory;
@@ -17,20 +32,22 @@ class FilesImage extends Model
 
     protected $fillable = [
         'id',
+        'uuid',
         'name',
         'path',
         'mime_type',
         'size',
         'uploaded_by',
         'active',
-        'uploaded_at',
-        'created_at',
-        'updated_at',
+    ];
+
+    protected $casts = [
+        'active' => 'boolean',
     ];
 
     protected $dates = [
-        'uploaded_at',
         'created_at',
         'updated_at',
+        'inactivated_at',
     ];
 }
