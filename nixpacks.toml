@@ -2,4 +2,4 @@
 type = "php"
 
 [commands]
-run = "./start.sh"
+run = "./ci.sh"
