@@ -6,22 +6,24 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     zlib1g-dev \
     libzip-dev \
+    libpq-dev \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-install zip \
-    && docker-php-ext-install sockets
+    && docker-php-ext-install sockets \
+    && docker-php-ext-install pdo_pgsql
 
-COPY . /var/www/app
+WORKDIR /var/www
 
-WORKDIR /var/www/app
+COPY . .
 
-RUN chown -R www-data:www-data /var/www/app \
-    && chmod -R 775 /var/www/app/storage
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www/storage
 
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/local/bin/composer
 
-RUN composer install --no-plugins --no-scripts || composer update --no-plugins --no-scripts
+RUN composer install --no-dev --optimize-autoloader
 
 EXPOSE 9000
 
