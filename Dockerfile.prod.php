@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) gd \
-    && docker-php-ext-install zip
+    && docker-php-ext-install zip \
+    && docker-php-ext-install sockets
 
 COPY . /var/www/app
 
@@ -20,8 +21,8 @@ RUN chown -R www-data:www-data /var/www/app \
 
 COPY --from=composer:2.6.5 /usr/bin/composer /usr/local/bin/composer
 
-COPY composer.json ./
+RUN composer install --no-plugins --no-scripts || composer update --no-plugins --no-scripts
 
-RUN composer install
+EXPOSE 9000
 
 CMD ["php-fpm"]
