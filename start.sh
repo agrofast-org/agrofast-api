@@ -1,14 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-echo "Running migrations"
+echo "Running database migrations..."
+php artisan migrate --force
 
-php artisan migrate
-
-echo "Starting queue worker"
-
+echo "Starting Laravel queue worker in background..."
 php artisan queue:work &
 
-echo "Starting PHP-FPM"
-
+echo "Starting php-fpm service..."
 exec php-fpm

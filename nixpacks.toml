@@ -1,4 +1,5 @@
-[build]
+[project]
+type = "php"
 
-[run]
-command = "./start.sh"
+[commands]
+run = "./start.sh"
