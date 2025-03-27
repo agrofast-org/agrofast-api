@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\System\ErrorLog;
+
 class Error
 {
     public readonly string $message;
@@ -15,5 +17,11 @@ class Error
         $this->errors = $errors;
         $this->data = $data;
         $this->code = $code;
+
+        ErrorLog::create([
+            'url' => request()->url(),
+            'error_message' => $message,
+            'stack_trace' => '',
+        ]);
     }
 }
