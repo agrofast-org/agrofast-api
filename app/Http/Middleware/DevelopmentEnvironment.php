@@ -15,7 +15,7 @@ class DevelopmentEnvironment
      */
     public function handle($request, \Closure $next)
     {
-        if (env('APP_ENV') !== 'local') {
+        if (env('APP_ENV') !== 'local' && env('ENVIRONMENT') !== 'development') {
             return response()->json(['message' => 'Not allowed environment'], 404);
         }
 
