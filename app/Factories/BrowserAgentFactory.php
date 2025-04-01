@@ -15,6 +15,6 @@ class BrowserAgentFactory
             'fingerprint' => Str::uuid(),
             'ip_address' => Tracker::ip(),
             'active' => true,
-        ]);;
+        ]);
     }
 }
