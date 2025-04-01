@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\SendMail;
 use App\Jobs\SendSms;
 use App\Mail\FirstLoginMail;
+use App\Models\Tracker;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -16,13 +17,14 @@ class DebugController extends Controller
     {
         return response()->json([
             'message' => ['ping' => 'pong'],
-            'data' => ['request' => $GLOBALS],
             'request' => [
+                'ip' => Tracker::ip(),
                 'request_method' => $request->method(),
                 'params' => $request->route()->parameters(),
                 'body' => $request->all(),
                 'query' => $request->query(),
             ],
+            'data' => ['request' => $GLOBALS],
             'raw_data' => $request->getContent(),
         ]);
     }

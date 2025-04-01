@@ -5,6 +5,7 @@ namespace App\Models\Hr;
 use App\Jobs\SendMail;
 use App\Mail\AuthenticationMail;
 use App\Mail\FirstLoginMail;
+use App\Models\Tracker;
 
 class AuthEmail
 {
@@ -28,7 +29,7 @@ class AuthEmail
 
         $authCodeParams = [
             'user_id' => $userId,
-            'ip_address' => request()->ip(),
+            'ip_address' => Tracker::ip(),
             'user_agent' => request()->userAgent(),
             'auth_type' => AuthCode::EMAIL,
             'code' => $code,

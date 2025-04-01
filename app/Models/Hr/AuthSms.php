@@ -3,6 +3,7 @@
 namespace App\Models\Hr;
 
 use App\Jobs\SendSms;
+use App\Models\Tracker;
 use Illuminate\Database\Eloquent\Model;
 
 class AuthSms extends Model
@@ -27,7 +28,7 @@ class AuthSms extends Model
 
         $authCodeParams = [
             'user_id' => $userId,
-            'ip_address' => request()->ip(),
+            'ip_address' => Tracker::ip(),
             'user_agent' => request()->userAgent(),
             'auth_type' => AuthCode::EMAIL,
             'code' => $code,

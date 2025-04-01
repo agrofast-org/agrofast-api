@@ -3,6 +3,7 @@
 namespace App\Factories;
 
 use App\Models\Hr\BrowserAgent;
+use App\Models\Tracker;
 use Illuminate\Support\Str;
 
 class BrowserAgentFactory
@@ -12,7 +13,7 @@ class BrowserAgentFactory
         return BrowserAgent::create([
             'user_agent' => request()->header('User-Agent'),
             'fingerprint' => Str::uuid(),
-            'ip_address' => request()->ip(),
+            'ip_address' => Tracker::ip(),
             'active' => true,
         ]);;
     }
