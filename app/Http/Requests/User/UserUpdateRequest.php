@@ -16,16 +16,6 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
-            'number' => 'regex:/^\d{13}$/',
-            // 'email'            => 'required|email|exists:pgsql.hr.user|max:255',
-            'password' => [
-                'required',
-                'string',
-                'min:8',
-                'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/',
-            ],
-            'password_confirm' => 'required|same:password',
-            'remember' => 'nullable|string',
         ];
     }
 
@@ -34,14 +24,6 @@ class UserUpdateRequest extends FormRequest
         return [
             'name.required' => 'name_required',
             'surname.required' => 'surname_required',
-            'number.required' => 'number_required',
-            'number.regex' => 'invalid_number',
-            'email.email' => 'invalid_email',
-            'password.required' => 'password_required',
-            'password.min' => 'password_length',
-            'password.regex' => 'password_character',
-            'password_confirm.required' => 'password_confirm_required',
-            'password_confirm.same' => 'password_not_coincide',
         ];
     }
 }

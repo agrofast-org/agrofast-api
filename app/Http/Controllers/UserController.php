@@ -60,10 +60,10 @@ class UserController extends Controller
         return ResponseFactory::success('user_created_successfully', $result, 201);
     }
 
-    public function update(UserUpdateRequest $request, $id)
+    public function update(UserUpdateRequest $request)
     {
-        $data = $request->only(['id', 'name', 'password', 'email']);
-        $user = User::find($id);
+        $data = $request->only(['name', 'email']);
+        $user = User::auth();
 
         if (!$user) {
             return ResponseFactory::error('user_not_found', null, null, 404);
@@ -71,7 +71,17 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return ResponseFactory::success('user_updated', $user);
+        return ResponseFactory::success('user_updated', [
+            'user' => [
+                'id' => $user->id,
+                'uuid' => $user->uuid,
+                'name' => $user->name,
+                'surname' => $user->surname,
+                'email' => $user->email,
+                'number' => $user->number,
+                'profile_picture' => $user->profile_picture,
+            ],
+        ]);
     }
 
     public function login(Request $request)
