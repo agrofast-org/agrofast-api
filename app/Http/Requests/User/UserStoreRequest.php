@@ -17,8 +17,9 @@ class UserStoreRequest extends FormRequest
             'name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
             'number' => 'regex:/^\d{13}$/',
-            'email' => 'required|email|unique:pgsql.hr.user|max:255',
+            'email' => 'required|email|unique:pgsql.hr.user,email|max:255',
             'password' => [
+                'bail',
                 'required',
                 'string',
                 'min:8',

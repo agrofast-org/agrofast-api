@@ -6,6 +6,7 @@ use App\Enums\UserAction;
 use App\Factories\SessionFactory;
 use App\Factories\TokenFactory;
 use App\Http\Requests\User\UserStoreRequest;
+use App\Http\Responses\User\UserDataResponse;
 use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
@@ -50,7 +51,7 @@ class UserService
         $jwt = TokenFactory::create($user, $session);
 
         return new Success('user_created', [
-            'user' => $user,
+            'user' => UserDataResponse::format($user),
             'token' => $jwt,
             'session' => $session,
             'auth' => UserAction::AUTHENTICATE->value,

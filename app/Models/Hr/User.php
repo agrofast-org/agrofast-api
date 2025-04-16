@@ -16,22 +16,23 @@ use Illuminate\Notifications\Notifiable;
  * Represents a system user with associated attributes and logic.
  *
  * @property int         $id
- * @property int         $uuid
+ * @property string      $uuid
  * @property string      $name
  * @property string      $surname
- * @property string      $number
  * @property string      $email
+ * @property string      $number
  * @property string      $password
  * @property string      $language
- * @property bool        $number_verified
- * @property null|Carbon $number_verified_at
  * @property bool        $email_verified
  * @property null|Carbon $email_verified_at
+ * @property bool        $number_verified
+ * @property null|Carbon $number_verified_at
  * @property bool        $active
  * @property null|string $profile_picture
  * @property null|string $remember_token
  * @property Carbon      $created_at
  * @property Carbon      $updated_at
+ * @property null|Carbon $inactivated_at
  */
 class User extends DynamicQuery
 {
@@ -56,10 +57,12 @@ class User extends DynamicQuery
         'email',
         'password',
         'language',
-        'number_verified',
-        'number_verified_at',
         'email_verified',
         'email_verified_at',
+        'number_verified',
+        'number_verified_at',
+        'updated_at',
+        'inactivated_at',
         'active',
         'profile_picture',
         'remember_token',
@@ -74,6 +77,9 @@ class User extends DynamicQuery
     protected $dates = [
         'created_at',
         'updated_at',
+        'inactivated_at',
+        'email_verified_at',
+        'number_verified_at',
     ];
 
     protected $hidden = [

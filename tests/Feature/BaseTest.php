@@ -2,15 +2,9 @@
 
 namespace Tests\Feature;
 
-// use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-/**
- * @internal
- *
- * @coversNothing
- */
-class ExampleTest extends TestCase
+class BaseTest extends TestCase
 {
     /**
      * A basic test example.

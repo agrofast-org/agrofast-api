@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Responses\User\UserDataResponse;
 use App\Models\Error;
 use App\Models\File\FilesImage;
 use App\Models\Hr\User;
@@ -82,14 +83,6 @@ class PictureService
             return new Error('failed_to_save_image_record');
         }
 
-        return new Success('image_found', ['user' => [
-            'id' => $user->id,
-            'uuid' => $user->uuid,
-            'name' => $user->name,
-            'surname' => $user->surname,
-            'email' => $user->email,
-            'number' => $user->number,
-            'profile_picture' => $user->profile_picture,
-        ]]);
+        return new Success('image_found', ['user' => UserDataResponse::format($user)]);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\UserAction;
 use App\Factories\SessionFactory;
 use App\Factories\TokenFactory;
+use App\Http\Responses\User\UserDataResponse;
 use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
@@ -67,15 +68,7 @@ class AuthService
         $jwt = TokenFactory::create($user, $session);
 
         return new Success('login_success', [
-            'user' => [
-                'id' => $user->id,
-                'uuid' => $user->uuid,
-                'name' => $user->name,
-                'surname' => $user->surname,
-                'email' => $user->email,
-                'number' => $user->number,
-                'profile_picture' => $user->profile_picture,
-            ],
+            'user' => UserDataResponse::format($user),
             'token' => $jwt,
             'auth' => ($user->email_verified && $remember) ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
         ]);
@@ -148,7 +141,7 @@ class AuthService
         $jwt = TokenFactory::create($user, $session);
 
         return new Success('authentication_success', [
-            'user' => $user,
+            'user' => UserDataResponse::format($user),
             'token' => $jwt,
         ]);
     }

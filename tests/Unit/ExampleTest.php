@@ -4,15 +4,10 @@ namespace Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
-/**
- * @internal
- *
- * @coversNothing
- */
 class ExampleTest extends TestCase
 {
     /**
-     * A basic test example.
+     * If this test fails, it means that everything is a lie.
      */
     public function testThatTrueIsTrue(): void
     {

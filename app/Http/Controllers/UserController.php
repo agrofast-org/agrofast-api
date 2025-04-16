@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Factories\ResponseFactory;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
+use App\Http\Responses\User\UserDataResponse;
 use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\User;
@@ -72,15 +73,7 @@ class UserController extends Controller
         $user->update($data);
 
         return ResponseFactory::success('user_updated', [
-            'user' => [
-                'id' => $user->id,
-                'uuid' => $user->uuid,
-                'name' => $user->name,
-                'surname' => $user->surname,
-                'email' => $user->email,
-                'number' => $user->number,
-                'profile_picture' => $user->profile_picture,
-            ],
+            'user' => UserDataResponse::format($user),
         ]);
     }
 
@@ -141,15 +134,7 @@ class UserController extends Controller
         $session = User::session();
 
         return ResponseFactory::success('user_found', [
-            'user' => [
-                'id' => $user->id,
-                'uuid' => $user->uuid,
-                'name' => $user->name,
-                'surname' => $user->surname,
-                'email' => $user->email,
-                'number' => $user->number,
-                'profile_picture' => $user->profile_picture,
-            ],
+            'user' => UserDataResponse::format($user),
             'authenticated' => $session->authenticated,
         ]);
     }
