@@ -17,18 +17,16 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => 'required|string|min:1|max:255',
             'surname' => 'required|string|min:1|max:255',
-            'documents' => ['nullable', 'array', 'max:2'],
+            'documents' => ['required', 'array', 'max:2'],
             'documents.*.id' => ['nullable', 'integer', 'exists:pgsql.hr.document,id'],
             'documents.*.type' => [
-                'nullable',
-                'integer',
-                // 'string',
+                'required',
+                'string',
                 'exists:pgsql.hr.document_type,key',
             ],
             'documents.*.number' => [
-                'nullable',
-                'integer',
-                // 'string',
+                'required',
+                'string',
                 'min:1',
                 'max:255',
             ],

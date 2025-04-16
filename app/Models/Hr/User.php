@@ -147,10 +147,10 @@ class User extends DynamicQuery
         }
 
         $session = Session::where('id', $decoded->sid)->first();
-        self::$session = $session;
         if (!$session) {
             return UserError::SESSION_NOT_FOUND;
         }
+        self::$session = $session;
 
         return $session;
     }

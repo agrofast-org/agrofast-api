@@ -125,6 +125,11 @@ class UserController extends Controller
 
     public function self()
     {
+        $session = User::session();
+        if (!$session) {
+            return ResponseFactory::error('user_not_authenticated', null, null, 401);
+        }
+
         $user = User::auth();
 
         if (!$user) {
