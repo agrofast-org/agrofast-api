@@ -1,8 +1,0 @@
-{
-    "email.authentication.welcome_header": "Welcome to Agrofast, :name,",
-    "email.authentication.account_created_success": "We are pleased to inform you that your account has been successfully created.",
-    "email.authentication.click_to_verify": "If you are using the web version, click the button below to verify your session.",
-    "email.authentication.verify_session": "Verify Session",
-    "email.authentication.verification_code": "Code to verify your session:",
-    "email.authentication.link_expires": "This link expires in :expires minutes."
-}

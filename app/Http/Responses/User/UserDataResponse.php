@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Responses\User;
 
 use App\Models\Hr\Document;

@@ -14,7 +14,8 @@ $rules = [
     'concat_space' => true,
     'method_chaining_indentation' => true,
     'php_unit_test_class_requires_covers' => false,
-    'php_unit_test_class_requires_internal' => false,
+    'indentation_type' => true,
+    'array_indentation' => true,
 ];
 
 $finder = Finder::create()

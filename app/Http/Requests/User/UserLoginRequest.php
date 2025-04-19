@@ -23,15 +23,4 @@ class UserLoginRequest extends FormRequest
             ],
         ];
     }
-
-    public function messages(): array
-    {
-        return [
-            'email.email' => 'invalid_email',
-            'email.exists' => 'user_not_found',
-            'password.required' => 'password_required',
-            'password.min' => 'password_length',
-            'password.regex' => 'password_character',
-        ];
-    }
 }

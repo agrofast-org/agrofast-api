@@ -3,7 +3,6 @@
 namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class UserUpdateRequest extends FormRequest
 {
@@ -17,8 +16,14 @@ class UserUpdateRequest extends FormRequest
         return [
             'name' => 'required|string|min:1|max:255',
             'surname' => 'required|string|min:1|max:255',
-            'documents' => ['required', 'array', 'max:2'],
+            'language' => 'required|string|max:10',
+            'documents' => ['nullable', 'array', 'max:2'],
             'documents.*.id' => ['nullable', 'integer', 'exists:pgsql.hr.document,id'],
+            'documents.*.emission_date' => [
+                'required',
+                'date_format:Y-m-d',
+                'before_or_equal:today',
+            ],
             'documents.*.type' => [
                 'required',
                 'string',
@@ -30,28 +35,6 @@ class UserUpdateRequest extends FormRequest
                 'min:1',
                 'max:255',
             ],
-        ];
-    }
-
-    public function messages(): array
-    {
-        return [
-            'name.required' => 'name_required',
-            'name.string' => 'name_string',
-            'name.min' => 'name_min',
-            'name.max' => 'name_max',
-
-            'surname.required' => 'surname_required',
-            'surname.string' => 'surname_string',
-            'surname.min' => 'surname_min',
-            'surname.max' => 'surname_max',
-
-            'documents.required' => 'documents_required',
-            'documents.array' => 'documents_array',
-            'documents.min' => 'documents_min',
-
-            'documents.*.number.required' => 'document_number_required_when_creating',
-            'documents.*.type.required' => 'document_type_required_when_creating',
         ];
     }
 }

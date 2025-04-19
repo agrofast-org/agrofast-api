@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+/**
+ * @internal
+ */
 class UserUpdateRequestTest extends TestCase
 {
     #[Test]
-    public function it_should_fail_when_updating_with_nonexistent_document_id()
+    public function itShouldFailWhenUpdatingWithNonexistentDocumentId()
     {
         $data = [
             'name' => 'Murilo',
@@ -27,7 +30,7 @@ class UserUpdateRequestTest extends TestCase
     }
 
     #[Test]
-    public function it_should_fail_when_creating_document_with_invalid_type()
+    public function itShouldFailWhenCreatingDocumentWithInvalidType()
     {
         $data = [
             'name' => 'Murilo',
@@ -35,8 +38,8 @@ class UserUpdateRequestTest extends TestCase
             'documents' => [
                 [
                     'number' => '12345678900',
-                    'type' => 1234 // tipo inexistente
-                ]
+                    'type' => 1234, // tipo inexistente
+                ],
             ],
         ];
 
@@ -47,7 +50,7 @@ class UserUpdateRequestTest extends TestCase
     }
 
     #[Test]
-    public function it_should_pass_with_valid_structure_but_invalid_references()
+    public function itShouldPassWithValidStructureButInvalidReferences()
     {
         $data = [
             'name' => 'Murilo',
@@ -58,7 +61,7 @@ class UserUpdateRequestTest extends TestCase
                     'type' => 9999, // tipo inexistente
                 ],
                 [
-                    'id' => 8888 // também inexistente
+                    'id' => 8888, // também inexistente
                 ],
             ],
         ];
@@ -71,7 +74,7 @@ class UserUpdateRequestTest extends TestCase
     }
 
     #[Test]
-    public function it_should_fail_when_documents_is_missing()
+    public function itShouldFailWhenDocumentsIsMissing()
     {
         $data = [
             'name' => 'Murilo',
@@ -85,7 +88,7 @@ class UserUpdateRequestTest extends TestCase
     }
 
     #[Test]
-    public function it_should_fail_when_document_is_empty()
+    public function itShouldFailWhenDocumentIsEmpty()
     {
         $data = [
             'name' => 'Murilo',
@@ -100,13 +103,13 @@ class UserUpdateRequestTest extends TestCase
     }
 
     #[Test]
-    public function it_should_fail_when_creating_document_without_required_fields()
+    public function itShouldFailWhenCreatingDocumentWithoutRequiredFields()
     {
         $data = [
             'name' => 'Murilo',
             'surname' => 'Figueiredo',
             'documents' => [
-                []
+                [],
             ],
         ];
 

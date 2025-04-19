@@ -7,16 +7,11 @@ use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+/**
+ * @internal
+ */
 class UserLoginRequestTest extends TestCase
 {
-    private function getValidData(): array
-    {
-        return [
-            'email' => 'murilo@example.com',
-            'password' => 'Password123',
-        ];
-    }
-
     #[Test]
     public function it_should_fail_when_required_fields_are_missing()
     {
@@ -71,5 +66,13 @@ class UserLoginRequestTest extends TestCase
 
         $validator = Validator::make($data, $rules);
         $this->assertTrue($validator->passes());
+    }
+
+    private function getValidData(): array
+    {
+        return [
+            'email' => 'murilo@example.com',
+            'password' => 'Password123',
+        ];
     }
 }

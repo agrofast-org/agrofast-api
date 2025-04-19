@@ -7,22 +7,11 @@ use Illuminate\Support\Facades\Validator;
 use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
+/**
+ * @internal
+ */
 class UserStoreRequestTest extends TestCase
 {
-    private function getBaseValidData(): array
-    {
-        return [
-            'name' => 'Murilo',
-            'surname' => 'Figueiredo',
-            'number' => '1234567890123',
-            'email' => 'murilo@example.com',
-            'password' => 'password123',
-            'password_confirm' => 'password123',
-            'terms_and_privacy_agreement' => true,
-            'remember' => '1',
-        ];
-    }
-
     #[Test]
     public function it_should_pass_with_valid_data()
     {
@@ -99,5 +88,19 @@ class UserStoreRequestTest extends TestCase
         $validator = Validator::make($data, (new UserStoreRequest())->rules());
         $this->assertTrue($validator->fails());
         $this->assertArrayHasKey('terms_and_privacy_agreement', $validator->errors()->toArray());
+    }
+
+    private function getBaseValidData(): array
+    {
+        return [
+            'name' => 'Murilo',
+            'surname' => 'Figueiredo',
+            'number' => '1234567890123',
+            'email' => 'murilo@example.com',
+            'password' => 'password123',
+            'password_confirm' => 'password123',
+            'terms_and_privacy_agreement' => true,
+            'remember' => '1',
+        ];
     }
 }
