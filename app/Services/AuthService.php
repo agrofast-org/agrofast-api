@@ -34,7 +34,7 @@ class AuthService
         }
 
         if (!Hash::check($credentials['password'], $user->password)) {
-            return new Error('wrong_password', ['password' => 'wrong_password']);
+            return new Error('current_password', ['password' => 'current_password']);
         }
 
         $browserFingerprint = $request->header('Browser-Agent');
