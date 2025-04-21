@@ -6,35 +6,32 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class User.
- *
- * Represents a system user with associated attributes and logic.
+ * Class DocumentType.
  *
  * @property int         $id
  * @property string      $uuid
- * @property int         $user_id
- * @property string      $document_type
- * @property Carbon      $emission_date
- * @property string      $number
+ * @property string      $key
+ * @property string      $label
+ * @property null|string $mask
  * @property bool        $active
  * @property Carbon      $created_at
  * @property Carbon      $updated_at
  * @property null|Carbon $inactivated_at
  */
-class Document extends Model
+class DocumentType extends Model
 {
-    protected $table = 'hr.document';
+    protected $table = 'hr.document_type';
 
     protected $primaryKey = 'id';
 
     protected $fillable = [
         'id',
         'uuid',
-        'user_id',
-        'emission_date',
-        'document_type',
-        'number',
+        'key',
+        'label',
+        'mask',
         'active',
+        'created_at',
         'updated_at',
         'inactivated_at',
     ];

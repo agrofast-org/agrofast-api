@@ -3,19 +3,23 @@
 namespace App\Http\Responses\User;
 
 use App\Models\Hr\Document;
+use App\Models\Hr\DocumentType;
 
 class UserDocumentDataResponse
 {
     /**
      * Format the user data for the response.
      */
-    public static function format(Document $user): array
+    public static function format(Document $document): array
     {
+        $documentType = DocumentType::where('id', $document->document_type)->first();
+
         return [
-            'id' => $user->id,
-            'uuid' => $user->uuid,
-            'type' => $user->type,
-            'number' => $user->number,
+            'uuid' => $document->uuid,
+            'emission_date' => $document->emission_date,
+            'document_type' => $documentType->key,
+            'mask' => $documentType->mask,
+            'number' => $document->number,
         ];
     }
 

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/{screen?}/{locale?}', function ($screen = 'authentication', $locale = null) {
-    App::setLocale($locale ?? 'pt_BR');
+    // App::setLocale($locale ?? 'pt_BR');
 
     if ($screen) {
         if (view()->exists("emails.{$screen}")) {

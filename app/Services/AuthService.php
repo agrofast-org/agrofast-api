@@ -68,7 +68,7 @@ class AuthService
         $jwt = TokenFactory::create($user, $session);
 
         return new Success('login_success', [
-            'user' => UserDataResponse::format($user),
+            'user' => UserDataResponse::withDocument($user),
             'token' => $jwt,
             'auth' => ($user->email_verified && $remember) ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
         ]);
@@ -141,7 +141,7 @@ class AuthService
         $jwt = TokenFactory::create($user, $session);
 
         return new Success('authentication_success', [
-            'user' => UserDataResponse::format($user),
+            'user' => UserDataResponse::withDocument($user),
             'token' => $jwt,
         ]);
     }

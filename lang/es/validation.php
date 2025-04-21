@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Validation Language Lines
@@ -178,6 +177,9 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'document' => [
+            'belongs_to' => 'El :attribute no pertenece a este usuario.',
+        ],
     ],
 
     /*
@@ -191,6 +193,52 @@ return [
     |
     */
 
-    'attributes' => [],
-
+    'attributes' => [
+        'address' => 'dirección',
+        'age' => 'edad',
+        'body' => 'contenido',
+        'cell' => 'celular',
+        'city' => 'ciudad',
+        'country' => 'país',
+        'date' => 'fecha',
+        'day' => 'día',
+        'document' => 'documento',
+        'excerpt' => 'extracto',
+        'first_name' => 'primer nombre',
+        'gender' => 'género',
+        'marital_status' => 'estado civil',
+        'profession' => 'profesión',
+        'nationality' => 'nacionalidad',
+        'hour' => 'hora',
+        'last_name' => 'apellido',
+        'message' => 'mensaje',
+        'minute' => 'minuto',
+        'mobile' => 'móvil',
+        'month' => 'mes',
+        'name' => 'nombre',
+        'zipcode' => 'código postal',
+        'company_name' => 'razón social',
+        'neighborhood' => 'barrio',
+        'number' => 'número',
+        'password' => 'contraseña',
+        'phone' => 'teléfono',
+        'second' => 'segundo',
+        'sex' => 'sexo',
+        'state' => 'estado',
+        'street' => 'calle',
+        'subject' => 'asunto',
+        'text' => 'texto',
+        'time' => 'hora',
+        'title' => 'título',
+        'username' => 'nombre de usuario',
+        'year' => 'año',
+        'description' => 'descripción',
+        'password_confirmation' => 'confirmación de la contraseña',
+        'current_password' => 'contraseña actual',
+        'complement' => 'complemento',
+        'modality' => 'modalidad',
+        'category' => 'categoría',
+        'blood_type' => 'tipo de sangre',
+        'birth_date' => 'fecha de nacimiento',
+    ],
 ];

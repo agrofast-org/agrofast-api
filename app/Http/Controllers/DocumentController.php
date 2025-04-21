@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Factories\ResponseFactory;
-use App\Http\Requests\User\DocumentStoreRequest;
-use App\Http\Responses\User\UserDataResponse;
 use App\Models\Hr\Document;
 use App\Models\Hr\User;
 use App\Services\UserDocumentService;
@@ -31,7 +29,7 @@ class DocumentController extends Controller
         return ResponseFactory::success('user_found', $documents);
     }
 
-    public function store(DocumentStoreRequest $request)
+    public function delete($uuid)
     {
         $user = User::auth();
 
@@ -39,13 +37,15 @@ class DocumentController extends Controller
             return ResponseFactory::error('user_not_found', null, 404);
         }
 
-        $data = $request->all();
-        $result = $this->userDocumentService->createDocument($data, $user);
+        $document = Document::where('uuid', $uuid)->first();
 
-        if ($result instanceof Error) {
-            return ResponseFactory::create($result);
+        if (!$document) {
+            return ResponseFactory::error('document_not_found', null, 404);
         }
 
-        return ResponseFactory::success('document_created', UserDataResponse::withDocument($result));
+        $document->active = false;
+        $document->save();
+
+        return ResponseFactory::success('document_deleted');
     }
 }

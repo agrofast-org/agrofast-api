@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Validation Language Lines
@@ -178,6 +177,9 @@ return [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
+        'document' => [
+            'belongs_to' => 'The :attribute does not belong to this user.',
+        ],
     ],
 
     /*
@@ -192,5 +194,4 @@ return [
     */
 
     'attributes' => [],
-
 ];

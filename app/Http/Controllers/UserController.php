@@ -11,6 +11,7 @@ use App\Models\Hr\AuthCode;
 use App\Models\Hr\User;
 use App\Services\AuthService;
 use App\Services\PictureService;
+use App\Services\UserDocumentService;
 use App\Services\UserQueryService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -24,17 +25,20 @@ class UserController extends Controller
     protected $userQueryService;
 
     protected $pictureService;
+    protected $userDocumentService;
 
     public function __construct(
         UserService $userService,
         AuthService $authService,
         UserQueryService $userQueryService,
-        PictureService $pictureService
+        PictureService $pictureService,
+        UserDocumentService $userDocumentService
     ) {
         $this->userService = $userService;
         $this->authService = $authService;
         $this->userQueryService = $userQueryService;
         $this->pictureService = $pictureService;
+        $this->userDocumentService = $userDocumentService;
     }
 
     public function index(Request $request)
@@ -63,7 +67,7 @@ class UserController extends Controller
 
     public function update(UserUpdateRequest $request)
     {
-        $data = $request->only(['name', 'email']);
+        $data = $request->only(['name', 'surname']);
         $user = User::auth();
 
         if (!$user) {
@@ -72,9 +76,15 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return ResponseFactory::success('user_updated', [
-            'user' => UserDataResponse::format($user),
-        ]);
+        $documents = $request->input('documents', []);
+        if (!empty($documents)) {
+            $this->userDocumentService->handleList(null, $documents);
+        }
+
+        return ResponseFactory::success(
+            'user_updated',
+            UserDataResponse::withDocument($user),
+        );
     }
 
     public function login(Request $request)
@@ -139,7 +149,7 @@ class UserController extends Controller
         $session = User::session();
 
         return ResponseFactory::success('user_found', [
-            'user' => UserDataResponse::format($user),
+            ...UserDataResponse::withDocument($user),
             'authenticated' => $session->authenticated,
         ]);
     }

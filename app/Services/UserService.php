@@ -51,7 +51,7 @@ class UserService
         $jwt = TokenFactory::create($user, $session);
 
         return new Success('user_created', [
-            'user' => UserDataResponse::format($user),
+            ...UserDataResponse::withDocument($user),
             'token' => $jwt,
             'session' => $session,
             'auth' => UserAction::AUTHENTICATE->value,

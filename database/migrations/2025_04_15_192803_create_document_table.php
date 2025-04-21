@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->id()->primary();
             $table->string('uuid')->unique();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
+            $table->date('emission_date')->nullable();
             $table->foreignId('document_type')->constrained('hr.document_type')->onDelete('cascade');
             $table->string('number')->unique();
             $table->boolean('active')->default(true);

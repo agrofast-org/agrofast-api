@@ -44,8 +44,10 @@ class UserDataResponse
         $documents = Document::where('user_id', $user['id'])->get();
 
         return [
-            'user' => $user,
-            'documents' => UserDocumentDataResponse::list($documents->all()),
+            'user' => [
+                ...$user,
+                'documents' => UserDocumentDataResponse::list($documents->all()),
+            ],
         ];
     }
 }

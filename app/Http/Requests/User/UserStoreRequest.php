@@ -16,7 +16,7 @@ class UserStoreRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'surname' => 'required|string|max:255',
-            'language' => 'required|string|max:10',
+            'language' => 'nullable|string|max:10',
             'number' => 'regex:/^\d{13}$/',
             'email' => 'required|email|unique:pgsql.hr.user,email|max:255',
             'password' => [
@@ -32,11 +32,11 @@ class UserStoreRequest extends FormRequest
         ];
     }
 
-    protected function prepareForValidation(): void
+    protected function passedValidation(): void
     {
-        $this->merge([
-            'name' => ucwords($this->input('name')),
-            'surname' => ucwords($this->input('surname')),
+        $this->replace([
+            'name' => ucwords(strtolower($this->input('name'))),
+            'surname' => ucwords(strtolower($this->input('surname'))),
         ]);
     }
 }
