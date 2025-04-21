@@ -13,6 +13,9 @@ $rules = [
     'yoda_style' => false,
     'concat_space' => true,
     'method_chaining_indentation' => true,
+    'php_unit_test_class_requires_covers' => false,
+    'indentation_type' => true,
+    'array_indentation' => true,
 ];
 
 $finder = Finder::create()

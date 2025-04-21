@@ -64,6 +64,7 @@ class Kernel extends HttpKernel
     protected $routeMiddleware = [
         'auth' => Middleware\UserAuth::class,
         'auth.basic' => Middleware\SessionAuth::class,
+        'lang' => Middleware\LanguageMiddleware::class,
         'fingerprint' => Middleware\BrowserFingerprint::class,
         'dev.env' => Middleware\DevelopmentEnvironment::class,
         'dev.auth' => Middleware\DeveloperAuth::class,

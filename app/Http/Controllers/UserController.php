@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Factories\ResponseFactory;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
+use App\Http\Responses\User\UserDataResponse;
 use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\User;
 use App\Services\AuthService;
 use App\Services\PictureService;
+use App\Services\UserDocumentService;
 use App\Services\UserQueryService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
@@ -23,17 +25,20 @@ class UserController extends Controller
     protected $userQueryService;
 
     protected $pictureService;
+    protected $userDocumentService;
 
     public function __construct(
         UserService $userService,
         AuthService $authService,
         UserQueryService $userQueryService,
-        PictureService $pictureService
+        PictureService $pictureService,
+        UserDocumentService $userDocumentService
     ) {
         $this->userService = $userService;
         $this->authService = $authService;
         $this->userQueryService = $userQueryService;
         $this->pictureService = $pictureService;
+        $this->userDocumentService = $userDocumentService;
     }
 
     public function index(Request $request)
@@ -62,7 +67,7 @@ class UserController extends Controller
 
     public function update(UserUpdateRequest $request)
     {
-        $data = $request->only(['name', 'email']);
+        $data = $request->only(['name', 'surname']);
         $user = User::auth();
 
         if (!$user) {
@@ -71,17 +76,15 @@ class UserController extends Controller
 
         $user->update($data);
 
-        return ResponseFactory::success('user_updated', [
-            'user' => [
-                'id' => $user->id,
-                'uuid' => $user->uuid,
-                'name' => $user->name,
-                'surname' => $user->surname,
-                'email' => $user->email,
-                'number' => $user->number,
-                'profile_picture' => $user->profile_picture,
-            ],
-        ]);
+        $documents = $request->input('documents', []);
+        if (!empty($documents)) {
+            $this->userDocumentService->handleList(null, $documents);
+        }
+
+        return ResponseFactory::success(
+            'user_updated',
+            UserDataResponse::withDocument($user),
+        );
     }
 
     public function login(Request $request)
@@ -132,6 +135,11 @@ class UserController extends Controller
 
     public function self()
     {
+        $session = User::session();
+        if (!$session) {
+            return ResponseFactory::error('user_not_authenticated', null, null, 401);
+        }
+
         $user = User::auth();
 
         if (!$user) {
@@ -141,15 +149,7 @@ class UserController extends Controller
         $session = User::session();
 
         return ResponseFactory::success('user_found', [
-            'user' => [
-                'id' => $user->id,
-                'uuid' => $user->uuid,
-                'name' => $user->name,
-                'surname' => $user->surname,
-                'email' => $user->email,
-                'number' => $user->number,
-                'profile_picture' => $user->profile_picture,
-            ],
+            ...UserDataResponse::withDocument($user),
             'authenticated' => $session->authenticated,
         ]);
     }

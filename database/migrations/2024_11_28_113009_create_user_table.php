@@ -16,14 +16,14 @@ return new class extends Migration {
             $table->uuid()->unique();
             $table->string('name');
             $table->string('surname');
-            $table->string('number')->unique()->nullable();
             $table->string('email')->unique();
+            $table->string('number')->unique()->nullable();
             $table->string('password');
             $table->string('language', 10)->default('pt-BR');
-            $table->boolean('number_verified')->default(false);
-            $table->timestamp('number_verified_at')->nullable();
             $table->boolean('email_verified')->default(false);
             $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('number_verified')->default(false);
+            $table->timestamp('number_verified_at')->nullable();
             $table->string('profile_picture')->nullable();
             $table->rememberToken();
             $table->boolean('active')->default(true);
