@@ -4,24 +4,37 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use App\Models\System\SystemMessage;
 
 class SystemMessageNotification extends Mailable
 {
-    use Queueable, SerializesModels;
+    use Queueable;
+    use SerializesModels;
 
-    public $messageData;
+    public function __construct(public array $data) {}
 
-    public function __construct(SystemMessage $message)
+    public function envelope(): Envelope
     {
-        $this->messageData = $message;
+        return new Envelope(
+            subject: $this->data['message']['subject'],
+        );
     }
 
-    public function build()
+    public function content(): Content
     {
-        return $this->subject($this->messageData->title)
-            ->view('emails.system_notification')
-            ->with(['messageData' => $this->messageData]);
+        return new Content(
+            view: 'emails.notification',
+            with: [
+                'user' => $this->data['user'],
+                'message' => $this->data['message'],
+            ],
+        );
+    }
+
+    public function attachments(): array
+    {
+        return [];
     }
 }

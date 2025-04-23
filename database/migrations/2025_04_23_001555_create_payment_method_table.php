@@ -11,13 +11,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('system.user_notifications', function (Blueprint $table) {
+        Schema::create('hr.payment_method', function (Blueprint $table) {
             $table->id()->unique()->primary();
             $table->uuid('uuid')->unique();
             $table->foreignId('user_id')->constrained('hr.user');
-            $table->foreignId('system_message_id')->constrained('system.system_message');
-            $table->boolean('read')->default(false);
-            $table->boolean('sent_email')->default(false);
+            $table->foreignId('payment_method_type')->constrained('hr.payment_method_type')->onDelete('cascade');
+            $table->string('provider')->nullable();
+            $table->string('number');
+            $table->string('holder_name')->nullable();
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('inactivated_at')->nullable();
@@ -29,6 +30,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('system.user_notifications');
+        Schema::dropIfExists('hr.payment_method');
     }
 };

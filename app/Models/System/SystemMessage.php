@@ -12,8 +12,7 @@ use Illuminate\Support\Carbon;
  *
  * @property int         $id             Unique identifier for the notification.
  * @property string      $uuid           Unique identifier for the system message.
- * @property string      $title          Title or summary of the message.
- * @property string      $message        Detailed content of the message.
+ * @property string      $key            Key used to identify the message.
  * @property string      $type           Type of the message (e.g., error, warning, info).
  * @property bool        $active         Indicates whether the message is active.
  * @property null|string $inactivated_at Timestamp when the message was deactivated.
@@ -27,8 +26,7 @@ class SystemMessage extends Model
     protected $fillable = [
         'id',
         'uuid',
-        'title',
-        'message',
+        'key',
         'type',
         'active',
         'inactivated_at',

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 
 /**
@@ -155,22 +156,13 @@ class User extends DynamicQuery
         return $session;
     }
 
-    /**
-     * Prepares data for insertion by normalizing and sanitizing inputs.
-     *
-     * @param array $params data received from the request
-     *
-     * @return array prepared data for insertion
-     */
-    public static function prepareInsert(array $params): array
+    public function documents(): HasMany
     {
-        if (isset($params['email'])) {
-            $params['email'] = strtolower($params['email']);
-        }
-        if (isset($params['number'])) {
-            $params['number'] = preg_replace('/\D/', '', $params['number']);
-        }
+        return $this->hasMany(Document::class, 'user_id', 'id');
+    }
 
-        return $params;
+    public function payment_methods(): HasMany
+    {
+        return $this->hasMany(PaymentMethod::class, 'user_id', 'id');
     }
 }

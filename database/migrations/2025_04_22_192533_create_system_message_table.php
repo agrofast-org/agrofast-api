@@ -14,8 +14,7 @@ return new class extends Migration {
         Schema::create('system.system_message', function (Blueprint $table) {
             $table->id()->unique()->primary();
             $table->uuid()->unique();
-            $table->string('title');
-            $table->string('message');
+            $table->string('key')->unique();
             $table->enum('type', ['default', 'primary', 'secondary', 'success', 'warning', 'danger']);
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

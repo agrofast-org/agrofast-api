@@ -12,19 +12,21 @@ class NotificationRuleService
     public function checkAndNotify(User $user)
     {
         $rules = [
-            'no_documents' => fn() => $user->documents()->count() === 0,
-            'no_pix' => fn() => !$user->payment_methods()->where('type', 'pix')->exists(),
+            'no_documents' => fn () => $user->documents()->count() === 0,
+            'no_pix' => fn () => !$user->payment_methods()->where('payment_method_type', 'pix')->exists(),
         ];
 
         foreach ($rules as $slug => $ruleCheck) {
             if ($ruleCheck()) {
-                $message = SystemMessage::where('uuid', $slug)->first();
-                if (!$message) continue;
+                $message = SystemMessage::where('key', $slug)->first();
+                if (!$message) {
+                    continue;
+                }
 
-                // Evitar duplicação
                 $alreadyNotified = UserNotification::where('user_id', $user->id)
                     ->where('system_message_id', $message->id)
-                    ->exists();
+                    ->exists()
+                ;
 
                 if (!$alreadyNotified) {
                     UserNotification::create([
@@ -39,4 +41,3 @@ class NotificationRuleService
         }
     }
 }
-
