@@ -37,14 +37,13 @@ class DocumentController extends Controller
             return ResponseFactory::error('user_not_found', null, 404);
         }
 
-        $document = Document::where('uuid', $uuid)->first();
+        $document = Document::where(['uuid' => $uuid, 'user_id' => $user->id])->first();
 
         if (!$document) {
             return ResponseFactory::error('document_not_found', null, 404);
         }
 
-        $document->active = false;
-        $document->save();
+        $document->update(['active' => false, 'inactivated_at' => now()]);
 
         return ResponseFactory::success('document_deleted');
     }

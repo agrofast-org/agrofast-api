@@ -28,10 +28,15 @@ class UserDocumentService
     {
         $items = [];
 
+        $user = User::auth();
+        $userDocuments = $user->documents()->get();
+
+        $providedDocumentUuids = array_filter(array_map(function ($documentData) {
+            return $documentData['uuid'] ?? null;
+        }, $documents));
+
         foreach ($documents as $documentData) {
             [$documentData, $documentType] = $this->sanitizeDocumentData($documentData);
-
-            $user = User::auth();
 
             if (empty($documentData['uuid'])) {
                 $document = DocumentFactory::create($user, $documentData);
@@ -47,12 +52,24 @@ class UserDocumentService
                 }
             }
 
+            if (!$document->active) {
+                $document->update(['user_id' => $user->id, 'active' => true, 'inactivated_at' => null]);
+            }
+
             $items[] = [
                 'uuid' => $document->uuid,
                 'emission_date' => $document->emission_date,
                 'type' => $documentType->key,
                 'number' => $document->number,
             ];
+        }
+
+        foreach ($userDocuments as $userDocument) {
+            if (!in_array($userDocument->uuid, $providedDocumentUuids)) {
+                if ($userDocument->active) {
+                    $userDocument->update(['active' => false, 'inactivated_at' => now()]);
+                }
+            }
         }
 
         return $items;
