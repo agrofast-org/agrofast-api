@@ -102,8 +102,12 @@ class UserController extends Controller
 
     public function resendCode()
     {
-        // $result = $this->authService->resendCode();
-        return ResponseFactory::error('not_implemented', null, null, 501);
+        $result = $this->authService->resendCode();
+        if ($result instanceof Error) {
+            return ResponseFactory::create($result);
+        }
+
+        return ResponseFactory::success('code_resend_successfully', $result);
     }
 
     public function authenticate(Request $request)
