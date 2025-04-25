@@ -2,6 +2,7 @@
 
 namespace App\Models\System;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -9,13 +10,13 @@ use Illuminate\Database\Eloquent\Model;
  *
  * Represents a notification sent to a user regarding a system message, including details about its read and email status.
  *
- * @property int                 $id               Unique identifier for the notification.
- * @property string              $uuid             Universally Unique Identifier for the notification.
- * @property int                 $user_id          Identifier of the user receiving the notification.
- * @property int                 $system_message_id Identifier of the associated system message.
- * @property bool                $read             Indicates whether the notification has been read.
- * @property bool                $sent_email       Indicates whether an email notification has been sent.
- * @property \Carbon\Carbon|null $notified_at      The datetime when the notification was recorded.
+ * @property int         $id                Unique identifier for the notification.
+ * @property string      $uuid              Universally Unique Identifier for the notification.
+ * @property int         $user_id           Identifier of the user receiving the notification.
+ * @property int         $system_message_id Identifier of the associated system message.
+ * @property bool        $read              Indicates whether the notification has been read.
+ * @property bool        $sent_email        Indicates whether an email notification has been sent.
+ * @property null|Carbon $notified_at       The datetime when the notification was recorded.
  */
 class UserNotification extends Model
 {
@@ -28,7 +29,7 @@ class UserNotification extends Model
         'system_message_id',
         'read',
         'sent_email',
-        'notified_at'
+        'notified_at',
     ];
 
     protected $casts = [
