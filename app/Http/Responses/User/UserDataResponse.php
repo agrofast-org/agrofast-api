@@ -20,6 +20,7 @@ class UserDataResponse
             'email' => $user->email,
             'number' => $user->number,
             'profile_picture' => $user->profile_picture,
+            'profile_type' => $user->profile_type,
         ];
     }
 

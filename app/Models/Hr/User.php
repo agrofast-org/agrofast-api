@@ -24,6 +24,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string      $number
  * @property string      $password
  * @property string      $language
+ * @property null|string $profile_type
  * @property bool        $email_verified
  * @property null|Carbon $email_verified_at
  * @property bool        $number_verified
@@ -57,6 +58,7 @@ class User extends DynamicQuery
         'number',
         'email',
         'password',
+        'profile_type',
         'language',
         'email_verified',
         'email_verified_at',
