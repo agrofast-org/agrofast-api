@@ -20,6 +20,7 @@ class UserDataResponse
             'email' => $user->email,
             'number' => $user->number,
             'profile_picture' => $user->profile_picture,
+            'profile_type' => $user->profile_type,
         ];
     }
 
@@ -41,7 +42,7 @@ class UserDataResponse
     public static function withDocument(User $user): array
     {
         $user = self::format($user);
-        $documents = Document::where('user_id', $user['id'])->get();
+        $documents = Document::where(['user_id' => $user['id'], 'active' => true])->get();
 
         return [
             'user' => [

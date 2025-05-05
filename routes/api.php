@@ -49,6 +49,7 @@ Route::middleware(['db.safe', 'fingerprint'])->group(function () {
             Route::get('/me', [UserController::class, 'self']);
             Route::get('/{uuid}', [UserController::class, 'info']);
         });
+        Route::middleware(['auth'])->post('/profile-type', [UserController::class, 'setProfileType']);
         Route::prefix('/picture')->middleware(['auth'])->group(function () {
             Route::post('/upload', [UserController::class, 'postPicture']);
         });

@@ -16,10 +16,6 @@ Route::middleware('lang')->group(function () {
     });
 
     Route::middleware(['dev.env'])->group(function () {
-        Route::prefix('/console')->group(function () {
-            require_once __DIR__.'/../routes/console.php';
-        });
-
         Route::prefix('/email')->group(function () {
             require_once __DIR__.'/../routes/email.php';
         });

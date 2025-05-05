@@ -14,7 +14,7 @@ class DocumentBelongsTo implements ValidationRule
     public function validate(string $attribute, mixed $value, \Closure $fail): void
     {
         $user = User::auth();
-        $document = Document::where('number', $value)->first();
+        $document = Document::where(['number' => $value, 'active' => true])->first();
 
         if ($document && $document->user_id !== $user->id) {
             $fail(__('validation.custom.document.belongs_to', [

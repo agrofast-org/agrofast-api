@@ -45,4 +45,12 @@ class DocumentType extends Model
         'updated_at',
         'inactivated_at',
     ];
+
+    /**
+     * Get the documents associated with this document type.
+     */
+    public function documents()
+    {
+        return $this->hasMany(Document::class, 'document_type', 'id');
+    }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Factories\ResponseFactory;
+use App\Http\Requests\User\UserProfileTypeRequest;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Http\Responses\User\UserDataResponse;
@@ -102,8 +103,12 @@ class UserController extends Controller
 
     public function resendCode()
     {
-        // $result = $this->authService->resendCode();
-        return ResponseFactory::error('not_implemented', null, null, 501);
+        $result = $this->authService->resendCode();
+        if ($result instanceof Error) {
+            return ResponseFactory::create($result);
+        }
+
+        return ResponseFactory::success('code_resend_successfully', $result);
     }
 
     public function authenticate(Request $request)
@@ -115,6 +120,18 @@ class UserController extends Controller
         }
 
         return ResponseFactory::success('user_authenticated_successfully', $result);
+    }
+
+    public function setProfileType(UserProfileTypeRequest $request)
+    {
+        $user = User::auth();
+
+        $user->update(['profile_type' => $request->input('profile_type')]);
+
+        return ResponseFactory::success(
+            'profile_type_set_successfully',
+            UserDataResponse::withDocument($user)
+        );
     }
 
     public function authenticationMethods()

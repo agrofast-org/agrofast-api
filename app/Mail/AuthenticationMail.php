@@ -18,7 +18,7 @@ class AuthenticationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Email de autenticação, por favor, confirme o acesso',
+            subject: __('email.authentication.subject'),
         );
     }
 
