@@ -14,8 +14,8 @@ return new class extends Migration {
         Schema::create('transport.offers', function (Blueprint $table) {
             $table->id()->primary();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
-            $table->foreignId('request_id')->constrained('transport.requests')->onDelete('cascade');
-            $table->foreignId('carrier_id')->constrained('transport.carriers')->onDelete('cascade');
+            $table->foreignId('request_id')->constrained('transport.request')->onDelete('cascade');
+            $table->foreignId('carrier_id')->constrained('transport.carrier')->onDelete('cascade');
             $table->decimal('price', 10, 2);
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

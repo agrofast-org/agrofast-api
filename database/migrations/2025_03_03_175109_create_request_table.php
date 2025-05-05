@@ -11,7 +11,7 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('transport.requests', function (Blueprint $table) {
+        Schema::create('transport.request', function (Blueprint $table) {
             $table->id()->primary();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('origin');
