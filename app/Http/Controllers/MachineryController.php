@@ -18,7 +18,7 @@ class MachineryController extends Controller
         ;
 
         return ResponseFactory::success(
-            'machineries',
+            'machinery_list',
             $machineries
         );
     }
