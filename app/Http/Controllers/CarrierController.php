@@ -2,108 +2,115 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\ResponseFactory;
+use App\Http\Requests\Carrier\StoreCarrierRequest;
+use App\Http\Requests\Carrier\UpdateCarrierRequest;
 use App\Models\Hr\User;
 use App\Models\Transport\Carrier;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CarrierController extends Controller
 {
-    /**
-     * List carriers for the authenticated user.
-     */
-    public function listTransports(): JsonResponse
+    public function index()
     {
-        $user = User::auth();
-        $carriers = Carrier::where('user_id', $user->id)->get();
+        $carrier = Carrier::where('user_id', User::auth()->id)
+            ->where('active', true)
+            ->orderBy('created_at', 'desc')
+        ;
 
-        return response()->json(['data' => $carriers], 200);
+        return ResponseFactory::success(
+            'carrier_list',
+            $carrier
+        );
     }
 
-    /**
-     * Create a new transport.
-     */
-    public function createTransport(Request $request): JsonResponse
+    public function store(StoreCarrierRequest $request)
     {
-        $user = User::auth();
+        $data = $request->validated();
+        $data['user_id'] = User::auth()->id;
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'plate' => 'required|string|max:255|unique:carriers,plate',
-        ]);
+        Carrier::create($data);
 
-        try {
-            Carrier::create([
-                'user_id' => $user->id,
-                'name' => $validated['name'],
-                'model' => $validated['model'],
-                'plate' => $validated['plate'],
-            ]);
+        $carrier = Carrier::where('user_id', User::auth()->id)
+            ->orderBy('created_at', 'desc')
+        ;
 
-            return response()->json(['message' => 'Carrier created'], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to create carrier', 'error' => $e->getMessage()], 500);
-        }
+        return ResponseFactory::success(
+            'carrier_created',
+            $carrier
+        );
     }
 
-    /**
-     * Update an existing transport.
-     */
-    public function updateTransport(Request $request): JsonResponse
+    public function show(string $uuid)
     {
-        $user = User::auth();
-
-        $validated = $request->validate([
-            'id' => 'required|exists:carriers,id',
-            'name' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'plate' => 'required|string|max:255|unique:carriers,plate,'.$request->id,
-        ]);
-
-        $carrier = Carrier::where('id', $validated['id'])->where('user_id', $user->id)->first();
+        $carrier = Carrier::where('uuid', $uuid)
+            ->where('user_id', User::auth()->id)
+            ->where('active', true)
+            ->firstOrFail()
+        ;
 
         if (!$carrier) {
-            return response()->json(['message' => 'Carrier not found'], 404);
+            return ResponseFactory::error(
+                'carrier_not_found',
+                null,
+                null,
+                404
+            );
         }
 
-        try {
-            $carrier->update([
-                'name' => $validated['name'],
-                'model' => $validated['model'],
-                'plate' => $validated['plate'],
-            ]);
-
-            return response()->json(['message' => 'Carrier updated'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to update carrier', 'error' => $e->getMessage()], 500);
-        }
+        return ResponseFactory::success(
+            'carrier',
+            $carrier
+        );
     }
 
-    /**
-     * Disable a transport.
-     */
-    public function disableTransport(Request $request): JsonResponse
+    public function update(UpdateCarrierRequest $request, string $uuid)
     {
-        $user = Auth::user();
-
-        $validated = $request->validate([
-            'id' => 'required|exists:carriers,id',
-        ]);
-
-        $carrier = Carrier::where('id', $validated['id'])->where('user_id', $user->id)->first();
+        $carrier = Carrier::where('uuid', $uuid)
+            ->where('user_id', User::auth()->id)
+            ->where('active', true)
+            ->firstOrFail()
+        ;
 
         if (!$carrier) {
-            return response()->json(['message' => 'Carrier not found'], 404);
+            return ResponseFactory::error(
+                'carrier_not_found',
+                null,
+                null,
+                404
+            );
         }
 
-        try {
-            $carrier->update(['active' => false]);
+        $data = $request->validated();
+        $carrier->update($data);
 
-            return response()->json(['message' => 'Carrier disabled'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to disable carrier', 'error' => $e->getMessage()], 500);
+        return ResponseFactory::success(
+            'Carrier_updated',
+            $carrier
+        );
+    }
+
+    public function disable(string $uuid)
+    {
+        $carrier = Carrier::where('uuid', $uuid)
+            ->where('user_id', User::auth()->id)
+            ->where('active', true)
+            ->firstOrFail()
+        ;
+
+        if (!$carrier) {
+            return ResponseFactory::error(
+                'carrier_not_found',
+                null,
+                null,
+                404
+            );
         }
+
+        $carrier->update(['active' => false, 'inactivated_at' => now()]);
+
+        return ResponseFactory::success(
+            'carrier_deleted',
+            $carrier
+        );
     }
 }

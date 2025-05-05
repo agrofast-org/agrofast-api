@@ -229,4 +229,15 @@ class UserController extends Controller
     {
         return ResponseFactory::success('code_length', ['length' => AuthCode::LENGTH]);
     }
+
+    public function profileType()
+    {
+        $user = User::auth();
+        $user->update(['profile_type' => request('profile_type')]);
+
+        return ResponseFactory::success(
+            'profile_type_updated',
+            UserDataResponse::withDocument($user),
+        );
+    }
 }

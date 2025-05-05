@@ -2,137 +2,115 @@
 
 namespace App\Http\Controllers;
 
+use App\Factories\ResponseFactory;
+use App\Http\Requests\Machinery\StoreMachineryRequest;
+use App\Http\Requests\Machinery\UpdateMachineryRequest;
+use App\Models\Hr\User;
 use App\Models\Transport\Machinery;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class MachineryController extends Controller
 {
-    /**
-     * List all machinery for the authenticated user.
-     */
-    public function listMachinery(): JsonResponse
+    public function index()
     {
-        $user = Auth::user();
+        $machineries = Machinery::where('user_id', User::auth()->id)
+            ->where('active', true)
+            ->orderBy('created_at', 'desc')
+        ;
 
-        $machines = Machinery::where('user_id', $user->id)->get();
-
-        return response()->json([
-            'data' => $machines,
-        ], 200);
+        return ResponseFactory::success(
+            'machinery_list',
+            $machineries
+        );
     }
 
-    /**
-     * Create a new machine for the authenticated user.
-     */
-    public function createMachine(Request $request): JsonResponse
+    public function store(StoreMachineryRequest $request)
     {
-        $user = Auth::user();
+        $data = $request->validated();
+        $data['user_id'] = User::auth()->id;
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'plate' => 'required|string|max:255|unique:machineries,plate',
-        ]);
+        Machinery::create($data);
 
-        try {
-            $machinery = Machinery::create([
-                'user_id' => $user->id,
-                'name' => $validated['name'],
-                'model' => $validated['model'],
-                'plate' => $validated['plate'],
-            ]);
+        $machineries = Machinery::where('user_id', User::auth()->id)
+            ->orderBy('created_at', 'desc')
+        ;
 
-            return response()->json([
-                'message' => 'Machine created successfully',
-                'data' => $machinery,
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to create machine',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return ResponseFactory::success(
+            'machineries_created',
+            $machineries
+        );
     }
 
-    /**
-     * Update an existing machine for the authenticated user.
-     */
-    public function updateMachine(Request $request): JsonResponse
+    public function show(string $uuid)
     {
-        $user = Auth::user();
-
-        $validated = $request->validate([
-            'id' => 'required|integer|exists:machineries,id',
-            'name' => 'required|string|max:255',
-            'model' => 'required|string|max:255',
-            'plate' => 'required|string|max:255|unique:machineries,plate,'.$request->id,
-        ]);
-
-        $machinery = Machinery::where('id', $validated['id'])
-            ->where('user_id', $user->id)
-            ->first()
+        $machinery = Machinery::where('uuid', $uuid)
+            ->where('user_id', User::auth()->id)
+            ->where('active', true)
+            ->firstOrFail()
         ;
 
         if (!$machinery) {
-            return response()->json([
-                'message' => 'Machine not found',
-            ], 404);
+            return ResponseFactory::error(
+                'machinery_not_found',
+                null,
+                null,
+                404
+            );
         }
 
-        try {
-            $machinery->update([
-                'name' => $validated['name'],
-                'model' => $validated['model'],
-                'plate' => $validated['plate'],
-            ]);
-
-            return response()->json([
-                'message' => 'Machine updated successfully',
-                'data' => $machinery,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to update machine',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return ResponseFactory::success(
+            'machinery',
+            $machinery
+        );
     }
 
-    /**
-     * Disable a machine for the authenticated user.
-     */
-    public function disableMachine(Request $request): JsonResponse
+    public function update(UpdateMachineryRequest $request, string $uuid)
     {
-        $user = Auth::user();
-
-        $validated = $request->validate([
-            'id' => 'required|integer|exists:machineries,id',
-        ]);
-
-        $machinery = Machinery::where('id', $validated['id'])
-            ->where('user_id', $user->id)
-            ->first()
+        $machinery = Machinery::where('uuid', $uuid)
+            ->where('user_id', User::auth()->id)
+            ->where('active', true)
+            ->firstOrFail()
         ;
 
         if (!$machinery) {
-            return response()->json([
-                'message' => 'Machine not found',
-            ], 404);
+            return ResponseFactory::error(
+                'machinery_not_found',
+                null,
+                null,
+                404
+            );
         }
 
-        try {
-            $machinery->update(['active' => false]);
+        $data = $request->validated();
+        $machinery->update($data);
 
-            return response()->json([
-                'message' => 'Machine disabled successfully',
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'message' => 'Failed to disable machine',
-                'error' => $e->getMessage(),
-            ], 500);
+        return ResponseFactory::success(
+            'machinery_updated',
+            $machinery
+        );
+    }
+
+    public function disable(string $uuid)
+    {
+        $machinery = Machinery::where('uuid', $uuid)
+            ->where('user_id', User::auth()->id)
+            ->where('active', true)
+            ->firstOrFail()
+        ;
+
+        if (!$machinery) {
+            return ResponseFactory::error(
+                'machinery_not_found',
+                null,
+                null,
+                404
+            );
         }
+
+        $machinery->update(['active' => false, 'inactivated_at' => now()]);
+
+        return ResponseFactory::success(
+            'machinery_deleted',
+            $machinery
+        );
     }
 }
