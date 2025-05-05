@@ -17,6 +17,16 @@ return new class extends Migration {
             $table->string('name');
             $table->string('model');
             $table->string('plate')->unique();
+            $table->string('type');
+            $table->string('manufacturer');
+            $table->date('manufacturer_date');
+            $table->decimal('weight', 8, 2)->nullable();
+            $table->decimal('lenght', 8, 2)->nullable();
+            $table->decimal('width', 8, 2)->nullable();
+            $table->decimal('height', 8, 2)->nullable();
+            $table->unsignedTinyInteger('axles')->nullable();
+            $table->string('tire_config')->nullable();
+            $table->text('obs')->nullable();
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));

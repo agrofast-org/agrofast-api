@@ -89,7 +89,7 @@ class MachineryController extends Controller
         );
     }
 
-    public function destroy(string $uuid)
+    public function disable(string $uuid)
     {
         $machinery = Machinery::where('uuid', $uuid)
             ->where('user_id', User::auth()->id)

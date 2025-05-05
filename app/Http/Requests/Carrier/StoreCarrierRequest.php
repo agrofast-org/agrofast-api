@@ -35,9 +35,10 @@ class StoreCarrierRequest extends FormRequest
             ],
             'renavam' => ['required', 'string', 'max:255', 'regex:/^[0-9]+$/'],
             'chassi' => ['required', 'string', 'max:255'],
-            'manufacturer' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
+            'manufacturer' => ['required', 'string', 'max:255'],
             'manufacture_year' => ['required', 'integer', 'min:1900', "max:{$currentYear}"],
+
             'licensing_uf' => ['required', 'string', 'size:2', Rule::in($ufs)],
             'vehicle_type' => ['required', 'string', 'max:255'],
             'body_type' => ['required', 'string', 'max:255'],
@@ -48,7 +49,7 @@ class StoreCarrierRequest extends FormRequest
             'tires_per_axle' => ['required', 'integer', 'min:1'],
             'traction' => ['required', 'string', Rule::in($tractions)],
             'rntrc' => ['required', 'string', 'max:255'],
-            'owner_document' => ['required', 'string', 'max:18'],
+
             'documents' => ['nullable', 'array'],
             'documents.*' => ['file', 'mimes:pdf,jpeg,png', 'max:5120'],
             'vehicle_photos' => ['nullable', 'array'],

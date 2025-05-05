@@ -72,34 +72,36 @@ Route::middleware(['db.safe', 'fingerprint'])->group(function () {
 
         // Machinery routes
         Route::prefix('/machinery')->group(function () {
-            Route::get('/', [MachineryController::class, 'listMachinery']);
-            Route::post('/create', [MachineryController::class, 'createMachine']);
-            Route::put('/update', [MachineryController::class, 'updateMachine']);
-            Route::delete('/disable', [MachineryController::class, 'disableMachine']);
+            Route::get('/', [MachineryController::class, 'index']);
+            Route::get('/{uuid}', [MachineryController::class, 'show']);
+            Route::post('/', [MachineryController::class, 'store']);
+            Route::put('/{uuid}', [MachineryController::class, 'update']);
+            Route::delete('/{uuid}', [MachineryController::class, 'disable']);
         });
 
         // Transport vehicle routes
-        Route::prefix('/transport')->group(function () {
-            Route::get('/', [CarrierController::class, 'listTransports']);
-            Route::post('/create', [CarrierController::class, 'createTransport']);
-            Route::put('/update', [CarrierController::class, 'updateTransport']);
-            Route::delete('/disable', [CarrierController::class, 'disableTransport']);
+        Route::prefix('/carrier')->group(function () {
+            Route::get('/', [CarrierController::class, 'index']);
+            Route::get('/{uuid}', [CarrierController::class, 'show']);
+            Route::post('/', [CarrierController::class, 'store']);
+            Route::put('/{uuid}', [CarrierController::class, 'update']);
+            Route::delete('/{uuid}', [CarrierController::class, 'disable']);
         });
 
-        // Request routes
-        Route::prefix('/request')->group(function () {
-            Route::get('/', [RequestController::class, 'listRequests']);
-            Route::post('/create', [RequestController::class, 'makeRequest']);
-            Route::put('/update', [RequestController::class, 'updateRequest']);
-            Route::delete('/cancel', [RequestController::class, 'cancelRequest']);
-        });
+        // // Request routes
+        // Route::prefix('/request')->group(function () {
+        //     Route::get('/', [RequestController::class, 'listRequests']);
+        //     Route::post('/create', [RequestController::class, 'makeRequest']);
+        //     Route::put('/update', [RequestController::class, 'updateRequest']);
+        //     Route::delete('/cancel', [RequestController::class, 'cancelRequest']);
+        // });
 
-        // Offer routes
-        Route::prefix('/offer')->group(function () {
-            Route::get('/', [OfferController::class, 'listOffers']);
-            Route::post('/create', [OfferController::class, 'makeOffer']);
-            Route::put('/update', [OfferController::class, 'updateOffer']);
-            Route::delete('/cancel', [OfferController::class, 'cancelOffer']);
-        });
+        // // Offer routes
+        // Route::prefix('/offer')->group(function () {
+        //     Route::get('/', [OfferController::class, 'listOffers']);
+        //     Route::post('/create', [OfferController::class, 'makeOffer']);
+        //     Route::put('/update', [OfferController::class, 'updateOffer']);
+        //     Route::delete('/cancel', [OfferController::class, 'cancelOffer']);
+        // });
     });
 });

@@ -89,7 +89,7 @@ class CarrierController extends Controller
         );
     }
 
-    public function destroy(string $uuid)
+    public function disable(string $uuid)
     {
         $carrier = Carrier::where('uuid', $uuid)
             ->where('user_id', User::auth()->id)
