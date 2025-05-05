@@ -11,13 +11,10 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('chat.message', function (Blueprint $table) {
+        Schema::create('transport.carrier_picture', function (Blueprint $table) {
             $table->id()->unique()->primary();
-            $table->uuid();
-            $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
-            $table->string('chat_id');
-            $table->text('message');
-            $table->foreignId('answer_to')->nullable()->constrained('chat.message')->onDelete('cascade');
+            $table->foreignId('carrier_id')->constrained('transport.carrier')->onDelete('cascade');
+            $table->foreignId('file_id')->constrained('file.file')->onDelete('cascade');
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
@@ -30,6 +27,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('chat.message');
+        Schema::dropIfExists('transport.carrier_picture');
     }
 };
