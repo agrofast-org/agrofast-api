@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->string('email')->unique();
             $table->string('number')->unique()->nullable();
             $table->string('password');
+            $table->enum('profile_type', ['requester', 'transporter'])->nullable();
             $table->string('language', 10)->default('pt-BR');
             $table->boolean('email_verified')->default(false);
             $table->timestamp('email_verified_at')->nullable();

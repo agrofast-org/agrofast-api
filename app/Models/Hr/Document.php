@@ -4,6 +4,7 @@ namespace App\Models\Hr;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class User.
@@ -48,4 +49,28 @@ class Document extends Model
         'updated_at',
         'inactivated_at',
     ];
+
+    /**
+     * Get the user that owns the document.
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    /**
+     * Get the document type associated with the document.
+     */
+    public function documentType(): BelongsTo
+    {
+        return $this->belongsTo(DocumentType::class, 'document_type', 'id');
+    }
+
+    /**
+     * Get the document type associated with the document.
+     */
+    public function documentTypeKey(): BelongsTo
+    {
+        return $this->belongsTo(DocumentType::class, 'document_type', 'key');
+    }
 }

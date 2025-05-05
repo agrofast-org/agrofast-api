@@ -79,8 +79,43 @@ class AuthService
      */
     public function resendCode(): Error|Success
     {
-        // TODO: Implement resendCode() method.
-        return new Error('not_implemented');
+        $user = User::auth();
+        if (!$user) {
+            return new Error('user_not_authenticated');
+        }
+
+        $session = User::session();
+        if (!$session) {
+            return new Error('session_not_found');
+        }
+
+        $authCode = AuthCode::where('id', $session->auth_code_id)
+            ->where('auth_type', AuthCode::EMAIL)
+            ->first()
+        ;
+        if (!$authCode) {
+            return new Error('invalid_authentication_code');
+        }
+
+        $timeoutSeconds = 60;
+        if (Carbon::now()->diffInSeconds($authCode->created_at) < $timeoutSeconds) {
+            return new Error('resend_timeout', [
+                'message' => "Please wait {$timeoutSeconds} seconds before resending the code.",
+            ]);
+        }
+
+        $attempts = $authCode->attempts;
+
+        $authCode->update(['active' => false]);
+
+        $newAuthCode = AuthCode::createCode($user->id, AuthCode::EMAIL);
+        $newAuthCode->update(['attempts' => $attempts]);
+
+        $session->update(['auth_code_id' => $newAuthCode->id]);
+
+        return new Success('code_resent', [
+            'user' => UserDataResponse::withDocument($user),
+        ]);
     }
 
     /**

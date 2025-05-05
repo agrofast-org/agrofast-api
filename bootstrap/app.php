@@ -6,8 +6,9 @@ use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        api: __DIR__ . '/../routes/index.php',
         apiPrefix: '/',
+        api: __DIR__.'/../routes/index.php',
+        commands: __DIR__.'/../routes/console.php',
     )
     ->withMiddleware(
         function (Middleware $middleware) {
@@ -22,5 +23,5 @@ return Application::configure(basePath: dirname(__DIR__))
         }
     )
     ->withExceptions(
-        //
-    )->create();
+    )->create()
+;
