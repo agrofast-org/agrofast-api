@@ -19,7 +19,7 @@ class MachineryController extends Controller
 
         return ResponseFactory::success(
             'machinery_list',
-            $machineries
+            $machineries->get()->toArray(),
         );
     }
 
@@ -28,11 +28,7 @@ class MachineryController extends Controller
         $data = $request->validated();
         $data['user_id'] = User::auth()->id;
 
-        Machinery::create($data);
-
-        $machineries = Machinery::where('user_id', User::auth()->id)
-            ->orderBy('created_at', 'desc')
-        ;
+        $machineries = Machinery::create($data);
 
         return ResponseFactory::success(
             'machineries_created',

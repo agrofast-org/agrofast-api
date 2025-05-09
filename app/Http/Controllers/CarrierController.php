@@ -19,7 +19,7 @@ class CarrierController extends Controller
 
         return ResponseFactory::success(
             'carrier_list',
-            $carrier
+            $carrier->get()->toArray(),
         );
     }
 
@@ -28,11 +28,7 @@ class CarrierController extends Controller
         $data = $request->validated();
         $data['user_id'] = User::auth()->id;
 
-        Carrier::create($data);
-
-        $carrier = Carrier::where('user_id', User::auth()->id)
-            ->orderBy('created_at', 'desc')
-        ;
+        $carrier = Carrier::create($data);
 
         return ResponseFactory::success(
             'carrier_created',

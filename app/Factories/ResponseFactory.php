@@ -46,7 +46,7 @@ class ResponseFactory
         if (!empty($message)) {
             $response['message'] = $message;
         }
-        if (!empty($payload)) {
+        if ($payload !== null) {
             if ($payload instanceof Success) {
                 $response['data'] = $payload->data;
             } else {
@@ -72,10 +72,10 @@ class ResponseFactory
         if (!empty($message)) {
             $response['message'] = $message;
         }
-        if (!empty($payload)) {
+        if ($payload !== null) {
             $response['data'] = $payload;
         }
-        if (!empty($errors)) {
+        if ($errors !== null) {
             if ($errors instanceof Error) {
                 $response['errors'] = $errors->errors;
             } else {
