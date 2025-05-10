@@ -6,8 +6,6 @@ use App\Http\Controllers\DebugController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MachineryController;
 use App\Http\Controllers\MessageController;
-use App\Http\Controllers\OfferController;
-use App\Http\Controllers\RequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 

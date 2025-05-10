@@ -4,9 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Factories\FileFactory;
 use App\Factories\ResponseFactory;
-use App\Http\Requests\User\FileAttachmentRequest;
-use App\Models\File\File;
-use App\Models\Hr\User;
+use App\Http\Requests\Assets\FileAttachmentRequest;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
@@ -42,39 +40,36 @@ class AssetController extends Controller
     public function attach(FileAttachmentRequest $request)
     {
         $validated = $request->validated();
-        $uuids = [];
+        $files = [];
 
         if (isset($validated['file'])) {
             $file = $validated['file'];
-            $path = Storage::putFile('images', $file);
             $fileRecord = FileFactory::create(
                 $file,
-                $path,
             );
-            $uuids[] = $fileRecord->uuid;
-            $paths[] = $fileRecord->path;
+            $files[] = $fileRecord;
         } else {
-            $files = $validated['files'];
-            $paths = [];
-            foreach ($files as $file) {
-                $path = Storage::putFile('images', $file);
+            foreach ($validated['files'] as $file) {
                 $fileRecord = FileFactory::create(
                     $file,
-                    $path,
                 );
-                $uuids[] = $fileRecord->uuid;
-                $paths[] = $fileRecord->path;
+                $files[] = $fileRecord;
             }
         }
 
-        return ResponseFactory::success('successful_upload', [
-            'uuids' => $uuids,
-            '' => $paths,
-        ])->setStatusCode(201);
+        return ResponseFactory::success('successful_upload', $files)->setStatusCode(201);
     }
 
     public function getAttachment(string $uuid)
     {
+        $path = "uploads/attachment/{$uuid}";
+        $file = Storage::get($path);
+        if (empty($file)) {
+            return ResponseFactory::error('no_images_found');
+        }
 
+        $type = Storage::mimeType($path);
+
+        return response($file, 200)->header('Content-Type', $type);
     }
 }
