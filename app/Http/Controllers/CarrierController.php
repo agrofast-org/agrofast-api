@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Factories\ResponseFactory;
 use App\Http\Requests\Carrier\StoreCarrierRequest;
 use App\Http\Requests\Carrier\UpdateCarrierRequest;
+use App\Models\File\File;
 use App\Models\Hr\User;
 use App\Models\Transport\Carrier;
+use Illuminate\Support\Str;
 
 class CarrierController extends Controller
 {
@@ -28,7 +30,31 @@ class CarrierController extends Controller
         $data = $request->validated();
         $data['user_id'] = User::auth()->id;
 
+        $data['uuid'] = Str::uuid();
+
         $carrier = Carrier::create($data);
+
+        if ($data['pictures']) {
+            $files = File::whereIn('uuid', $data['pictures'])
+                ->where('user_id', User::auth()->id)
+                ->where('active', true)
+                ->get()
+            ;
+            foreach ($files as $file) {
+                $carrier->addPicture($file->id);
+            }
+        }
+
+        if ($data['documents']) {
+            $files = File::whereIn('uuid', $data['documents'])
+                ->where('user_id', User::auth()->id)
+                ->where('active', true)
+                ->get()
+            ;
+            foreach ($files as $file) {
+                $carrier->addDocument($file->id);
+            }
+        }
 
         return ResponseFactory::success(
             'carrier_created',

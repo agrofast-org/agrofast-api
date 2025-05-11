@@ -2,8 +2,6 @@
 
 namespace App\Models\Transport;
 
-use App\Models\File\CarrierDocument;
-use App\Models\File\CarrierPicture;
 use App\Models\Hr\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * Represents a transport carrier with associated attributes and logic.
  *
  * @property int         $id
+ * @property string      $uuid
  * @property int         $user_id
  * @property string      $name
  * @property string      $model
@@ -44,6 +43,7 @@ class Carrier extends Model
     protected $table = 'transport.carrier';
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'name',
         'model',
@@ -74,9 +74,9 @@ class Carrier extends Model
 
     protected $casts = [
         'manufacture_year' => 'integer',
-        'plank_length' => 'decimal:2',
-        'tare' => 'decimal:2',
-        'pbtc' => 'decimal:2',
+        'plank_length' => 'float',
+        'tare' => 'float',
+        'pbtc' => 'float',
         'axles' => 'integer',
         'tires_per_axle' => 'integer',
         'inactivated_at' => 'datetime',
@@ -107,5 +107,21 @@ class Carrier extends Model
     public function documents()
     {
         return $this->hasMany(CarrierDocument::class, 'carrier_id', 'id');
+    }
+
+    public function addPicture(string $id)
+    {
+        CarrierPicture::create([
+            'carrier_id' => $this->id,
+            'file_id' => $id,
+        ]);
+    }
+
+    public function addDocument(string $id)
+    {
+        CarrierDocument::create([
+            'carrier_id' => $this->id,
+            'file_id' => $id,
+        ]);
     }
 }

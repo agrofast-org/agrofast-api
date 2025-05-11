@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Models\File;
+namespace App\Models;
 
+use App\Models\File\File;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
 
 /**
  * Class File.
@@ -19,7 +19,6 @@ use Illuminate\Notifications\Notifiable;
 class FileAttachment extends Model
 {
     use HasFactory;
-    use Notifiable;
 
     protected $primaryKey = 'id';
 

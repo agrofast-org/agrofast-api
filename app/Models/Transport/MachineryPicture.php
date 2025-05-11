@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models\File;
+namespace App\Models\Transport;
 
+use App\Models\FileAttachment;
 use Carbon\Carbon;
 
 /**

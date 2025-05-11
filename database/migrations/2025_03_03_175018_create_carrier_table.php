@@ -13,6 +13,7 @@ return new class extends Migration {
     {
         Schema::create('transport.carrier', function (Blueprint $table) {
             $table->id()->primary();
+            $table->uuid()->unique();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('name');
             $table->string('plate')->unique();

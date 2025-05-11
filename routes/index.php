@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\AssetController;
 use App\Http\Controllers\BrowserAgentController;
 use Illuminate\Support\Facades\Route;
 
@@ -31,9 +30,6 @@ Route::middleware('lang')->group(function () {
     });
 
     Route::prefix('/api')->group(function () {
-        Route::prefix('/uploads/attachment')->group(function () {
-            Route::post('/attach', [AssetController::class, 'attach']);
-        });
         Route::prefix('fingerprint')->group(function () {
             Route::get('/', [BrowserAgentController::class, 'makeFingerprint']);
             Route::middleware('fingerprint')->get('/validate', [BrowserAgentController::class, 'validate']);

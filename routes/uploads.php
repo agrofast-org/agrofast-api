@@ -8,6 +8,7 @@ Route::prefix('/pictures/{userUuid}')->group(function () {
     Route::get('/{pictureUuid?}', [UserController::class, 'picture']);
 });
 
-Route::prefix('/attachment')->group(function () {
-    Route::get('/{uuid}', [AssetController::class, 'getAttachment']);
+Route::prefix('/attachments')->group(function () {
+    Route::post('/', [AssetController::class, 'store']);
+    Route::get('/{uuid}', [AssetController::class, 'show']);
 });

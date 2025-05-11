@@ -13,6 +13,7 @@ return new class extends Migration {
     {
         Schema::create('transport.machinery', function (Blueprint $table) {
             $table->id()->primary();
+            $table->uuid()->unique();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('name');
             $table->string('model');
@@ -21,7 +22,7 @@ return new class extends Migration {
             $table->string('manufacturer');
             $table->date('manufacturer_date');
             $table->decimal('weight', 8, 2)->nullable();
-            $table->decimal('lenght', 8, 2)->nullable();
+            $table->decimal('length', 8, 2)->nullable();
             $table->decimal('width', 8, 2)->nullable();
             $table->decimal('height', 8, 2)->nullable();
             $table->unsignedTinyInteger('axles')->nullable();

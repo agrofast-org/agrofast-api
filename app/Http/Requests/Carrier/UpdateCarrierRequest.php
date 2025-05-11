@@ -30,7 +30,6 @@ class UpdateCarrierRequest extends FormRequest
                 'required',
                 'string',
                 'size:7',
-                'regex:/^[A-Z]{3}[0-9][A-Z][0-9]{2}$/i',
                 Rule::unique('transport.carriers', 'plate'),
             ],
             'renavam' => ['required', 'string', 'max:255', 'regex:/^[0-9]+$/'],
@@ -51,9 +50,9 @@ class UpdateCarrierRequest extends FormRequest
             'rntrc' => ['required', 'string', 'max:255'],
 
             'documents' => ['nullable', 'array'],
-            'documents.*' => ['file', 'mimes:pdf,jpeg,png', 'max:5120'],
+            'documents.*' => ['uuid', 'exists:pgsql.file.file,uuid'],
             'vehicle_photos' => ['nullable', 'array'],
-            'vehicle_photos.*' => ['image', 'mimes:jpeg,png,webp', 'max:5120'],
+            'vehicle_photos.*' => ['uuid', 'exists:pgsql.file.file,uuid'],
             'obs' => ['nullable', 'string'],
         ];
     }

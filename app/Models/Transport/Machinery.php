@@ -2,7 +2,6 @@
 
 namespace App\Models\Transport;
 
-use App\Models\File\MachineryPicture;
 use App\Models\Hr\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,19 +13,20 @@ use Illuminate\Database\Eloquent\Model;
  * Represents a machinery item with associated attributes and logic.
  *
  * @property int         $id
+ * @property string      $uuid
  * @property int         $user_id
  * @property string      $name
  * @property string      $model
+ * @property string      $plate
  * @property string      $type
  * @property string      $manufacturer
  * @property null|Carbon $manufacturer_date
  * @property float       $weight
- * @property float       $lenght
+ * @property float       $length
  * @property float       $width
  * @property float       $height
  * @property int         $axles
  * @property string      $tire_config
- * @property array       $pictures
  * @property null|string $obs
  * @property bool        $active
  * @property null|Carbon $inactivated_at
@@ -43,19 +43,20 @@ class Machinery extends Model
     protected $table = 'transport.machinery';
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'name',
         'model',
         'type',
+        'plate',
         'manufacturer',
         'manufacturer_date',
         'weight',
-        'lenght',
+        'length',
         'width',
         'height',
         'axles',
         'tire_config',
-        'pictures',
         'obs',
         'active',
         'inactivated_at',
@@ -67,12 +68,11 @@ class Machinery extends Model
 
     protected $casts = [
         'manufacturer_date' => 'date',
-        'weight' => 'decimal:2',
-        'lenght' => 'decimal:2',
-        'width' => 'decimal:2',
-        'height' => 'decimal:2',
+        'weight' => 'float',
+        'length' => 'float',
+        'width' => 'float',
+        'height' => 'float',
         'axles' => 'integer',
-        'pictures' => 'array',
         'inactivated_at' => 'datetime',
     ];
 
@@ -96,5 +96,13 @@ class Machinery extends Model
     public function pictures()
     {
         return $this->hasMany(MachineryPicture::class, 'machinery_id');
+    }
+
+    public function addPicture(string $id)
+    {
+        MachineryPicture::create([
+            'machinery_id' => $this->id,
+            'file_id' => $id,
+        ]);
     }
 }

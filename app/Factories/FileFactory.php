@@ -8,14 +8,14 @@ use Illuminate\Support\Str;
 
 class FileFactory
 {
-    public static function create($file): File
+    public static function create($file, string $type): File
     {
         $uuid = Str::uuid();
 
         $fileName = $uuid.'.'.$file->getClientOriginalExtension();
         $disk = env('FILESYSTEM_DISK', 's3');
 
-        $path = $file->storeAs('/uploads/attachment', $fileName, $disk);
+        $path = $file->storeAs("/uploads/{$type}", $fileName, $disk);
 
         $appUrl = env('APP_URL');
 
