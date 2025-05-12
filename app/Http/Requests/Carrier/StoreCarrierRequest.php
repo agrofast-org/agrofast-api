@@ -17,7 +17,6 @@ class StoreCarrierRequest extends FormRequest
      */
     public function rules(): array
     {
-        $currentYear = date('Y');
         $ufs = [
             'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA',
             'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN',
@@ -26,17 +25,18 @@ class StoreCarrierRequest extends FormRequest
         $tractions = ['4x2', '6x2', '6x4', '8x2'];
 
         return [
+            'name' => ['required', 'string', 'max:255'],
             'plate' => [
                 'required',
                 'string',
                 'size:7',
-                Rule::unique('transport.carriers', 'plate'),
+                Rule::unique('pgsql.transport.carrier', 'plate'),
             ],
             'renavam' => ['required', 'string', 'max:255', 'regex:/^[0-9]+$/'],
             'chassi' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
             'manufacturer' => ['required', 'string', 'max:255'],
-            'manufacture_year' => ['required', 'integer', 'min:1900', "max:{$currentYear}"],
+            'manufacturer_date' => ['required', 'date', 'before_or_equal:today'],
 
             'licensing_uf' => ['required', 'string', 'size:2', Rule::in($ufs)],
             'vehicle_type' => ['required', 'string', 'max:255'],
@@ -51,8 +51,8 @@ class StoreCarrierRequest extends FormRequest
 
             'documents' => ['nullable', 'array'],
             'documents.*' => ['uuid', 'exists:pgsql.file.file,uuid'],
-            'vehicle_photos' => ['nullable', 'array'],
-            'vehicle_photos.*' => ['uuid', 'exists:pgsql.file.file,uuid'],
+            'pictures' => ['nullable', 'array'],
+            'pictures.*' => ['uuid', 'exists:pgsql.file.file,uuid'],
             'obs' => ['nullable', 'string'],
         ];
     }

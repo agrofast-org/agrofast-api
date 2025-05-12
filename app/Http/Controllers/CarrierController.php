@@ -34,25 +34,25 @@ class CarrierController extends Controller
 
         $carrier = Carrier::create($data);
 
-        if ($data['pictures']) {
-            $files = File::whereIn('uuid', $data['pictures'])
-                ->where('user_id', User::auth()->id)
-                ->where('active', true)
-                ->get()
-            ;
-            foreach ($files as $file) {
-                $carrier->addPicture($file->id);
-            }
-        }
-
         if ($data['documents']) {
             $files = File::whereIn('uuid', $data['documents'])
-                ->where('user_id', User::auth()->id)
+                ->where('uploaded_by', User::auth()->id)
                 ->where('active', true)
                 ->get()
             ;
             foreach ($files as $file) {
                 $carrier->addDocument($file->id);
+            }
+        }
+
+        if ($data['pictures']) {
+            $files = File::whereIn('uuid', $data['pictures'])
+                ->where('uploaded_by', User::auth()->id)
+                ->where('active', true)
+                ->get()
+            ;
+            foreach ($files as $file) {
+                $carrier->addPicture($file->id);
             }
         }
 

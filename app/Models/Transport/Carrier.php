@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string      $renavam
  * @property string      $chassi
  * @property string      $manufacturer
- * @property int         $manufacture_year
+ * @property Carbon      $manufacturer_date
  * @property string      $licensing_uf
  * @property string      $vehicle_type
  * @property string      $body_type
@@ -51,7 +51,7 @@ class Carrier extends Model
         'renavam',
         'chassi',
         'manufacturer',
-        'manufacture_year',
+        'manufacturer_date',
         'licensing_uf',
         'vehicle_type',
         'body_type',
@@ -73,7 +73,7 @@ class Carrier extends Model
     ];
 
     protected $casts = [
-        'manufacture_year' => 'integer',
+        'manufacturer_date' => 'datetime',
         'plank_length' => 'float',
         'tare' => 'float',
         'pbtc' => 'float',
@@ -109,17 +109,17 @@ class Carrier extends Model
         return $this->hasMany(CarrierDocument::class, 'carrier_id', 'id');
     }
 
-    public function addPicture(string $id)
+    public function addDocument(string $id)
     {
-        CarrierPicture::create([
+        CarrierDocument::create([
             'carrier_id' => $this->id,
             'file_id' => $id,
         ]);
     }
 
-    public function addDocument(string $id)
+    public function addPicture(string $id)
     {
-        CarrierDocument::create([
+        CarrierPicture::create([
             'carrier_id' => $this->id,
             'file_id' => $id,
         ]);

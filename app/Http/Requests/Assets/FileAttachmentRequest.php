@@ -13,10 +13,12 @@ class FileAttachmentRequest extends FormRequest
 
     public function rules(): array
     {
+        $mimes = 'jpg,jpeg,png,gif,webp,svg,pdf';
+
         return [
-            'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,webp,svg|max:2048|required_without:files',
+            'file' => "nullable|file|mimes:{$mimes}|max:2048|required_without:files",
             'files' => 'nullable|array|required_without:file',
-            'files.*' => 'file|mimes:jpg,jpeg,png,gif,webp,svg|max:2048',
+            'files.*' => "file|mimes:{$mimes}|max:2048",
             'description' => 'nullable|string|max:255',
             'tags' => 'nullable|array',
             'tags.*' => 'string|max:50',
