@@ -39,4 +39,9 @@ return [
         'secret' => env('SMS_SERVICE_SECRET'),
         'from' => env('SMS_SERVICE_FROM', 'Agrofast'),
     ],
+
+    'google' => [
+        'maps_key' => env('GOOGLE_MAPS_KEY'),
+        'places_key' => env('GOOGLE_PLACES_KEY'),
+    ],
 ];

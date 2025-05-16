@@ -6,6 +6,7 @@ use App\Http\Controllers\DebugController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MachineryController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\RequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -89,13 +90,13 @@ Route::middleware(['db.safe', 'fingerprint'])->group(function () {
             Route::delete('/{uuid}', [CarrierController::class, 'disable']);
         });
 
-        // // Request routes
-        // Route::prefix('/request')->group(function () {
-        //     Route::get('/', [RequestController::class, 'listRequests']);
-        //     Route::post('/create', [RequestController::class, 'makeRequest']);
-        //     Route::put('/update', [RequestController::class, 'updateRequest']);
-        //     Route::delete('/cancel', [RequestController::class, 'cancelRequest']);
-        // });
+        // Request routes
+        Route::prefix('/request')->group(function () {
+            Route::get('/', [RequestController::class, 'index']);
+            Route::post('/', [RequestController::class, 'store']);
+            Route::put('/', [RequestController::class, 'update']);
+            Route::delete('/', [RequestController::class, 'cancel']);
+        });
 
         // // Offer routes
         // Route::prefix('/offer')->group(function () {
