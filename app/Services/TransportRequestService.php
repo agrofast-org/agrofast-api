@@ -12,18 +12,20 @@ class TransportRequestService
         $req = TransportRequest::findOrFail($requestId);
 
         // --- 1) Detalhes do lugar de origem ---
-        $originResp = Http::get('https://maps.googleapis.com/maps/api/place/details/json', [
-            'place_id' => $req->origin_place_id,
+        $originResp = Http::withHeaders([
+            'Referer' => env('WEB_URL'),
+        ])->get("https://places.googleapis.com/v1/places/{$req->origin_place_id}", [
+            'fields' => 'id,displayName',
             'key' => config('services.google.maps_key'),
-        ])->throw()->json('result');
+        ])->throw();
 
         $req->origin_place_name = $originResp['name'];
         $req->origin_latitude = $originResp['geometry']['location']['lat'];
         $req->origin_longitude = $originResp['geometry']['location']['lng'];
 
         // --- 2) Detalhes do lugar de destino ---
-        $destResp = Http::get('https://maps.googleapis.com/maps/api/place/details/json', [
-            'place_id' => $req->destination_place_id,
+        $destResp = Http::get("https://places.googleapis.com/v1/places/{$req->destination_place_id}", [
+            'fields' => 'id,displayName',
             'key' => config('services.google.maps_key'),
         ])->throw()->json('result');
 
@@ -48,4 +50,3 @@ class TransportRequestService
         $req->save();
     }
 }
-
