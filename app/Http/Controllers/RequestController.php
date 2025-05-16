@@ -18,7 +18,7 @@ class RequestController extends Controller
 
         $transportRequest = TransportRequest::create(array_merge(
             $data,
-            ['user_id' => $user->id]
+            ['user_id' => $user->id, 'state' => 'pending']
         ));
 
         // ValidateGooglePlacesJob::dispatch($transportRequest->id);

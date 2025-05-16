@@ -9,44 +9,66 @@ class TransportRequestService
 {
     public function validateTransportRequest($requestId)
     {
-        $req = TransportRequest::findOrFail($requestId);
+        $request = TransportRequest::findOrFail($requestId);
 
-        // --- 1) Detalhes do lugar de origem ---
-        $originResp = Http::withHeaders([
-            'Referer' => env('WEB_URL'),
-        ])->get("https://places.googleapis.com/v1/places/{$req->origin_place_id}", [
-            'fields' => 'id,displayName',
-            'key' => config('services.google.maps_key'),
-        ])->throw();
+        $originData = $this->getPlace($request->origin_place_id, 'formatted_address,location');
+        if (empty($originData['formattedAddress']) || empty($originData['location'])) {
+            $request->state = 'rejected';
+            $request->save();
+            return;
+        }
+        $request->origin_place_name = $originData['formattedAddress'];
+        $request->origin_latitude = $originData['location']['latitude'];
+        $request->origin_longitude = $originData['location']['longitude'];
 
-        $req->origin_place_name = $originResp['name'];
-        $req->origin_latitude = $originResp['geometry']['location']['lat'];
-        $req->origin_longitude = $originResp['geometry']['location']['lng'];
-
-        // --- 2) Detalhes do lugar de destino ---
-        $destResp = Http::get("https://places.googleapis.com/v1/places/{$req->destination_place_id}", [
-            'fields' => 'id,displayName',
-            'key' => config('services.google.maps_key'),
-        ])->throw()->json('result');
-
-        $req->destination_place_name = $destResp['name'];
-        $req->destination_origin_latitude = $destResp['geometry']['location']['lat'];
-        $req->destination_origin_longitude = $destResp['geometry']['location']['lng'];
-
-        // --- 3) Matriz de distância/tempo ---
-        $matrix = Http::get('https://maps.googleapis.com/maps/api/distancematrix/json', [
-            'origins' => "{$req->origin_latitude},{$req->origin_longitude}",
-            'destinations' => "{$req->destination_origin_latitude},{$req->destination_origin_longitude}",
-            'key' => config('services.google.maps_key'),
-        ])->throw()->json('rows.0.elements.0');
-
-        if ($matrix['status'] === 'OK') {
-            // distância em metros → converter para km, se preferir
-            $req->distance = $matrix['distance']['value'] / 1000;
-            // tempo estimado em texto (ex: “1 hora 20 min”)
-            $req->estimated_time = $matrix['duration']['text'];
+        $destinationResp = $this->getPlace($request->destination_place_id, 'formatted_address,location');
+        if (empty($destinationResp['formattedAddress']) || empty($destinationResp['location'])) {
+            $request->state = 'rejected';
+            $request->save();
+            return;
         }
 
-        $req->save();
+        $request->origin_place_name = $destinationResp['formattedAddress'];
+        $request->origin_latitude = $destinationResp['location']['latitude'];
+        $request->origin_longitude = $destinationResp['location']['longitude'];
+
+        $matrix = $this->getDistanceMatrix(
+            "{$request->origin_latitude},{$request->origin_longitude}",
+            "{$request->destination_origin_latitude},{$request->destination_origin_longitude}"
+        );
+
+        if ($matrix['status'] === 'OK') {
+            $request->distance = $matrix['distance']['value'] / 1000;
+            $request->estimated_time = $matrix['duration']['text'];
+
+            $request->state = 'approved';
+        }
+
+        $request->save();
+    }
+
+    protected function makeRequest()
+    {
+        return Http::withHeaders([
+            'Referer' => env('APP_URL'),
+        ]);
+    }
+
+    protected function getPlace(string $placeId, string $fields = '*')
+    {
+        return $this->makeRequest()->get("https://places.googleapis.com/v1/places/{$placeId}", [
+            'fields' => $fields,
+            'key' => config('services.google.maps_key'),
+        ])->throw()->json();
+    }
+
+    protected function getDistanceMatrix(string $origin, string $destination)
+    {
+        return $this->makeRequest()->get('https://maps.googleapis.com/maps/api/distancematrix/json', [
+            'origins' => $origin,
+            'destinations' => $destination,
+            'units' => 'imperial',
+            'key' => config('services.google.maps_key'),
+        ])->throw()->json();
     }
 }
