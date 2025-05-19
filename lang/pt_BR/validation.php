@@ -178,6 +178,10 @@ return [
         'document' => [
             'belongs_to' => 'O :attribute não pertence a este usuário.',
         ],
+        'request' => [
+            'machinery_not_found' => 'Máquina não encontrada.',
+            'request_already_exists' => 'Solicitação para esta máquina já existe.',
+        ],
     ],
 
     /*

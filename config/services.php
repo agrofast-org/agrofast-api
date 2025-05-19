@@ -40,8 +40,12 @@ return [
         'from' => env('SMS_SERVICE_FROM', 'Agrofast'),
     ],
 
+    'mercadopago' => [
+        'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
+    ],
+
     'google' => [
-        'maps_key' => env('GOOGLE_MAPS_KEY'),
         'places_key' => env('GOOGLE_PLACES_KEY'),
+        'maps_key' => env('GOOGLE_MAPS_KEY'),
     ],
 ];

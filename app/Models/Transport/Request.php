@@ -25,6 +25,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property float       $destination_origin_longitude Longitude coordinate of the destination.
  * @property float       $distance                     Distance between origin and destination.
  * @property string      $estimated_time               Estimated travel time.
+ * @property string      $estimated_cost               Estimated cost of the transport.
+ * @property int         $payment_id                   Identifier for the associated Pix payment.
+ * @property null|string $payment_pix_url              URL for the Pix payment.
+ * @property null|string $payment_pix_qr_code          QR code for the Pix payment.
  * @property Carbon      $desired_date                 Desired date and time for the transport.
  * @property string      $state                        Current state of the request (e.g., 'pending').
  * @property bool        $active                       Indicates if the request is active.
@@ -33,13 +37,22 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon      $updated_at                   Timestamp when the request was last updated.
  * @property User        $user                         The user who owns the transport request.
  */
-class TransportRequest extends Model
+class Request extends Model
 {
     use HasFactory;
+
+    public const STATE_PENDING = 'pending';
+    public const STATE_PAYMENT_PENDING = 'payment_pending';
+    public const STATE_APPROVED = 'approved';
+    public const STATE_REJECTED = 'rejected';
+    public const STATE_IN_PROGRESS = 'in_progress';
+    public const STATE_CANCELED = 'canceled';
+    public const STATE_COMPLETED = 'completed';
 
     protected $table = 'transport.request';
 
     protected $fillable = [
+        'uuid',
         'user_id',
 
         'origin_place_id',
@@ -54,6 +67,10 @@ class TransportRequest extends Model
 
         'distance',
         'estimated_time',
+        'estimated_cost',
+
+        'payment_id',
+
         'desired_date',
         'state',
         'active',
@@ -72,6 +89,12 @@ class TransportRequest extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
+
+    public static function getEstimatedCost($distance)
+    {
+        // Assuming cost is $2.5 per km
+        return number_format($distance / 1000 * 2.5, 2);
+    }
 
     /**
      * Relationship with User model.

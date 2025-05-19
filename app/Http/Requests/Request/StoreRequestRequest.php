@@ -19,6 +19,7 @@ class StoreRequestRequest extends FormRequest
         return [
             'origin_place_id' => 'required|string',
             'destination_place_id' => 'required|string',
+            'machine_uuid' => 'required|uuid|exists:pgsql.transport.machinery,uuid',
         ];
     }
 }

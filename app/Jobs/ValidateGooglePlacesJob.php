@@ -1,18 +1,22 @@
 <?php
+
+// app/Jobs/ValidateGooglePlacesJob.php
+
 namespace App\Jobs;
 
-use App\Models\Transport\TransportRequest;
 use App\Services\TransportRequestService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Http;
 
 class ValidateGooglePlacesJob implements ShouldQueue
 {
-    use Dispatchable, Queueable, InteractsWithQueue, SerializesModels;
+    use Dispatchable;
+    use Queueable;
+    use InteractsWithQueue;
+    use SerializesModels;
 
     protected int $requestId;
 
@@ -21,9 +25,8 @@ class ValidateGooglePlacesJob implements ShouldQueue
         $this->requestId = $requestId;
     }
 
-    public function handle()
+    public function handle(TransportRequestService $transportValidationService): void
     {
-        $transportValidationService = new TransportRequestService();
         $transportValidationService->validateTransportRequest($this->requestId);
     }
 }

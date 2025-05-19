@@ -1,74 +1,86 @@
 <?php
 
+// app/Services/TransportRequestService.php
+
 namespace App\Services;
 
-use App\Models\Transport\TransportRequest;
-use Illuminate\Support\Facades\Http;
+use App\Models\Transport\Request;
+use App\Services\Google\Contracts\DistanceMatrixClientInterface;
+use App\Services\Google\Contracts\PlacesClientInterface;
+use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class TransportRequestService
 {
-    public function validateTransportRequest($requestId)
+    public function __construct(
+        protected PlacesClientInterface $placesClient,
+        protected DistanceMatrixClientInterface $distanceClient,
+    ) {}
+
+    public function validateTransportRequest(int $requestId): void
     {
-        $request = TransportRequest::findOrFail($requestId);
+        $request = Request::findOrFail($requestId);
 
-        $originData = $this->getPlace($request->origin_place_id, 'formatted_address,location');
-        if (empty($originData['formattedAddress']) || empty($originData['location'])) {
-            $request->state = 'rejected';
-            $request->save();
-            return;
-        }
-        $request->origin_place_name = $originData['formattedAddress'];
-        $request->origin_latitude = $originData['location']['latitude'];
-        $request->origin_longitude = $originData['location']['longitude'];
+        DB::transaction(function () use ($request) {
+            try {
+                $origin = $this->placesClient->getPlaceData($request->origin_place_id);
+                $destination = $this->placesClient->getPlaceData($request->destination_place_id);
+                $matrix = $this->distanceClient->getDistance($origin['formattedAddress'], $destination['formattedAddress']);
 
-        $destinationResp = $this->getPlace($request->destination_place_id, 'formatted_address,location');
-        if (empty($destinationResp['formattedAddress']) || empty($destinationResp['location'])) {
-            $request->state = 'rejected';
-            $request->save();
-            return;
-        }
-
-        $request->origin_place_name = $destinationResp['formattedAddress'];
-        $request->origin_latitude = $destinationResp['location']['latitude'];
-        $request->origin_longitude = $destinationResp['location']['longitude'];
-
-        $matrix = $this->getDistanceMatrix(
-            "{$request->origin_latitude},{$request->origin_longitude}",
-            "{$request->destination_origin_latitude},{$request->destination_origin_longitude}"
-        );
-
-        if ($matrix['status'] === 'OK') {
-            $request->distance = $matrix['distance']['value'] / 1000;
-            $request->estimated_time = $matrix['duration']['text'];
-
-            $request->state = 'approved';
-        }
-
-        $request->save();
+                $request->update([
+                    'origin_place_name' => $origin['formattedAddress'],
+                    'origin_latitude' => $origin['location']['latitude'],
+                    'origin_longitude' => $origin['location']['longitude'],
+                    'destination_place_name' => $destination['formattedAddress'],
+                    'destination_latitude' => $destination['location']['latitude'],
+                    'destination_longitude' => $destination['location']['longitude'],
+                    'distance' => $matrix['distance']['value'],
+                    'estimated_time' => $matrix['duration']['value'],
+                    'estimated_cost' => Request::getEstimatedCost($matrix['distance']['value']),
+                    'state' => Request::STATE_PAYMENT_PENDING,
+                ]);
+            } catch (\Throwable $e) {
+                Log::warning("Request {$request->id} rejeitado: {$e->getMessage()}");
+                $request->update(['state' => Request::STATE_REJECTED, 'origin_place_name' => $e->getMessage()]);
+            }
+        });
     }
 
-    protected function makeRequest()
+    public function updatePaymentStatus(string $uuid): Request
     {
-        return Http::withHeaders([
-            'Referer' => env('APP_URL'),
-        ]);
-    }
+        $transportRequest = Request::where('uuid', $uuid)->firstOrFail();
 
-    protected function getPlace(string $placeId, string $fields = '*')
-    {
-        return $this->makeRequest()->get("https://places.googleapis.com/v1/places/{$placeId}", [
-            'fields' => $fields,
-            'key' => config('services.google.maps_key'),
-        ])->throw()->json();
-    }
+        $client = new Client();
 
-    protected function getDistanceMatrix(string $origin, string $destination)
-    {
-        return $this->makeRequest()->get('https://maps.googleapis.com/maps/api/distancematrix/json', [
-            'origins' => $origin,
-            'destinations' => $destination,
-            'units' => 'imperial',
-            'key' => config('services.google.maps_key'),
-        ])->throw()->json();
+        try {
+            $response = $client->get("https://api.mercadopago.com/v1/payments/{$transportRequest->pix_payment_id}", [
+                'headers' => [
+                    'Authorization' => 'Bearer '.config('services.mercadopago.access_token'),
+                ],
+            ]);
+
+            $paymentData = json_decode($response->getBody(), true);
+
+            if (isset($paymentData['status'])) {
+                if ($paymentData['status'] === 'approved') {
+                    $transportRequest->state = Request::STATE_APPROVED;
+                } elseif ($paymentData['status'] === 'pending') {
+                    $transportRequest->state = Request::STATE_PENDING;
+                } else {
+                    $transportRequest->state = Request::STATE_REJECTED;
+                }
+            } else {
+                $transportRequest->state = Request::STATE_REJECTED;
+            }
+        } catch (\Exception $e) {
+            Log::error("Error checking Mercado Pago payment status for request {$transportRequest->id}: ".$e->getMessage());
+            $transportRequest->state = Request::STATE_REJECTED;
+        }
+
+        $transportRequest->state = Request::STATE_APPROVED; // or any other state based on payment status
+        $transportRequest->save();
+
+        return $transportRequest;
     }
 }

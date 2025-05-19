@@ -37,7 +37,7 @@ class Offer extends Model
      */
     public function request()
     {
-        return $this->belongsTo(TransportRequest::class);
+        return $this->belongsTo(Request::class);
     }
 
     /**

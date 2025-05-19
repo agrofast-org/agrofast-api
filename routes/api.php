@@ -93,8 +93,10 @@ Route::middleware(['db.safe', 'fingerprint'])->group(function () {
         // Request routes
         Route::prefix('/request')->group(function () {
             Route::get('/', [RequestController::class, 'index']);
+            Route::get('/{uuid}', [RequestController::class, 'show']);
+            Route::get('/{uuid}/update', [RequestController::class, 'updatePaymentStatus']);
             Route::post('/', [RequestController::class, 'store']);
-            Route::put('/', [RequestController::class, 'update']);
+            // Route::put('/', [RequestController::class, 'update']);
             Route::delete('/', [RequestController::class, 'cancel']);
         });
 

@@ -13,6 +13,7 @@ return new class extends Migration {
     {
         Schema::create('transport.request', function (Blueprint $table) {
             $table->id()->primary();
+            $table->uuid()->unique();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
 
             $table->string('origin_place_id');
@@ -24,14 +25,20 @@ return new class extends Migration {
             $table->string('destination_origin_latitude')->nullable();
             $table->string('destination_origin_longitude')->nullable();
 
-            $table->float('distance')->nullable();
-            $table->string('estimated_time')->nullable();
+            $table->integer('distance')->nullable()->comment('Distance in meters between origin and destination in meters');
+            $table->integer('estimated_time')->nullable()->comment('Estimated travel time in seconds between origin and destination');
+            $table->string('estimated_cost')->nullable();
+
+            $table->foreignId('payment_id')->nullable(); // ->constrained('payment')->onDelete('cascade');
 
             $table->timestamp('desired_date')->nullable();
             $table->enum('state', [
                 'pending',
+                'payment_pending',
                 'approved',
                 'rejected',
+                'in_progress',
+                'canceled',
                 'completed',
             ])->default('pending');
             $table->boolean('active')->default(true);
