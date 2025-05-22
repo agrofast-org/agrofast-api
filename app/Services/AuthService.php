@@ -70,7 +70,7 @@ class AuthService
         return new Success('login_success', [
             'user' => UserDataResponse::withDocument($user),
             'token' => $jwt,
-            'auth' => ($user->email_verified && $remember) ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
+            'auth' => ($user->email_verified && ($user->email_two_factor_auth || $remember)) ? UserAct\ion::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
         ]);
     }
 

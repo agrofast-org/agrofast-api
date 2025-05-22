@@ -21,8 +21,10 @@ return new class extends Migration {
             $table->string('password');
             $table->enum('profile_type', ['requester', 'transporter'])->nullable();
             $table->string('language', 10)->default('pt-BR');
+            $table->boolean('email_two_factor_auth')->default(false);
             $table->boolean('email_verified')->default(false);
             $table->timestamp('email_verified_at')->nullable();
+            $table->boolean('number_two_factor_auth')->default(false);
             $table->boolean('number_verified')->default(false);
             $table->timestamp('number_verified_at')->nullable();
             $table->string('profile_picture')->nullable();
