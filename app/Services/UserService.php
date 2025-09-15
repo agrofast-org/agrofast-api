@@ -12,9 +12,9 @@ use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\User;
-use App\Models\Success;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 
 class UserService
 {
@@ -24,12 +24,14 @@ class UserService
      * @param array            $data    user data to be inserted
      * @param UserStoreRequest $request request instance
      *
-     * @return Error|Success result with user and token or error
+     * @return array result with user and token or error
+     *
+     * @throws ValidationException
      */
-    public function createUser(array $data, UserStoreRequest $request): Error|Success
+    public function createUser(array $data, UserStoreRequest $request): array
     {
         if (!empty($validated)) {
-            return new Error('validation_failed', $validated);
+            throw new ValidationException($validated);
         }
 
         $data['password'] = Hash::make($data['password']);
@@ -50,11 +52,11 @@ class UserService
 
         $jwt = TokenFactory::create($user, $session);
 
-        return new Success('user_created', [
+        return [
             ...UserDataResponse::withDocument($user),
             'token' => $jwt,
             'session' => $session,
             'auth' => UserAction::AUTHENTICATE->value,
-        ]);
+        ];
     }
 }

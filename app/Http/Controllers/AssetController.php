@@ -32,7 +32,7 @@ class AssetController extends Controller
             }
         }
 
-        return ResponseFactory::success('successful_upload', $files)->setStatusCode(201);
+        return response()->json($files, 201);
     }
 
     public function show(string $uuid)
@@ -40,7 +40,7 @@ class AssetController extends Controller
         $path = "uploads/attachments/{$uuid}";
         $file = Storage::get($path);
         if (empty($file)) {
-            return ResponseFactory::error('no_images_found');
+            return response()->json(['message' => 'No images found'], 404);
         }
 
         $type = Storage::mimeType($path);

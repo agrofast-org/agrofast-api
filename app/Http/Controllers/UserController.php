@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Factories\ResponseFactory;
+use App\Http\Requests\User\UserLoginRequest;
 use App\Http\Requests\User\UserProfileTypeRequest;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Http\Responses\User\UserDataResponse;
-use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\User;
 use App\Services\AuthService;
@@ -48,10 +48,10 @@ class UserController extends Controller
         $user = $this->userQueryService->getUser($query);
 
         if ($user) {
-            return ResponseFactory::success('user_found', $user);
+            return response()->json($user, 200);
         }
 
-        return ResponseFactory::error('user_not_found', null, null, 404);
+        return response()->json(['message' => 'User not found'], 404);
     }
 
     public function store(UserStoreRequest $request)
@@ -59,20 +59,16 @@ class UserController extends Controller
         $data = $request->validated();
         $result = $this->userService->createUser($data, $request);
 
-        if ($result instanceof Error) {
-            return ResponseFactory::create($result);
-        }
-
-        return ResponseFactory::success('user_created_successfully', $result, 201);
+        return response()->json($result, 201);
     }
 
     public function update(UserUpdateRequest $request)
     {
-        $data = $request->only(['name', 'surname']);
+        $data = $request->validated();
         $user = User::auth();
 
         if (!$user) {
-            return ResponseFactory::error('user_not_found', null, null, 404);
+            return response()->json(['message' => 'User not found'], 404);
         }
 
         $user->update($data);
@@ -82,44 +78,30 @@ class UserController extends Controller
             $this->userDocumentService->handleList(null, $documents);
         }
 
-        return ResponseFactory::success(
-            'user_updated',
-            UserDataResponse::withDocument($user),
-        );
+        return response()->json(UserDataResponse::withDocument($user), 200);
     }
 
-    public function login(Request $request)
+    public function login(UserLoginRequest $request)
     {
         $credentials = $request->only(['email', 'password', 'remember']);
 
         $result = $this->authService->login($credentials, $request);
 
-        if ($result instanceof Error) {
-            return ResponseFactory::create($result);
-        }
-
-        return ResponseFactory::success('login_authentication_code_sent', $result);
+        return response()->json($result, 200);
     }
 
     public function resendCode()
     {
         $result = $this->authService->resendCode();
-        if ($result instanceof Error) {
-            return ResponseFactory::create($result);
-        }
 
-        return ResponseFactory::success('code_resend_successfully', $result);
+        return response()->json($result, 200);
     }
 
     public function authenticate(Request $request)
     {
         $result = $this->authService->authenticate($request);
 
-        if ($result instanceof Error) {
-            return ResponseFactory::create($result);
-        }
-
-        return ResponseFactory::success('user_authenticated_successfully', $result);
+        return response()->json($result, 200);
     }
 
     public function setProfileType(UserProfileTypeRequest $request)
@@ -128,10 +110,7 @@ class UserController extends Controller
 
         $user->update(['profile_type' => $request->input('profile_type')]);
 
-        return ResponseFactory::success(
-            'profile_type_set_successfully',
-            UserDataResponse::withDocument($user)
-        );
+        return response()->json(UserDataResponse::withDocument($user), 200);
     }
 
     public function authenticationMethods()
@@ -147,25 +126,25 @@ class UserController extends Controller
             $methods[] = 'email';
         }
 
-        return ResponseFactory::success('available_authentication_methods', ['methods' => $methods]);
+        return response()->json($methods, 200);
     }
 
     public function self()
     {
         $session = User::session();
         if (!$session) {
-            return ResponseFactory::error('user_not_authenticated', null, null, 401);
+            return response()->json(['message' => 'User not authenticated'], 401);
         }
 
         $user = User::auth();
 
         if (!$user) {
-            return ResponseFactory::error('user_not_authenticated', null, null, 401);
+            return response()->json(['message' => 'User not authenticated'], 401);
         }
 
         $session = User::session();
 
-        return ResponseFactory::success('user_found', [
+        return response()->json([
             ...UserDataResponse::withDocument($user),
             'authenticated' => $session->authenticated,
         ]);
@@ -176,19 +155,15 @@ class UserController extends Controller
         $user = $this->userQueryService->getInfo($uuid);
 
         if (!$user) {
-            return ResponseFactory::error('user_not_found', null, null, 404);
+            return response()->json(['message' => 'User not found'], 404);
         }
 
-        return ResponseFactory::success('user_found', $user);
+        return response()->json($user, 200);
     }
 
     public function picture($userUuid, $pictureUuid = null)
     {
         $result = $this->pictureService->getPicture($userUuid, $pictureUuid);
-
-        if ($result instanceof Error) {
-            return ResponseFactory::create($result);
-        }
 
         return response($result->data['file'], 200)->header('Content-Type', $result->data['mime']);
     }
@@ -198,16 +173,12 @@ class UserController extends Controller
         $user = User::auth();
 
         if (!$user) {
-            return ResponseFactory::error('user_not_authenticated', null, null, 401);
+            return response()->json(['message' => 'User not authenticated'], 401);
         }
 
         $result = $this->pictureService->uploadPicture($request, $user);
 
-        if ($result instanceof Error) {
-            return ResponseFactory::error('error_uploading_image', null, $result);
-        }
-
-        return ResponseFactory::success('image_uploaded_successfully', $result, 201);
+        return response()->json($result, 201);
     }
 
     public function exists(Request $request)
@@ -219,15 +190,15 @@ class UserController extends Controller
         $user = $this->userQueryService->exists($validated['number']);
 
         if (!$user) {
-            return ResponseFactory::error('user_not_found', null, null, 404);
+            return response()->json(['message' => 'User not authenticated'], 401);
         }
 
-        return ResponseFactory::success('user_found', $user);
+        return response()->json($user, 200);
     }
 
     public function codeLength()
     {
-        return ResponseFactory::success('code_length', ['length' => AuthCode::LENGTH]);
+        return response()->json(['length' => AuthCode::LENGTH], 200);
     }
 
     public function profileType()
@@ -235,9 +206,6 @@ class UserController extends Controller
         $user = User::auth();
         $user->update(['profile_type' => request('profile_type')]);
 
-        return ResponseFactory::success(
-            'profile_type_updated',
-            UserDataResponse::withDocument($user),
-        );
+        return response()->json(UserDataResponse::withDocument($user), 200);
     }
 }

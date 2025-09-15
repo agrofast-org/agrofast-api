@@ -28,7 +28,7 @@ class RequestController extends Controller
             ->get()
         ;
 
-        return ResponseFactory::success('requests_found', $requests);
+        return response()->json($requests, 200);
     }
 
     public function store(StoreRequestRequest $request): JsonResponse
@@ -42,9 +42,7 @@ class RequestController extends Controller
         ;
 
         if (!$machinery->active) {
-            return ResponseFactory::error('machinery_not_found', [
-                'machine_uuid' => __('validation.custom.request.machinery_not_found'),
-            ]);
+            return response()->json(['message' => 'Machinery not found'], 404);
         }
 
         $request = TransportRequest::where('user_id', $user->id)
@@ -53,9 +51,7 @@ class RequestController extends Controller
         ;
 
         if (!empty($request)) {
-            return ResponseFactory::error('request_already_exists', [
-                'machine_uuid' => __('validation.custom.request.request_already_exists'),
-            ]);
+            return response()->json(['message' => 'Request already exists'], 409);
         }
 
         $data['uuid'] = Str::uuid()->toString();
@@ -83,7 +79,7 @@ class RequestController extends Controller
             ]);
         }
 
-        return ResponseFactory::success('request_created', $transportRequest);
+        return response()->json($transportRequest, 201);
     }
 
     public function show(string $uuid): JsonResponse
@@ -99,7 +95,7 @@ class RequestController extends Controller
         $data = $transportRequest->toArray();
         $data['payment'] = $pixPayment;
 
-        return ResponseFactory::success('request_found', $data);
+        return response()->json($data, 200);
     }
 
     public function updatePaymentStatus(string $uuid): JsonResponse
