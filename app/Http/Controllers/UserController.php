@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\ResponseFactory;
 use App\Http\Requests\User\UserLoginRequest;
 use App\Http\Requests\User\UserProfileTypeRequest;
 use App\Http\Requests\User\UserStoreRequest;
@@ -83,7 +82,7 @@ class UserController extends Controller
 
     public function login(UserLoginRequest $request)
     {
-        $credentials = $request->only(['email', 'password', 'remember']);
+        $credentials = $request->validated();
 
         $result = $this->authService->login($credentials, $request);
 

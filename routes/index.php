@@ -3,7 +3,7 @@
 use App\Http\Controllers\BrowserAgentController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('lang')->group(function () {
+Route::middleware(['response.error', 'lang'])->group(function () {
     Route::fallback(function () {
         return response()->json(['message' => 'Endpoint not found'], 404);
     });

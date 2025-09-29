@@ -11,26 +11,27 @@ class LanguageMiddleware
 {
     public function handle(Request $request, \Closure $next)
     {
-        if (User::auth()) {
-            try {
-                $candidate = Locale::format(User::auth()->language);
-            } catch (\Exception $e) {
-                $candidate = Locale::format(config('app.fallback_locale', 'en'));
-            }
-        } else {
-            $raw = $request->header('Accept-Language')
-            ?: $request->input('language');
+        // if (User::auth()) {
+        //     try {
+        //         $candidate = Locale::format(User::auth()->language);
+        //     } catch (\Exception $e) {
+        //         $candidate = Locale::format(config('app.fallback_locale', 'en'));
+        //     }
+        // } else {
+        //     $raw = $request->header('Accept-Language')
+        //     ?: $request->input('language');
 
-            if ($raw) {
-                $candidate = Locale::format(explode(',', $raw)[0]);
-            } else {
-                $candidate = Locale::format(config('app.fallback_locale', 'en'));
-            }
-        }
+        //     if ($raw) {
+        //         $candidate = Locale::format(explode(',', $raw)[0]);
+        //     } else {
+        //         $candidate = Locale::format(config('app.fallback_locale', 'en'));
+        //     }
+        // }
 
-        $locale = Locale::resolve($candidate);
+        // $locale = Locale::resolve($candidate);
 
-        App::setLocale($locale);
+        // App::setLocale($locale);
+        App::setLocale('pt_BR');
 
         return $next($request);
     }
