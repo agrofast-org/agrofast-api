@@ -17,6 +17,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $mime_type
  * @property string $size
  * @property int    $uploaded_by
+ * @property bool   $attached
  * @property bool   $active
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -39,11 +40,13 @@ class File extends Model
         'mime_type',
         'size',
         'uploaded_by',
+        'attached',
         'active',
     ];
 
     protected $casts = [
         'active' => 'boolean',
+        'attached' => 'boolean',
     ];
 
     protected $dates = [

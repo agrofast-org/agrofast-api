@@ -129,19 +129,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
         });
     });
 
-    Route::prefix('/storage')->group(function () {
-        Route::get('/', function () {
-            return response()->json([
-                'message' => 'Agrofast data bucket',
-            ], 200);
-        });
-
-        Route::post('/upload', [AssetController::class, 'upload']);
-        Route::get('/all', [AssetController::class, 'all']);
-        Route::get('/last', [AssetController::class, 'last']);
-    });
-
     Route::middleware(['dev.env'])->group(function () {
-        include __DIR__ . '/testing/email.php';
+        include __DIR__.'/testing/email.php';
     });
 });

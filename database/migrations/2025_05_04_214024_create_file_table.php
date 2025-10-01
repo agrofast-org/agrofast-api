@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('size');
             $table->foreignId('uploaded_by')->nullable()->constrained('hr.user')->onDelete('set null');
             $table->boolean('active')->default(true);
+            $table->boolean('attached')->default(false);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('inactivated_at')->nullable();
