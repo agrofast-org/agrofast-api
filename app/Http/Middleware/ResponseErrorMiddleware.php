@@ -3,7 +3,6 @@
 namespace App\Http\Middleware;
 
 use App\Exception\InvalidFormException;
-use App\Models\System\ErrorLog;
 use Illuminate\Http\Request;
 
 class ResponseErrorMiddleware
@@ -31,14 +30,6 @@ class ResponseErrorMiddleware
                 'errors' => $e->getErrors(),
             ], 422);
         } catch (\Throwable $e) {
-            // ErrorLog::create([
-            //     'url' => $request->url(),
-            //     'error_message' => $e->getMessage(),
-            //     'stack_trace' => $e->getTraceAsString(),
-            //     'request_data' => $request->all(),
-            // ]);
-            // logger()->error($e);
-
             return response()->json([
                 'message' => 'An error occurred',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
