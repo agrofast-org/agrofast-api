@@ -47,10 +47,6 @@ class DocumentController extends Controller
     {
         $user = User::auth();
 
-        if (!$user) {
-            return response()->json(['message' => 'User not found'], 404);
-        }
-
         $document = Document::where(['uuid' => $uuid, 'user_id' => $user->id])->first();
 
         if (!$document) {

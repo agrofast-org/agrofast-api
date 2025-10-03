@@ -130,16 +130,7 @@ class UserController extends Controller
 
     public function self()
     {
-        $session = User::session();
-        if (!$session) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
-
         $user = User::auth();
-
-        if (!$user) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
 
         $session = User::session();
 
@@ -164,40 +155,26 @@ class UserController extends Controller
     {
         $result = $this->pictureService->getPicture($userUuid, $pictureUuid);
 
-        return response($result->data['file'], 200)->header('Content-Type', $result->data['mime']);
+        return response($result['file'], 200)->header('Content-Type', $result['mime']);
     }
 
     public function postPicture(Request $request)
     {
         $user = User::auth();
 
-        if (!$user) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
-
         $result = $this->pictureService->uploadPicture($request, $user);
 
         return response()->json($result, 201);
     }
 
-    public function exists(Request $request)
+    public function exists()
     {
-        $validated = $request->validate([
-            'number' => 'required|string|max:255',
-        ]);
-
-        $user = $this->userQueryService->exists($validated['number']);
-
-        if (!$user) {
-            return response()->json(['message' => 'User not authenticated'], 401);
-        }
-
-        return response()->json($user, 200);
+        return response()->json(["message" => "Not implemented"], 501);
     }
 
     public function codeLength()
     {
-        return response()->json(['length' => AuthCode::LENGTH], 200);
+        return response()->json(AuthCode::LENGTH, 200);
     }
 
     public function profileType()

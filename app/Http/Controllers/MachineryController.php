@@ -39,6 +39,7 @@ class MachineryController extends Controller
             foreach ($files as $file) {
                 $machineries->addPicture($file->id);
             }
+            File::markAsAttached($data['pictures']);
         }
 
         return response()->json($machineries, 201);

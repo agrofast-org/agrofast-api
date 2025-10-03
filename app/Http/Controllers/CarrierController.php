@@ -39,6 +39,7 @@ class CarrierController extends Controller
             foreach ($files as $file) {
                 $carrier->addDocument($file->id);
             }
+            File::markAsAttached($data['documents']);
         }
 
         if ($data['pictures']) {
@@ -50,6 +51,7 @@ class CarrierController extends Controller
             foreach ($files as $file) {
                 $carrier->addPicture($file->id);
             }
+            File::markAsAttached($data['pictures']);
         }
 
         return response()->json($carrier, 201);

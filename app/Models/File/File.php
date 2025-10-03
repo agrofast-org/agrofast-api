@@ -2,6 +2,7 @@
 
 namespace App\Models\File;
 
+use App\Models\Hr\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -54,4 +55,17 @@ class File extends Model
         'updated_at',
         'inactivated_at',
     ];
+
+    /**
+     * Summary of markAsAttached.
+     *
+     * @param string[] $uuidList
+     */
+    public static function markAsAttached(array $uuidList)
+    {
+        return self::where('uploaded_by', User::auth()->id)
+            ->whereIn('uuid', $uuidList)
+            ->update(['attached' => true])
+        ;
+    }
 }
