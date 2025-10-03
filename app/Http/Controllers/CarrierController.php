@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\ResponseFactory;
 use App\Http\Requests\Carrier\StoreCarrierRequest;
 use App\Http\Requests\Carrier\UpdateCarrierRequest;
 use App\Models\File\File;

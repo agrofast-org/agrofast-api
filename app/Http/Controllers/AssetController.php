@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Factories\FileFactory;
-use App\Factories\ResponseFactory;
 use App\Http\Requests\Assets\FileAttachmentRequest;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;

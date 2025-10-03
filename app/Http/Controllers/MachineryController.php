@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\ResponseFactory;
 use App\Http\Requests\Machinery\StoreMachineryRequest;
 use App\Http\Requests\Machinery\UpdateMachineryRequest;
 use App\Models\File\File;

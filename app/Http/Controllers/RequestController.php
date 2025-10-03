@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\ResponseFactory;
 use App\Http\Requests\Request\StoreRequestRequest;
 use App\Models\Hr\PixPayment;
 use App\Models\Hr\User;

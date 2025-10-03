@@ -7,8 +7,5 @@ class CarrierSeeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
-    {
-
-    }
+    public function run(): void {}
 }

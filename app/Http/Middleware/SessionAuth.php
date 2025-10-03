@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use App\Enums\UserError;
 use App\Models\Hr\User;
 
 class SessionAuth
@@ -11,8 +10,8 @@ class SessionAuth
     {
         $session = User::session();
 
-        if ($session instanceof UserError) {
-            return response()->json(['message' => $session->value], 401);
+        if (!$session) {
+            return response()->json(['code' => User::getLastError()], 401);
         }
 
         return $next($request);

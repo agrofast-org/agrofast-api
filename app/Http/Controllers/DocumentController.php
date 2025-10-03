@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Factories\DocumentFactory;
-use App\Factories\ResponseFactory;
 use App\Http\Requests\User\DocumentStoreRequest;
 use App\Http\Requests\User\DocumentUpdateRequest;
 use App\Models\Hr\Document;

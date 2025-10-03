@@ -26,6 +26,7 @@ class FileFactory
             'mime_type' => $file->getClientMimeType(),
             'size' => $file->getSize(),
             'uploaded_by' => User::auth()->id,
+            'attached' => false,
             'active' => true,
         ]);
     }
