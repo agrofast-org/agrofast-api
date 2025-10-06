@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Exception\InvalidFormException;
+use App\Exception\InvalidRequestException;
 use App\Models\System\ErrorLog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +24,7 @@ class DatabaseTransaction
         try {
             $response = $next($request);
 
-            if (isset($response->exception)) {
+            if (isset($response->exception) && !($response->exception instanceof InvalidFormException || $response->exception instanceof InvalidRequestException)) {
                 DB::rollBack();
             } else {
                 DB::commit();

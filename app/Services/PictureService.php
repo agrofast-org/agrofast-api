@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
+use App\Factories\FileFactory;
 use App\Http\Responses\User\UserDataResponse;
 use App\Models\Error;
 use App\Models\File\File;
 use App\Models\Hr\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class PictureService
 {
@@ -42,35 +42,22 @@ class PictureService
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $uuid = Str::uuid();
-
         $file = $validated['image'];
-        $fileName = $uuid.'.'.$file->getClientOriginalExtension();
         $disk = env('FILESYSTEM_DISK', 's3');
 
-        $path = $file->storeAs("uploads/pictures/{$user->uuid}", $fileName, $disk);
-        if (!$path) {
+        $fileRecord = FileFactory::create($file, "pictures/{$user->uuid}");
+        if (!$fileRecord) {
             return throw new \Exception('failed_to_store_image');
         }
 
-        $fileRecord = File::create([
-            'uuid' => $uuid,
-            'name' => $file->getClientOriginalName(),
-            'path' => $path,
-            'mime_type' => $file->getMimeType(),
-            'size' => $file->getSize(),
-            'uploaded_by' => $user->id,
-        ]);
-
-        $appUrl = env('APP_URL');
         $user->update([
-            'profile_picture' => "{$appUrl}/{$path}",
+            'profile_picture' => $fileRecord->path,
         ]);
 
         if (!$fileRecord) {
-            Storage::disk($disk)->delete($path);
+            Storage::disk($disk)->delete($fileRecord->path);
 
-            return throw new \Exception('failed_to_save_image_record');
+            throw new \Exception('failed_to_save_image_record');
         }
 
         return ['user' => UserDataResponse::format($user)];

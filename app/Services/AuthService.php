@@ -159,10 +159,10 @@ class AuthService
             }
             $authCode->update(['attempts' => $updatedAttempts]);
 
-            throw new InvalidRequestException('incorrect_authentication_code', [
+            throw new InvalidRequestException([
                 'code' => 'incorrect_authentication_code',
                 'attempts' => AuthCode::MAX_ATTEMPTS - $updatedAttempts,
-            ], 400);
+            ], 'incorrect_authentication_code', 400);
         }
 
         $authCode->update(['active' => false]);

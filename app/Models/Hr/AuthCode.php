@@ -54,7 +54,7 @@ class AuthCode extends Model
     ];
 
     protected $attributes = [
-        'attempts' => 0,
+        // 'attempts' => 0,
         'active' => true,
     ];
 

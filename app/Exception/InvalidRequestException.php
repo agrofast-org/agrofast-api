@@ -4,16 +4,16 @@ namespace App\Exception;
 
 class InvalidRequestException extends \Exception
 {
-    protected array $errors;
+    protected array $data;
 
-    public function __construct($errors, $message = 'Invalid form data', $code = 422, ?\Exception $previous = null)
+    public function __construct(array $data, string $message = 'Invalid request', $code = 422, ?\Exception $previous = null)
     {
         parent::__construct($message, $code, $previous);
-        $this->errors = $errors;
+        $this->data = $data;
     }
 
-    public function getErrors()
+    public function data()
     {
-        return $this->errors;
+        return $this->data;
     }
 }

@@ -37,7 +37,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             // Route::get('/sms', [DebugController::class, 'sendSms']);
         });
         Route::middleware(['dev.env'])->group(function () {
-            include __DIR__ . '/testing/email.php';
+            include __DIR__.'/testing/email.php';
         });
     });
 
@@ -51,6 +51,10 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             Route::get('/code-length', [UserController::class, 'codeLength']);
             Route::post('/sign-in', [UserController::class, 'login']);
             Route::post('/sign-up', [UserController::class, 'store']);
+            Route::middleware(['auth.basic'])->group(function () {
+                Route::get('/', [UserController::class, 'authenticate']);
+                Route::get('/methods', [UserController::class, 'authenticationMethods']);
+            });
             Route::middleware(['auth.basic'])->get('/resend-code', [UserController::class, 'resendCode']);
         });
     });
@@ -69,10 +73,6 @@ Route::middleware(['response.error', 'lang'])->group(function () {
                 });
             });
             Route::get('/exists', [UserController::class, 'exists']);
-            Route::middleware(['auth.basic'])->prefix('/auth')->group(function () {
-                Route::get('/', [UserController::class, 'authenticate']);
-                Route::get('/methods', [UserController::class, 'authenticationMethods']);
-            });
         });
         Route::middleware(['auth'])->group(function () {
             // Chat routes
@@ -118,17 +118,16 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             //     Route::put('/update', [OfferController::class, 'updateOffer']);
             //     Route::delete('/cancel', [OfferController::class, 'cancelOffer']);
             // });
+        });
+    });
+    Route::middleware([])->prefix('/uploads')->group(function () {
+        Route::prefix('/pictures/{userUuid}')->group(function () {
+            Route::get('/{pictureUuid?}', [UserController::class, 'picture']);
+        });
 
-            Route::middleware([])->prefix('/uploads')->group(function () {
-                Route::prefix('/pictures/{userUuid}')->group(function () {
-                    Route::get('/{pictureUuid?}', [UserController::class, 'picture']);
-                });
-
-                Route::prefix('/attachments')->group(function () {
-                    Route::post('/', [AssetController::class, 'store']);
-                    Route::get('/{uuid}', [AssetController::class, 'show']);
-                });
-            });
+        Route::prefix('/attachments')->group(function () {
+            Route::middleware(['db.safe', 'fingerprint', 'auth'])->post('/', [AssetController::class, 'store']);
+            Route::get('/{uuid}', [AssetController::class, 'show']);
         });
     });
 });

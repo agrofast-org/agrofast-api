@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class FileFactory
 {
-    public static function create($file, string $type): File
+    public static function create($file, string $type): false|File
     {
         $uuid = Str::uuid();
 
@@ -16,13 +16,16 @@ class FileFactory
         $disk = env('FILESYSTEM_DISK', 's3');
 
         $path = $file->storeAs("/uploads/{$type}", $fileName, $disk);
+        if (!$path) {
+            return false;
+        }
 
         $appUrl = env('APP_URL');
 
         return File::create([
             'uuid' => $uuid,
             'name' => $file->getClientOriginalName(),
-            'path' => "{$appUrl}/{$path}",
+            'path' => "{$appUrl}/api/{$path}",
             'mime_type' => $file->getClientMimeType(),
             'size' => $file->getSize(),
             'uploaded_by' => User::auth()->id,
