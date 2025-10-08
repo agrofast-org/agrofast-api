@@ -67,7 +67,7 @@ class PaymentService
     /**
      * Consulta o status de um pagamento por ID usando a API REST do Mercado Pago.
      *
-     * @return array{status: string, status_detail: null|string, raw: array}
+     * @return array status: string, status_detail: null|string, raw: array}
      *
      * @throws \RuntimeException
      */
