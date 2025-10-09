@@ -14,13 +14,15 @@ class UserLoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => 'required|email|exists:pgsql.hr.user|max:255',
-            'password' => [
-                'required',
-                'string',
-                'min:8',
-                'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/',
-            ],
+            'email' => 'required|email|exists:pgsql.hr.user',
+            'password' => 'required|string|min:8',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'email.exists' => __('passwords.user'),
         ];
     }
 }

@@ -33,19 +33,7 @@ class DatabaseTransaction
             return $response;
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            ErrorLog::create([
-                'url' => $request->url(),
-                'error_message' => $e->getMessage(),
-                'stack_trace' => $e->getTraceAsString(),
-                'request_data' => $request->all(),
-            ]);
-            logger()->error($e);
-
-            return response()->json([
-                'message' => 'An error occurred',
-                'error' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
-            ], 500);
+            throw $e;
         }
     }
 }

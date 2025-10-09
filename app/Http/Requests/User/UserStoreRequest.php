@@ -32,6 +32,13 @@ class UserStoreRequest extends FormRequest
         ];
     }
 
+    public function messages(): array
+    {
+        return [
+            'password.regex' => __('passwords.regex'),
+        ];
+    }
+
     protected function passedValidation(): void
     {
         $this->replace([

@@ -50,6 +50,7 @@ class PictureService
             return throw new \Exception('failed_to_store_image');
         }
 
+        $fileRecord->update(['attached' => true]);
         $user->update([
             'profile_picture' => $fileRecord->path,
         ]);

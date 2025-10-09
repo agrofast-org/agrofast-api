@@ -4,17 +4,18 @@ namespace App\Http\Middleware;
 
 use App\Exception\InvalidFormException;
 use App\Exception\InvalidRequestException;
-use Illuminate\Http\Request;
+use App\Support\Traits\HandlesJsonErrors;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 class ResponseErrorMiddleware
 {
+    use HandlesJsonErrors;
+
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     *
-     * @return mixed
+     * @param mixed $request
      */
     public function handle($request, \Closure $next)
     {
@@ -26,25 +27,18 @@ class ResponseErrorMiddleware
             }
 
             return $response;
-        } catch (InvalidFormException $e) {
-            return $this->returnErrors($e);
-        } catch (ValidationException $e) {
-            return $this->returnErrors($e);
+        } catch (InvalidFormException|ValidationException $e) {
+            return $this->returnValidationErrors($e);
         } catch (InvalidRequestException $e) {
-            return response()->json($e->data(), $e->getCode() ?: 400);
+            return response()->json(
+                $e->data(),
+                $this->validHttpCode($e->getCode(), Response::HTTP_UNPROCESSABLE_ENTITY)
+            );
         } catch (\Throwable $e) {
             return response()->json([
-                'message' => 'An error occurred',
+                'message' => 'An unexpected error occurred',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
-            ], $response->status() ?: 500);
+            ], $this->validHttpCode($e->getCode(), Response::HTTP_INTERNAL_SERVER_ERROR));
         }
-    }
-
-    protected function returnErrors(InvalidFormException|ValidationException $e)
-    {
-        return response()->json([
-            'message' => $e->getMessage(),
-            'errors' => $e->errors(),
-        ], $e->status ?? 422);
     }
 }

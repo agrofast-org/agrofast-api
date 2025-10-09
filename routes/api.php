@@ -126,7 +126,10 @@ Route::middleware(['response.error', 'lang'])->group(function () {
         });
 
         Route::prefix('/attachments')->group(function () {
-            Route::middleware(['db.safe', 'fingerprint', 'auth'])->post('/', [AssetController::class, 'store']);
+            Route::middleware(['db.safe', 'fingerprint', 'auth'])->group(function () {
+                Route::get('/', [AssetController::class, 'recent']);
+                Route::post('/', [AssetController::class, 'store']);
+            });
             Route::get('/{uuid}', [AssetController::class, 'show']);
         });
     });
