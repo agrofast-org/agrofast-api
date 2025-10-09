@@ -20,5 +20,6 @@ return [
     'token' => 'Este token de redefinição de senha é inválido.',
     'user' => 'Não encontramos um usuário com esse endereço de e-mail.',
     'regex' => 'A senha deve conter pelo menos uma letra e um número.',
+    'one_time_password' => 'A senha de uso único é inválida.',
 
 ];

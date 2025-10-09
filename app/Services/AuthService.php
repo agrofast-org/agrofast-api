@@ -31,19 +31,13 @@ class AuthService
     public function login(array $credentials, UserLoginRequest $request): array
     {
         $user = User::where('email', $credentials['email'])->first();
-        if (!$user) {
-            throw new ValidationException('user_not_found');
-        }
 
         if (!Hash::check($credentials['password'], $user->password)) {
-            throw new InvalidFormException(['password' => __('validation.current_password')], __('validation.current_password'));
+            throw new InvalidFormException(__('validation.current_password'), ['password' => __('validation.current_password')]);
         }
 
         $browserFingerprint = $request->header('Browser-Agent');
         $browserAgent = BrowserAgent::where('fingerprint', $browserFingerprint)->first();
-        if (!$browserAgent) {
-            throw new ValidationException('browser_agent_not_found');
-        }
 
         $remember = RememberBrowser::where('user_id', $user->id)
             ->where('browser_agent_id', $browserAgent->id)
@@ -84,14 +78,8 @@ class AuthService
     public function resendCode()
     {
         $user = User::auth();
-        if (!$user) {
-            throw new ValidationException('user_not_authenticated');
-        }
 
         $session = User::session();
-        if (!$session) {
-            throw new ValidationException('session_not_found');
-        }
 
         $authCode = AuthCode::where('id', $session->auth_code_id)
             ->where('auth_type', AuthCode::EMAIL)
@@ -130,14 +118,8 @@ class AuthService
     public function authenticate(Request $request)
     {
         $user = User::auth();
-        if (!$user) {
-            throw new ValidationException('user_not_authenticated');
-        }
 
         $session = User::session();
-        if (!$session) {
-            throw new ValidationException('session_not_found');
-        }
 
         $authCode = AuthCode::where('id', $session->auth_code_id)
             ->where('auth_type', AuthCode::EMAIL)
@@ -159,10 +141,10 @@ class AuthService
             }
             $authCode->update(['attempts' => $updatedAttempts]);
 
-            throw new InvalidRequestException([
+            throw new InvalidRequestException('incorrect_authentication_code', [
                 'code' => 'incorrect_authentication_code',
                 'attempts' => AuthCode::MAX_ATTEMPTS - $updatedAttempts,
-            ], 'incorrect_authentication_code', 400);
+            ], 400);
         }
 
         $authCode->update(['active' => false]);

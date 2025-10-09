@@ -3,6 +3,7 @@
 namespace App\Support\Traits;
 
 use App\Exception\InvalidFormException;
+use App\Exception\InvalidRequestException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,6 +17,17 @@ trait HandlesJsonErrors
         return response()->json([
             'message' => $e->getMessage(),
             'errors' => $e->errors(),
+        ], $this->validHttpCode($e->status ?? $e->getCode(), Response::HTTP_UNPROCESSABLE_ENTITY));
+    }
+
+    /**
+     * Format and return request-related errors.
+     */
+    protected function returnRequestErrors(InvalidRequestException $e)
+    {
+        return response()->json([
+            'message' => $e->getMessage(),
+            'data' => $e->data(),
         ], $this->validHttpCode($e->status ?? $e->getCode(), Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 

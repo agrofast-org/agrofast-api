@@ -5,11 +5,16 @@ namespace App\Http\Middleware;
 use App\Exception\InvalidFormException;
 use App\Exception\InvalidRequestException;
 use App\Models\System\ErrorLog;
+use App\Support\Traits\IgnoresExceptionOnTransaction;
+use Dotenv\Exception\ValidationException;
+use Illuminate\Validation\ValidationException as ValidationValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseTransaction
 {
+    use IgnoresExceptionOnTransaction;
+
     /**
      * Handle an incoming request.
      *
@@ -24,7 +29,7 @@ class DatabaseTransaction
         try {
             $response = $next($request);
 
-            if (isset($response->exception) && !($response->exception instanceof InvalidFormException || $response->exception instanceof InvalidRequestException)) {
+            if (isset($response->exception) && !$this->shouldIgnoreException($response->exception)) {
                 DB::rollBack();
             } else {
                 DB::commit();

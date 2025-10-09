@@ -19,5 +19,6 @@ return [
     'token' => 'Este token de restablecimiento de contraseña no es válido.',
     'user' => "No podemos encontrar un usuario con esa dirección de correo electrónico.",
     'regex' => 'La contraseña debe contener al menos una letra y un número.',
+    'one_time_password' => 'La contraseña de un solo uso no es válida.',
 
 ];

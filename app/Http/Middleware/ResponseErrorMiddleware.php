@@ -5,6 +5,8 @@ namespace App\Http\Middleware;
 use App\Exception\InvalidFormException;
 use App\Exception\InvalidRequestException;
 use App\Support\Traits\HandlesJsonErrors;
+use App\Utils;
+use Dotenv\Exception\ValidationException as ExceptionValidationException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -27,14 +29,18 @@ class ResponseErrorMiddleware
             }
 
             return $response;
-        } catch (InvalidFormException|ValidationException $e) {
+        } catch (ExceptionValidationException $e) {
+            return $this->returnRequestErrors(new InvalidRequestException($e->getMessage()));
+        } catch (ValidationException $e) {
+            return $this->returnValidationErrors($e);
+        } catch (InvalidFormException $e) {
             return $this->returnValidationErrors($e);
         } catch (InvalidRequestException $e) {
-            return response()->json(
-                $e->data(),
-                $this->validHttpCode($e->getCode(), Response::HTTP_UNPROCESSABLE_ENTITY)
-            );
+            return $this->returnRequestErrors($e);
         } catch (\Throwable $e) {
+            if (!Utils::isProduction()) {
+                throw $e;
+            }    
             return response()->json([
                 'message' => 'An unexpected error occurred',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
