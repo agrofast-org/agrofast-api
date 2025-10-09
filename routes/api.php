@@ -41,6 +41,10 @@ Route::middleware(['response.error', 'lang'])->group(function () {
         });
     });
 
+    Route::middleware([])->prefix('/webhook')->group(function () {
+        Route::prefix('/mercado-pago')->group(function () {});
+    });
+
     Route::middleware([])->prefix('/auth')->group(function () {
         Route::prefix('fingerprint')->group(function () {
             Route::get('/', [BrowserAgentController::class, 'makeFingerprint']);
