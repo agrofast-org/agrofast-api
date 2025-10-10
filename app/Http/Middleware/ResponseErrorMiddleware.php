@@ -32,7 +32,7 @@ class ResponseErrorMiddleware
         } catch (ExceptionValidationException $e) {
             return $this->returnRequestErrors(new InvalidRequestException($e->getMessage()));
         } catch (ValidationException $e) {
-            return $this->returnValidationErrors($e);
+            return $this->returnValidationErrors($e);   
         } catch (InvalidFormException $e) {
             return $this->returnValidationErrors($e);
         } catch (InvalidRequestException $e) {

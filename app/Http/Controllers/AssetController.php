@@ -69,4 +69,58 @@ class AssetController extends Controller
 
         return response($file, 200)->header('Content-Type', $type);
     }
+
+    public function miniature(string $uuid)
+    {
+        $path = "uploads/attachments/{$uuid}";
+        $file = Storage::get($path);
+        if (empty($file)) {
+            return response()->json(['message' => 'No images found'], 404);
+        }
+
+        $mime = Storage::mimeType($path) ?: ($file->mime_type ?? null);
+        if (!$mime || explode('/', $mime)[0] !== 'image') {
+            return response()->json(['message' => 'Cannot get file miniature as it is not an image'], 400);
+        }
+    
+        $thumbPath = "uploads/thumbnails/{$uuid}.jpg";
+        if (Storage::exists($thumbPath)) {
+            $thumb = Storage::get($thumbPath);
+            return response($thumb, 200)->header('Content-Type', 'image/jpeg');
+        }
+    
+        $contents = Storage::get($path);
+    
+        try {
+            if (function_exists('imagecreatefromstring')) {
+                $src = imagecreatefromstring($contents);
+                if ($src === false) {
+                    return response()->json(['message' => 'Cannot create image from source'], 500);
+                }
+                $origW = imagesx($src);
+                $origH = imagesy($src);
+                $max = 150;
+                $ratio = min($max / $origW, $max / $origH, 1);
+                $newW = (int) floor($origW * $ratio);
+                $newH = (int) floor($origH * $ratio);
+                $dst = imagecreatetruecolor($newW, $newH);
+    
+                imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
+    
+                ob_start();
+                imagejpeg($dst, null, 80);
+                $thumb = ob_get_clean();
+    
+                imagedestroy($src);
+                imagedestroy($dst);
+            } else {
+                return response()->json(['message' => 'No supported image library (Imagick or GD) available'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error generating thumbnail', 'error' => $e->getMessage()], 500);
+        }
+    
+        Storage::put($thumbPath, $thumb);
+        return response($thumb, 200)->header('Content-Type', 'image/jpeg');
+    }
 }

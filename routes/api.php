@@ -135,6 +135,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
                 Route::post('/', [AssetController::class, 'store']);
             });
             Route::get('/{uuid}', [AssetController::class, 'show']);
+            Route::get('/{uuid}/miniature', [AssetController::class, 'miniature']);
         });
     });
 });

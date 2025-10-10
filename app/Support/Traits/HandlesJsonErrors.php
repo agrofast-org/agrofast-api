@@ -25,10 +25,9 @@ trait HandlesJsonErrors
      */
     protected function returnRequestErrors(InvalidRequestException $e)
     {
-        return response()->json([
-            'message' => $e->getMessage(),
-            'data' => $e->data(),
-        ], $this->validHttpCode($e->status ?? $e->getCode(), Response::HTTP_UNPROCESSABLE_ENTITY));
+        $data = $e->data();
+        $data['message'] = $e->getMessage();
+        return response()->json($data, $this->validHttpCode($e->status ?? $e->getCode(), Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 
     /**
