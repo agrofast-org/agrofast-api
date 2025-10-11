@@ -27,11 +27,15 @@ trait HandlesJsonErrors
     {
         $data = $e->data();
         $data['message'] = $e->getMessage();
+
         return response()->json($data, $this->validHttpCode($e->status ?? $e->getCode(), Response::HTTP_UNPROCESSABLE_ENTITY));
     }
 
     /**
      * Ensures that the HTTP status code is valid.
+     *
+     * @param mixed $code
+     * @param mixed $fallback
      */
     protected function validHttpCode($code, $fallback = 500): int
     {

@@ -32,7 +32,7 @@ class ResponseErrorMiddleware
         } catch (ExceptionValidationException $e) {
             return $this->returnRequestErrors(new InvalidRequestException($e->getMessage()));
         } catch (ValidationException $e) {
-            return $this->returnValidationErrors($e);   
+            return $this->returnValidationErrors($e);
         } catch (InvalidFormException $e) {
             return $this->returnValidationErrors($e);
         } catch (InvalidRequestException $e) {
@@ -40,7 +40,8 @@ class ResponseErrorMiddleware
         } catch (\Throwable $e) {
             if (!Utils::isProduction()) {
                 throw $e;
-            }    
+            }
+
             return response()->json([
                 'message' => 'An unexpected error occurred',
                 'error' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',

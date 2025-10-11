@@ -11,6 +11,6 @@ class Utils
 
     public static function isProduction(): bool
     {
-        return (env('APP_ENV') === 'production' || env('ENVIRONMENT') === 'production');
+        return env('APP_ENV') === 'production' || env('ENVIRONMENT') === 'production';
     }
 }

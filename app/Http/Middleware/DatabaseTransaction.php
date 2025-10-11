@@ -2,12 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Exception\InvalidFormException;
-use App\Exception\InvalidRequestException;
-use App\Models\System\ErrorLog;
 use App\Support\Traits\IgnoresExceptionOnTransaction;
-use Dotenv\Exception\ValidationException;
-use Illuminate\Validation\ValidationException as ValidationValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -38,6 +33,7 @@ class DatabaseTransaction
             return $response;
         } catch (\Throwable $e) {
             DB::rollBack();
+
             throw $e;
         }
     }

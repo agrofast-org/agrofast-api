@@ -82,15 +82,16 @@ class AssetController extends Controller
         if (!$mime || explode('/', $mime)[0] !== 'image') {
             return response()->json(['message' => 'Cannot get file miniature as it is not an image'], 400);
         }
-    
+
         $thumbPath = "uploads/thumbnails/{$uuid}.jpg";
         if (Storage::exists($thumbPath)) {
             $thumb = Storage::get($thumbPath);
+
             return response($thumb, 200)->header('Content-Type', 'image/jpeg');
         }
-    
+
         $contents = Storage::get($path);
-    
+
         try {
             if (function_exists('imagecreatefromstring')) {
                 $src = imagecreatefromstring($contents);
@@ -104,13 +105,13 @@ class AssetController extends Controller
                 $newW = (int) floor($origW * $ratio);
                 $newH = (int) floor($origH * $ratio);
                 $dst = imagecreatetruecolor($newW, $newH);
-    
+
                 imagecopyresampled($dst, $src, 0, 0, 0, 0, $newW, $newH, $origW, $origH);
-    
+
                 ob_start();
                 imagejpeg($dst, null, 80);
                 $thumb = ob_get_clean();
-    
+
                 imagedestroy($src);
                 imagedestroy($dst);
             } else {
@@ -119,8 +120,9 @@ class AssetController extends Controller
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error generating thumbnail', 'error' => $e->getMessage()], 500);
         }
-    
+
         Storage::put($thumbPath, $thumb);
+
         return response($thumb, 200)->header('Content-Type', 'image/jpeg');
     }
 }

@@ -169,7 +169,7 @@ class UserController extends Controller
 
     public function exists()
     {
-        return response()->json(["message" => "Not implemented"], 501);
+        return response()->json(['message' => 'Not implemented'], 501);
     }
 
     public function codeLength()
