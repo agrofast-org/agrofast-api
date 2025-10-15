@@ -7,6 +7,6 @@ set -e
 
 ./script/queue.sh
 
-./script/schedule.sh
+# ./script/schedule.sh
 
 ./script/serve.sh
