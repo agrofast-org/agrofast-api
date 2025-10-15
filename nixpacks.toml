@@ -1,8 +1,13 @@
-[stack]
-id = "php"
+[phases.setup]
+nixPkgs = ["php", "composer", "nodejs_22"]
 
-[project]
-type = "php"
+[phases.install]
+cmds = [
+  "composer install --no-dev --optimize-autoloader"
+]
 
-[commands]
-run = "./ci.sh"
+[phases.build]
+cmds = []
+
+[start]
+cmd = "php artisan serve --host=0.0.0.0 --port=${PORT:-8080}"
