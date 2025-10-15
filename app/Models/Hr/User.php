@@ -4,6 +4,7 @@ namespace App\Models\Hr;
 
 use App\Enums\UserError;
 use App\Models\DynamicQuery;
+use App\Models\LastError;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -25,8 +26,10 @@ use Illuminate\Notifications\Notifiable;
  * @property string      $password
  * @property string      $language
  * @property null|string $profile_type
+ * @property bool        $email_two_factor_auth
  * @property bool        $email_verified
  * @property null|Carbon $email_verified_at
+ * @property bool        $number_two_factor_auth
  * @property bool        $number_verified
  * @property null|Carbon $number_verified_at
  * @property bool        $active
@@ -40,6 +43,7 @@ class User extends DynamicQuery
 {
     use HasFactory;
     use Notifiable;
+    use LastError;
 
     protected static User $user;
 
@@ -60,8 +64,10 @@ class User extends DynamicQuery
         'password',
         'profile_type',
         'language',
+        'email_two_factor_auth',
         'email_verified',
         'email_verified_at',
+        'number_two_factor_auth',
         'number_verified',
         'number_verified_at',
         'updated_at',
@@ -72,8 +78,10 @@ class User extends DynamicQuery
     ];
 
     protected $casts = [
-        'number_authenticated' => 'boolean',
+        'email_two_factor_auth' => 'boolean',
         'email_authenticated' => 'boolean',
+        'number_two_factor_auth' => 'boolean',
+        'number_authenticated' => 'boolean',
         'active' => 'boolean',
     ];
 
@@ -90,7 +98,7 @@ class User extends DynamicQuery
         'remember_token',
     ];
 
-    public static function getDecodedToken(): \stdClass|UserError
+    public static function getDecodedToken(): false|\stdClass
     {
         if (!empty(self::$decodedToken)) {
             return self::$decodedToken;
@@ -98,7 +106,9 @@ class User extends DynamicQuery
 
         $token = request()->bearerToken();
         if (empty($token)) {
-            return UserError::MISSING_TOKEN;
+            self::setLastError(UserError::MISSING_TOKEN);
+
+            return false;
         }
 
         $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
@@ -110,7 +120,7 @@ class User extends DynamicQuery
     /**
      * Authenticates the user based on the provided token.
      */
-    public static function auth(): self|UserError
+    public static function auth(): false|self
     {
         if (!empty(self::$user)) {
             return self::$user;
@@ -120,25 +130,33 @@ class User extends DynamicQuery
             $decoded = self::getDecodedToken();
 
             if (gettype($decoded) === 'enum') {
-                return $decoded;
+                self::setLastError($decoded);
+
+                return false;
             }
 
             if (!isset($decoded->sub)) {
-                return UserError::INVALID_TOKEN;
+                self::setLastError(UserError::INVALID_TOKEN);
+
+                return false;
             }
             $user = self::where('id', $decoded->sub)->first();
             if (!$user) {
-                return UserError::USER_NOT_FOUND;
+                self::setLastError(UserError::USER_NOT_FOUND);
+
+                return false;
             }
             self::$user = $user;
 
             return $user;
         } catch (\Throwable) {
-            return UserError::INVALID_TOKEN;
+            self::setLastError(UserError::INVALID_TOKEN);
+
+            return false;
         }
     }
 
-    public static function session(): Session|UserError
+    public static function session(): false|Session
     {
         if (!empty(self::$session)) {
             return self::$session;
@@ -151,7 +169,9 @@ class User extends DynamicQuery
 
         $session = Session::where('id', $decoded->sid)->first();
         if (!$session) {
-            return UserError::SESSION_NOT_FOUND;
+            self::setLastError(UserError::SESSION_NOT_FOUND);
+
+            return false;
         }
         self::$session = $session;
 

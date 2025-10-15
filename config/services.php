@@ -39,4 +39,13 @@ return [
         'secret' => env('SMS_SERVICE_SECRET'),
         'from' => env('SMS_SERVICE_FROM', 'Agrofast'),
     ],
+
+    'mercadopago' => [
+        'access_token' => env('MERCADOPAGO_ACCESS_TOKEN'),
+    ],
+
+    'google' => [
+        'places_key' => env('GOOGLE_PLACES_KEY'),
+        'maps_key' => env('GOOGLE_MAPS_KEY'),
+    ],
 ];

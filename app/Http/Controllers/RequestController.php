@@ -2,119 +2,133 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Transport\TransportRequest;
+use App\Http\Requests\Request\StoreRequestRequest;
+use App\Models\Hr\PixPayment;
+use App\Models\Hr\User;
+use App\Models\Transport\Machinery;
+use App\Models\Transport\Request as TransportRequest;
+use App\Services\MercadoPago\PaymentService;
+use App\Services\TransportRequestService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class RequestController extends Controller
 {
-    /**
-     * List requests for the authenticated user.
-     */
-    public function listRequests(): JsonResponse
-    {
-        $user = Auth::user();
-        $requests = TransportRequest::where('user_id', $user->id)->get();
+    public function __construct(
+        protected TransportRequestService $transportService,
+        protected PaymentService $pixClient,
+    ) {}
 
-        return response()->json(['data' => $requests], 200);
+    public function index(): JsonResponse
+    {
+        $user = User::auth();
+        $requests = TransportRequest::where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+        ;
+
+        return response()->json($requests, 200);
     }
 
-    /**
-     * Create a new transport request.
-     */
-    public function makeRequest(Request $request): JsonResponse
+    public function store(StoreRequestRequest $request): JsonResponse
     {
-        $user = Auth::user();
+        $data = $request->validated();
+        $user = User::auth();
 
-        $validated = $request->validate([
-            'origin' => 'required|string|max:255',
-            'destination' => 'required|string|max:255',
-        ]);
+        $machinery = Machinery::where('uuid', $data['machine_uuid'])
+            ->where('user_id', $user->id)
+            ->firstOrFail()
+        ;
 
-        // Ensure user doesn't have an active request
-        $existingRequest = TransportRequest::where('user_id', $user->id)
+        if (!$machinery->active) {
+            return response()->json(['message' => 'Machinery not found'], 404);
+        }
+
+        $request = TransportRequest::where('user_id', $user->id)
             ->where('active', true)
+            ->where('state', '!=', TransportRequest::STATE_REJECTED)
             ->first()
         ;
 
-        if ($existingRequest) {
-            return response()->json(['message' => 'Cannot make more than one request at a time'], 400);
+        if (!empty($request)) {
+            return response()->json(['message' => 'Request already exists'], 409);
         }
 
-        try {
-            TransportRequest::create([
-                'user_id' => $user->id,
-                'origin' => $validated['origin'],
-                'destination' => $validated['destination'],
-            ]);
+        $data['uuid'] = Str::uuid()->toString();
+        $data['user_id'] = $user->id;
+        $data['state'] = TransportRequest::STATE_PENDING;
 
-            return response()->json(['message' => 'Request created'], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to make request', 'error' => $e->getMessage()], 500);
-        }
-    }
+        $transportRequest = TransportRequest::create($data);
 
-    /**
-     * Update an existing transport request.
-     */
-    public function updateRequest(Request $request): JsonResponse
-    {
-        $user = Auth::user();
+        $this->transportService->validateTransportRequest($transportRequest->id);
 
-        $validated = $request->validate([
-            'id' => 'required|exists:transport_requests,id',
-            'origin' => 'required|string|max:255',
-            'destination' => 'required|string|max:255',
-        ]);
-
-        $transportRequest = TransportRequest::where('id', $validated['id'])
-            ->where('user_id', $user->id)
+        $transportRequest = TransportRequest::where('id', $transportRequest->id)
             ->first()
         ;
 
-        if (!$transportRequest) {
-            return response()->json(['message' => 'Request not found'], 404);
-        }
+        if (!empty($transportRequest) && $transportRequest->state === TransportRequest::STATE_PAYMENT_PENDING) {
+            $paymentService = new PaymentService();
+            $pixPayment = $paymentService->makePayment(
+                $transportRequest->estimated_cost,
+                $user,
+            );
 
-        try {
             $transportRequest->update([
-                'origin' => $validated['origin'],
-                'destination' => $validated['destination'],
+                'payment_id' => $pixPayment->id,
+                'state' => TransportRequest::STATE_PAYMENT_PENDING,
             ]);
-
-            return response()->json(['message' => 'Request updated'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to update request', 'error' => $e->getMessage()], 500);
         }
+
+        return response()->json($transportRequest, 201);
     }
 
-    /**
-     * Cancel an existing transport request.
-     */
-    public function cancelRequest(Request $request): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
-        $user = Auth::user();
+        $transportRequest = TransportRequest::where('uuid', $uuid)
+            ->firstOrFail()
+        ;
 
-        $validated = $request->validate([
-            'id' => 'required|exists:transport_requests,id',
-        ]);
-
-        $transportRequest = TransportRequest::where('id', $validated['id'])
-            ->where('user_id', $user->id)
+        $pixPayment = PixPayment::where('id', $transportRequest->payment_id)
             ->first()
         ;
 
-        if (!$transportRequest) {
-            return response()->json(['message' => 'Request not found'], 404);
+        $data = $transportRequest->toArray();
+        $data['payment'] = $pixPayment;
+
+        return response()->json($data, 200);
+    }
+
+    public function updatePaymentStatus(string $uuid): JsonResponse
+    {
+        $transportRequest = TransportRequest::where('uuid', $uuid)->firstOrFail();
+
+        if ($transportRequest->state === TransportRequest::STATE_PAYMENT_PENDING) {
+            $pix = PixPayment::where('id', $transportRequest->payment_id)
+                ->first()
+            ;
+
+            if ($pix) {
+                $statusData = $this->pixClient->getPaymentStatus($pix->payment_id);
+
+                $pix->update([
+                    'status' => $statusData['status'],
+                    'status_detail' => $statusData['status_detail'],
+                    'date_last_updated' => now(),
+                ]);
+
+                if ($statusData['status'] === 'approved') {
+                    $transportRequest->state = TransportRequest::STATE_APPROVED;
+                } elseif (in_array($statusData['status'], ['cancelled', 'rejected', 'refunded'], true)) {
+                    $transportRequest->state = TransportRequest::STATE_REJECTED;
+                }
+
+                $transportRequest->save();
+            }
         }
 
-        try {
-            $transportRequest->update(['active' => false]);
-
-            return response()->json(['message' => 'Request cancelled'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to cancel request', 'error' => $e->getMessage()], 500);
-        }
+        return response()->json([
+            'message' => 'request_payment_status_updated',
+            'data' => $transportRequest,
+        ]);
     }
 }

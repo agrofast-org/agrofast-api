@@ -2,12 +2,14 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\System\ErrorLog;
+use App\Support\Traits\IgnoresExceptionOnTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DatabaseTransaction
 {
+    use IgnoresExceptionOnTransaction;
+
     /**
      * Handle an incoming request.
      *
@@ -22,7 +24,7 @@ class DatabaseTransaction
         try {
             $response = $next($request);
 
-            if (isset($response->exception)) {
+            if (isset($response->exception) && !$this->shouldIgnoreException($response->exception)) {
                 DB::rollBack();
             } else {
                 DB::commit();
@@ -32,18 +34,7 @@ class DatabaseTransaction
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            ErrorLog::create([
-                'url' => $request->url(),
-                'error_message' => $e->getMessage(),
-                'stack_trace' => $e->getTraceAsString(),
-                'request_data' => $request->all(),
-            ]);
-            logger()->error($e);
-
-            return response()->json([
-                'message' => 'An error occurred',
-                'error' => config('app.debug') ? $e->getMessage() : 'Internal Server Error',
-            ], 500);
+            throw $e;
         }
     }
 }

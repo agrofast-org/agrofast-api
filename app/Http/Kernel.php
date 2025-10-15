@@ -2,6 +2,7 @@
 
 namespace App\Http;
 
+use App\Http\Middleware\ResponseErrorMiddleware;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Auth\Middleware\RequirePassword;
@@ -69,6 +70,7 @@ class Kernel extends HttpKernel
         'dev.env' => Middleware\DevelopmentEnvironment::class,
         'dev.auth' => Middleware\DeveloperAuth::class,
         'db.safe' => Middleware\DatabaseTransaction::class,
+        'response.error' => ResponseErrorMiddleware::class,
         'cache.headers' => SetCacheHeaders::class,
         'can' => Authorize::class,
         'password.confirm' => RequirePassword::class,

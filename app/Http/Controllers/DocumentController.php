@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\ResponseFactory;
+use App\Factories\DocumentFactory;
+use App\Http\Requests\User\DocumentStoreRequest;
+use App\Http\Requests\User\DocumentUpdateRequest;
 use App\Models\Hr\Document;
 use App\Models\Hr\User;
 use App\Services\UserDocumentService;
@@ -22,11 +24,56 @@ class DocumentController extends Controller
         $user = User::auth();
 
         if (!$user) {
-            return ResponseFactory::error('user_not_found', null, 404);
+            return response()->json(['message' => 'User not found'], 404);
         }
         $documents = Document::where('user_id', $user['id'])->get();
 
-        return ResponseFactory::success('user_found', $documents);
+        return response()->json($documents, 200);
+    }
+
+    public function store(DocumentStoreRequest $request)
+    {
+        $data = $request->validated();
+
+        $document = DocumentFactory::create(
+            User::auth(),
+            $data
+        );
+
+        return response()->json($document, 201);
+    }
+
+    public function show($uuid)
+    {
+        $user = User::auth();
+
+        $document = Document::where(['uuid' => $uuid, 'user_id' => $user->id])->first();
+
+        if (!$document) {
+            return response()->json(['message' => 'Document not found'], 404);
+        }
+
+        return response()->json($document, 200);
+    }
+
+    public function update($uuid, DocumentUpdateRequest $request)
+    {
+        $user = User::auth();
+        $data = $request->validated();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $document = Document::where(['uuid' => $uuid, 'user_id' => $user->id])->first();
+
+        if (!$document) {
+            return response()->json(['message' => 'Document not found'], 404);
+        }
+
+        $document->update($data);
+
+        return response()->json($document, 200);
     }
 
     public function delete($uuid)
@@ -34,17 +81,17 @@ class DocumentController extends Controller
         $user = User::auth();
 
         if (!$user) {
-            return ResponseFactory::error('user_not_found', null, 404);
+            return response()->json(['message' => 'User not found'], 404);
         }
 
         $document = Document::where(['uuid' => $uuid, 'user_id' => $user->id])->first();
 
         if (!$document) {
-            return ResponseFactory::error('document_not_found', null, 404);
+            return response()->json(['message' => 'Document not found'], 404);
         }
 
         $document->update(['active' => false, 'inactivated_at' => now()]);
 
-        return ResponseFactory::success('document_deleted');
+        return response()->json(['message' => 'Document deleted successfully'], 200);
     }
 }

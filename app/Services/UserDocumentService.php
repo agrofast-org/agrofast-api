@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Request;
 
 class UserDocumentService
 {
-    public function createDocument(Request $request, array $document): array
+    public function store(Request $request, array $document): array
     {
         [$documentData, $documentType] = $this->sanitizeDocumentData($document);
 

@@ -13,9 +13,12 @@ class IndexController extends Controller
      */
     public function index(): JsonResponse
     {
-        return response()->json([
-            'message' => 'Welcome to the Agrofast API',
-        ], 200);
+        return response()->json(['message' => 'Bem vindo aos serviços de '.env('APP_COMERCIAL_NAME').''], 200);
+    }
+
+    public function fallback()
+    {
+        return response()->json(['message' => 'Endpoint not found'], 404);
     }
 
     /**

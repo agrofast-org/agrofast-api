@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\ResponseFactory;
 use App\Http\Requests\Carrier\StoreCarrierRequest;
 use App\Http\Requests\Carrier\UpdateCarrierRequest;
 use App\Models\File\File;
@@ -19,10 +18,7 @@ class CarrierController extends Controller
             ->orderBy('created_at', 'desc')
         ;
 
-        return ResponseFactory::success(
-            'carrier_list',
-            $carrier->get()->toArray(),
-        );
+        return response()->json($carrier->get()->toArray(), 200);
     }
 
     public function store(StoreCarrierRequest $request)
@@ -43,6 +39,7 @@ class CarrierController extends Controller
             foreach ($files as $file) {
                 $carrier->addDocument($file->id);
             }
+            File::markAsAttached($data['documents']);
         }
 
         if ($data['pictures']) {
@@ -54,12 +51,10 @@ class CarrierController extends Controller
             foreach ($files as $file) {
                 $carrier->addPicture($file->id);
             }
+            File::markAsAttached($data['pictures']);
         }
 
-        return ResponseFactory::success(
-            'carrier_created',
-            $carrier
-        );
+        return response()->json($carrier, 201);
     }
 
     public function show(string $uuid)
@@ -71,18 +66,10 @@ class CarrierController extends Controller
         ;
 
         if (!$carrier) {
-            return ResponseFactory::error(
-                'carrier_not_found',
-                null,
-                null,
-                404
-            );
+            return response()->json(['message' => 'Carrier not found'], 404);
         }
 
-        return ResponseFactory::success(
-            'carrier',
-            $carrier
-        );
+        return response()->json($carrier, 200);
     }
 
     public function update(UpdateCarrierRequest $request, string $uuid)
@@ -94,21 +81,13 @@ class CarrierController extends Controller
         ;
 
         if (!$carrier) {
-            return ResponseFactory::error(
-                'carrier_not_found',
-                null,
-                null,
-                404
-            );
+            return response()->json(['message' => 'Carrier not found'], 404);
         }
 
         $data = $request->validated();
         $carrier->update($data);
 
-        return ResponseFactory::success(
-            'Carrier_updated',
-            $carrier
-        );
+        return response()->json(['message' => 'Carrier updated successfully', 'data' => $carrier], 200);
     }
 
     public function disable(string $uuid)
@@ -120,19 +99,11 @@ class CarrierController extends Controller
         ;
 
         if (!$carrier) {
-            return ResponseFactory::error(
-                'carrier_not_found',
-                null,
-                null,
-                404
-            );
+            return response()->json(['message' => 'Carrier not found'], 404);
         }
 
         $carrier->update(['active' => false, 'inactivated_at' => now()]);
 
-        return ResponseFactory::success(
-            'carrier_deleted',
-            $carrier
-        );
+        return response()->json(['message' => 'Carrier disabled successfully'], 200);
     }
 }

@@ -2,43 +2,33 @@
 
 namespace App\Services;
 
+use App\Factories\FileFactory;
 use App\Http\Responses\User\UserDataResponse;
 use App\Models\Error;
-use App\Models\File\FilesImage;
+use App\Models\File\File;
 use App\Models\Hr\User;
-use App\Models\Success;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class PictureService
 {
     /**
      * Returns the user's image from Storage.
      */
-    public function getPicture(string $userUuid, ?string $pictureUuid = null): Error|Success
+    public function getPicture(string $userUuid, ?string $pictureUuid = null)
     {
-        $files = Storage::files("uploads/pictures/{$userUuid}");
-        if (empty($files)) {
-            return new Error('no_images_found');
+        $filePath = $pictureUuid
+            ? "uploads/pictures/{$userUuid}/{$pictureUuid}"
+            : $this->getLastUploadedPicturePath($userUuid);
+
+        if (!$filePath || !Storage::exists($filePath)) {
+            return false;
         }
 
-        if ($pictureUuid) {
-            $filePath = "uploads/pictures/{$userUuid}/{$pictureUuid}";
-            if (!Storage::exists($filePath)) {
-                return new Error('no_images_found');
-            }
-            $file = Storage::get($filePath);
-            $type = Storage::mimeType($filePath);
-
-            return new Success('image_found', ['file' => $file, 'mime' => $type]);
-        }
-
-        $lastFile = end($files);
-        $file = Storage::get($lastFile);
-        $type = Storage::mimeType($lastFile);
-
-        return new Success('image_found', ['file' => $file, 'mime' => $type]);
+        return [
+            'file' => Storage::get($filePath),
+            'mime' => Storage::mimeType($filePath),
+        ];
     }
 
     /**
@@ -46,43 +36,41 @@ class PictureService
      *
      * @return array Result with the file record or error
      */
-    public function uploadPicture(Request $request, User $user): Error|Success
+    public function uploadPicture(Request $request, User $user)
     {
         $validated = $request->validate([
             'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $uuid = Str::uuid();
-
         $file = $validated['image'];
-        $fileName = $uuid.'.'.$file->getClientOriginalExtension();
         $disk = env('FILESYSTEM_DISK', 's3');
 
-        $path = $file->storeAs("uploads/pictures/{$user->uuid}", $fileName, $disk);
-        if (!$path) {
-            return new Error('failed_to_upload_image');
+        $fileRecord = FileFactory::create($file, "pictures/{$user->uuid}");
+        if (!$fileRecord) {
+            return throw new \Exception('failed_to_store_image');
         }
 
-        $fileRecord = FilesImage::create([
-            'uuid' => $uuid,
-            'name' => $file->getClientOriginalName(),
-            'path' => $path,
-            'mime_type' => $file->getMimeType(),
-            'size' => $file->getSize(),
-            'uploaded_by' => $user->id,
-        ]);
-
-        $appUrl = env('APP_URL');
+        $fileRecord->update(['attached' => true]);
         $user->update([
-            'profile_picture' => "{$appUrl}/{$path}",
+            'profile_picture' => $fileRecord->path,
         ]);
 
         if (!$fileRecord) {
-            Storage::disk($disk)->delete($path);
+            Storage::disk($disk)->delete($fileRecord->path);
 
-            return new Error('failed_to_save_image_record');
+            throw new \Exception('failed_to_save_image_record');
         }
 
-        return new Success('image_found', ['user' => UserDataResponse::format($user)]);
+        return ['user' => UserDataResponse::format($user)];
+    }
+
+    /**
+     * Retrieves the path of the last uploaded picture for a user.
+     */
+    private function getLastUploadedPicturePath(string $userUuid): ?string
+    {
+        $files = Storage::files("uploads/pictures/{$userUuid}");
+
+        return empty($files) ? null : end($files);
     }
 }

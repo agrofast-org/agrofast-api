@@ -2,6 +2,7 @@
 
 namespace App\Models\File;
 
+use App\Models\Hr\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string $mime_type
  * @property string $size
  * @property int    $uploaded_by
+ * @property bool   $attached
  * @property bool   $active
  * @property Carbon $created_at
  * @property Carbon $updated_at
@@ -39,11 +41,13 @@ class File extends Model
         'mime_type',
         'size',
         'uploaded_by',
+        'attached',
         'active',
     ];
 
     protected $casts = [
         'active' => 'boolean',
+        'attached' => 'boolean',
     ];
 
     protected $dates = [
@@ -51,4 +55,17 @@ class File extends Model
         'updated_at',
         'inactivated_at',
     ];
+
+    /**
+     * Summary of markAsAttached.
+     *
+     * @param string[] $uuidList
+     */
+    public static function markAsAttached(array $uuidList)
+    {
+        return self::where('uploaded_by', User::auth()->id)
+            ->whereIn('uuid', $uuidList)
+            ->update(['attached' => true])
+        ;
+    }
 }

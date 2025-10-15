@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Factories\ResponseFactory;
 use App\Http\Requests\Machinery\StoreMachineryRequest;
 use App\Http\Requests\Machinery\UpdateMachineryRequest;
 use App\Models\File\File;
@@ -19,10 +18,7 @@ class MachineryController extends Controller
             ->orderBy('created_at', 'desc')
         ;
 
-        return ResponseFactory::success(
-            'machinery_list',
-            $machineries->get()->toArray(),
-        );
+        return response()->json($machineries->get()->toArray(), 200);
     }
 
     public function store(StoreMachineryRequest $request)
@@ -43,12 +39,10 @@ class MachineryController extends Controller
             foreach ($files as $file) {
                 $machineries->addPicture($file->id);
             }
+            File::markAsAttached($data['pictures']);
         }
 
-        return ResponseFactory::success(
-            'machineries_created',
-            $machineries
-        );
+        return response()->json($machineries, 201);
     }
 
     public function show(string $uuid)
@@ -60,18 +54,10 @@ class MachineryController extends Controller
         ;
 
         if (!$machinery) {
-            return ResponseFactory::error(
-                'machinery_not_found',
-                null,
-                null,
-                404
-            );
+            return response()->json(['message' => 'Machinery not found'], 404);
         }
 
-        return ResponseFactory::success(
-            'machinery',
-            $machinery
-        );
+        return response()->json($machinery, 200);
     }
 
     public function update(UpdateMachineryRequest $request, string $uuid)
@@ -83,21 +69,13 @@ class MachineryController extends Controller
         ;
 
         if (!$machinery) {
-            return ResponseFactory::error(
-                'machinery_not_found',
-                null,
-                null,
-                404
-            );
+            return response()->json(['message' => 'Machinery not found'], 404);
         }
 
         $data = $request->validated();
         $machinery->update($data);
 
-        return ResponseFactory::success(
-            'machinery_updated',
-            $machinery
-        );
+        return response()->json($machinery, 200);
     }
 
     public function disable(string $uuid)
@@ -109,19 +87,11 @@ class MachineryController extends Controller
         ;
 
         if (!$machinery) {
-            return ResponseFactory::error(
-                'machinery_not_found',
-                null,
-                null,
-                404
-            );
+            return response()->json(['message' => 'Machinery not found'], 404);
         }
 
         $machinery->update(['active' => false, 'inactivated_at' => now()]);
 
-        return ResponseFactory::success(
-            'machinery_deleted',
-            $machinery
-        );
+        return response()->json(['message' => 'Machinery deleted successfully'], 200);
     }
 }

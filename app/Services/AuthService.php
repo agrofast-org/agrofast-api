@@ -3,16 +3,18 @@
 namespace App\Services;
 
 use App\Enums\UserAction;
+use App\Exception\InvalidFormException;
+use App\Exception\InvalidRequestException;
 use App\Factories\SessionFactory;
 use App\Factories\TokenFactory;
+use App\Http\Requests\User\UserLoginRequest;
 use App\Http\Responses\User\UserDataResponse;
-use App\Models\Error;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\User;
-use App\Models\Success;
 use Carbon\Carbon;
+use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -24,24 +26,18 @@ class AuthService
      * @param array   $credentials Authentication data (email, password, remember)
      * @param Request $request     Request instance
      *
-     * @return Error|Success Result containing user, token, session, or error
+     * @return array Result containing user, token, session, or error
      */
-    public function login(array $credentials, Request $request): Error|Success
+    public function login(array $credentials, UserLoginRequest $request): array
     {
         $user = User::where('email', $credentials['email'])->first();
-        if (!$user) {
-            return new Error('user_not_found', ['email' => 'user_not_found']);
-        }
 
         if (!Hash::check($credentials['password'], $user->password)) {
-            return new Error('current_password', ['password' => 'current_password']);
+            throw new InvalidFormException(__('validation.current_password'), ['password' => __('validation.current_password')]);
         }
 
         $browserFingerprint = $request->header('Browser-Agent');
         $browserAgent = BrowserAgent::where('fingerprint', $browserFingerprint)->first();
-        if (!$browserAgent) {
-            return new Error('browser_agent_not_found');
-        }
 
         $remember = RememberBrowser::where('user_id', $user->id)
             ->where('browser_agent_id', $browserAgent->id)
@@ -50,7 +46,7 @@ class AuthService
         ;
 
         $authType = AuthCode::EMAIL;
-        $authCode = ($user->email_verified && $remember) ? null : AuthCode::createCode($user->id, $authType);
+        $authCode = ($user->email_verified && ($user->email_two_factor_auth || $remember)) ? null : AuthCode::createCode($user->id, $authType);
 
         $session = SessionFactory::create($user, $request, $browserAgent, $authCode);
 
@@ -67,41 +63,35 @@ class AuthService
 
         $jwt = TokenFactory::create($user, $session);
 
-        return new Success('login_success', [
+        return [
             'user' => UserDataResponse::withDocument($user),
             'token' => $jwt,
-            'auth' => ($user->email_verified && $remember) ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
-        ]);
+            'auth' => ($user->email_verified && ($user->email_two_factor_auth || $remember)) ? UserAction::AUTHENTICATED->value : UserAction::AUTHENTICATE->value,
+        ];
     }
 
     /**
-     * @return Error|Success the result of the resend operation
+     * @return array the result of the resend operation
+     *
+     * @throws ValidationException if the user is not authenticated or the session is not found
      */
-    public function resendCode(): Error|Success
+    public function resendCode()
     {
         $user = User::auth();
-        if (!$user) {
-            return new Error('user_not_authenticated');
-        }
 
         $session = User::session();
-        if (!$session) {
-            return new Error('session_not_found');
-        }
 
         $authCode = AuthCode::where('id', $session->auth_code_id)
             ->where('auth_type', AuthCode::EMAIL)
             ->first()
         ;
         if (!$authCode) {
-            return new Error('invalid_authentication_code');
+            throw new ValidationException('invalid_authentication_code');
         }
 
         $timeoutSeconds = 60;
         if (Carbon::now()->diffInSeconds($authCode->created_at) < $timeoutSeconds) {
-            return new Error('resend_timeout', [
-                'message' => "Please wait {$timeoutSeconds} seconds before resending the code.",
-            ]);
+            throw new ValidationException('resend_timeout');
         }
 
         $attempts = $authCode->attempts;
@@ -113,9 +103,9 @@ class AuthService
 
         $session->update(['auth_code_id' => $newAuthCode->id]);
 
-        return new Success('code_resent', [
+        return [
             'user' => UserDataResponse::withDocument($user),
-        ]);
+        ];
     }
 
     /**
@@ -123,19 +113,13 @@ class AuthService
      *
      * @param Request $request Request instance
      *
-     * @return Error|Success Result containing user and new token, or error
+     * @return array Result containing user and new token, or error
      */
-    public function authenticate(Request $request): Error|Success
+    public function authenticate(Request $request)
     {
         $user = User::auth();
-        if (!$user) {
-            return new Error('user_not_authenticated');
-        }
 
         $session = User::session();
-        if (!$session) {
-            return new Error('session_not_found');
-        }
 
         $authCode = AuthCode::where('id', $session->auth_code_id)
             ->where('auth_type', AuthCode::EMAIL)
@@ -143,7 +127,7 @@ class AuthService
         ;
 
         if (!$authCode) {
-            return new Error('invalid_authentication_code');
+            throw new ValidationException('invalid_authentication_code');
         }
 
         $codeInput = $request->input('code');
@@ -153,13 +137,12 @@ class AuthService
                 $authCode->update(['attempts' => $updatedAttempts, 'active' => false]);
                 $session->update(['authenticated' => false, 'active' => false]);
 
-                return new Error('authentication_code_attempts_exceeded', null, null, 401);
+                throw new ValidationException('authentication_code_attempts_exceeded', 401);
             }
             $authCode->update(['attempts' => $updatedAttempts]);
 
-            return new Error('incorrect_authentication_code', [
+            throw new InvalidRequestException('incorrect_authentication_code', [
                 'code' => 'incorrect_authentication_code',
-            ], [
                 'attempts' => AuthCode::MAX_ATTEMPTS - $updatedAttempts,
             ], 400);
         }
@@ -175,9 +158,9 @@ class AuthService
 
         $jwt = TokenFactory::create($user, $session);
 
-        return new Success('authentication_success', [
+        return [
             'user' => UserDataResponse::withDocument($user),
             'token' => $jwt,
-        ]);
+        ];
     }
 }
