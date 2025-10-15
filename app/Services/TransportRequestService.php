@@ -23,27 +23,29 @@ class TransportRequestService
         $request = Request::findOrFail($requestId);
 
         DB::transaction(function () use ($request) {
+            $data = [];
+
             try {
                 $origin = $this->placesClient->getPlaceData($request->origin_place_id);
-                $destination = $this->placesClient->getPlaceData($request->destination_place_id);
-                $matrix = $this->distanceClient->getDistance($origin['formattedAddress'], $destination['formattedAddress']);
+                $data['origin_place_name'] = $origin['formattedAddress'];
+                $data['origin_latitude'] = $origin['location']['latitude'];
+                $data['origin_longitude'] = $origin['location']['longitude'];
 
-                $request->update([
-                    'origin_place_name' => $origin['formattedAddress'],
-                    'origin_latitude' => $origin['location']['latitude'],
-                    'origin_longitude' => $origin['location']['longitude'],
-                    'destination_place_name' => $destination['formattedAddress'],
-                    'destination_latitude' => $destination['location']['latitude'],
-                    'destination_longitude' => $destination['location']['longitude'],
-                    'distance' => $matrix['distance']['value'],
-                    'estimated_time' => $matrix['duration']['value'],
-                    'estimated_cost' => Request::getEstimatedCost($matrix['distance']['value']),
-                    'state' => Request::STATE_PAYMENT_PENDING,
-                ]);
-            } catch (\Throwable $e) {
-                Log::warning("Request {$request->id} rejeitado: {$e->getMessage()}");
-                $request->update(['state' => Request::STATE_REJECTED, 'origin_place_name' => $e->getMessage()]);
+                $destination = $this->placesClient->getPlaceData($request->destination_place_id);
+                $data['destination_place_name'] = $destination['formattedAddress'];
+                $data['destination_latitude'] = $destination['location']['latitude'];
+                $data['destination_longitude'] = $destination['location']['longitude'];
+
+                $matrix = $this->distanceClient->getDistance($origin['formattedAddress'], $destination['formattedAddress']);
+                $data['distance'] = $matrix['distance']['value'];
+                $data['estimated_time'] = $matrix['duration']['value'];
+                $data['estimated_cost'] = Request::getEstimatedCost($matrix['distance']['value']);
+                $data['state'] = Request::STATE_PAYMENT_PENDING;
+            } catch (\Throwable $th) {
+                $this->rejected($request, $data, $th);
             }
+
+            $request->update($data);
         });
     }
 
@@ -82,5 +84,12 @@ class TransportRequestService
         $transportRequest->save();
 
         return $transportRequest;
+    }
+
+    private function rejected(Request $request, array $data, \Throwable $throwable): void
+    {
+        Log::warning("Request {$request->id} rejeitado: {$throwable->getMessage()}");
+        $data['state'] = Request::STATE_REJECTED;
+        $request->update($data);
     }
 }

@@ -46,6 +46,7 @@ class RequestController extends Controller
 
         $request = TransportRequest::where('user_id', $user->id)
             ->where('active', true)
+            ->where('state', '!=', TransportRequest::STATE_REJECTED)
             ->first()
         ;
 
