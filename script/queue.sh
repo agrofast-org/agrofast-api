@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
 
 echo "Starting Laravel queue worker in background"
-php artisan queue:work --daemon --sleep=3 --tries=3 &
+nohup php artisan queue:work > /dev/null 2>&1 &
+disown
