@@ -1,3 +1,6 @@
+[stack]
+id = "php"
+
 [project]
 type = "php"
 
