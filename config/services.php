@@ -46,6 +46,6 @@ return [
 
     'google' => [
         'places_key' => env('GOOGLE_PLACES_KEY'),
-        'maps_key' => env('GOOGLE_MAPS_KEY'),
+        'matrix_key' => env('GOOGLE_MATRIX_KEY'),
     ],
 ];

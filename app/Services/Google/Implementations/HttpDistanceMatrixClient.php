@@ -14,7 +14,7 @@ class HttpDistanceMatrixClient implements DistanceMatrixClientInterface
             ->get('https://maps.googleapis.com/maps/api/distancematrix/json', [
                 'origins' => $origin,
                 'destinations' => $destination,
-                'key' => config('services.google.maps_key'),
+                'key' => config('services.google.matrix_key'),
             ])
         ;
 

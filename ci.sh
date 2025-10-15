@@ -3,7 +3,7 @@ set -e
 
 ./script/migration.sh
 
-./script/seed.sh
+# ./script/seed.sh
 
 ./script/queue.sh
 
