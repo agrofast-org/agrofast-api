@@ -91,7 +91,7 @@ class TransportRequestService
     {
         ErrorLog::create([
             'url' => 'N/A',
-            'message' => $throwable->getMessage(),
+            'error_message' => $throwable->getMessage(),
             'stack_trace' => $throwable->getTraceAsString(),
             'request_data' => $data,
         ]);
