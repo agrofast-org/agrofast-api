@@ -4,6 +4,7 @@
 
 namespace App\Services;
 
+use App\Models\System\ErrorLog;
 use App\Models\Transport\Request;
 use App\Services\Google\Contracts\DistanceMatrixClientInterface;
 use App\Services\Google\Contracts\PlacesClientInterface;
@@ -88,7 +89,12 @@ class TransportRequestService
 
     private function rejected(Request $request, array $data, \Throwable $throwable): void
     {
-        Log::warning("Request {$request->id} rejeitado: {$throwable->getMessage()}");
+        ErrorLog::create([
+            'url' => 'N/A',
+            'message' => $throwable->getMessage(),
+            'stack_trace' => $throwable->getTraceAsString(),
+            'request_data' => $data,
+        ]);
         $data['state'] = Request::STATE_REJECTED;
         $request->update($data);
     }
