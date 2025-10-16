@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->id()->primary();
             $table->uuid()->unique();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
+            $table->foreignId('machine_id')->constrained('transport.machinery')->onDelete('cascade');
 
             $table->string('origin_place_id');
             $table->string('origin_place_name')->nullable();

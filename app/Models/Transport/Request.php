@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @property int         $id                           Unique identifier of the transport request.
  * @property int         $user_id                      Identifier of the user who requested the transport.
+ * @property int         $machine_id                   Identifier of the machine used for the transport.
  * @property int         $origin_place_id              Identifier for the origin location.
  * @property string      $origin_place_name            Name of the origin place.
  * @property float       $origin_latitude              Latitude coordinate of the origin.
@@ -54,6 +55,7 @@ class Request extends Model
     protected $fillable = [
         'uuid',
         'user_id',
+        'machine_id',
 
         'origin_place_id',
         'origin_place_name',

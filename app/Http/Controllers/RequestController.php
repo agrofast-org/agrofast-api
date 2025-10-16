@@ -45,6 +45,7 @@ class RequestController extends Controller
         }
 
         $request = TransportRequest::where('user_id', $user->id)
+            ->where('machine_id', $machinery->id)
             ->where('active', true)
             ->where('state', '!=', TransportRequest::STATE_REJECTED)
             ->first()
@@ -56,7 +57,9 @@ class RequestController extends Controller
 
         $data['uuid'] = Str::uuid()->toString();
         $data['user_id'] = $user->id;
+        $data['machine_id'] = $machinery->id;
         $data['state'] = TransportRequest::STATE_PENDING;
+
 
         $transportRequest = TransportRequest::create($data);
 

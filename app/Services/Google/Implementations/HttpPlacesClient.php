@@ -10,7 +10,7 @@ class HttpPlacesClient implements PlacesClientInterface
     public function getPlaceData(string $placeId): array
     {
         $response = Http::withHeaders([
-            'Referer' => env('WEB_URL'),
+            'Referer' => env('API_URL'),
         ])
             ->timeout(5)
             ->retry(2, 100)
