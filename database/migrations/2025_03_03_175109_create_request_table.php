@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Transport\Request;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -29,18 +30,20 @@ return new class extends Migration {
             $table->integer('distance')->nullable()->comment('Distance in meters between origin and destination in meters');
             $table->integer('estimated_time')->nullable()->comment('Estimated travel time in seconds between origin and destination');
             $table->string('estimated_cost')->nullable();
+            $table->string('final_cost')->nullable();
 
             $table->foreignId('payment_id')->nullable(); // ->constrained('payment')->onDelete('cascade');
 
             $table->timestamp('desired_date')->nullable();
             $table->enum('state', [
-                'pending',
-                'payment_pending',
-                'approved',
-                'rejected',
-                'in_progress',
-                'canceled',
-                'completed',
+                Request::STATE_PENDING,
+                Request::STATE_WAITING_FOR_OFFER,
+                Request::STATE_PAYMENT_PENDING,
+                Request::STATE_APPROVED,
+                Request::STATE_REJECTED,
+                Request::STATE_IN_PROGRESS,
+                Request::STATE_CANCELED,
+                Request::STATE_COMPLETED,
             ])->default('pending');
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

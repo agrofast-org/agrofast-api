@@ -43,6 +43,7 @@ class Request extends Model
     use HasFactory;
 
     public const STATE_PENDING = 'pending';
+    public const STATE_WAITING_FOR_OFFER = 'waiting_for_offer';
     public const STATE_PAYMENT_PENDING = 'payment_pending';
     public const STATE_APPROVED = 'approved';
     public const STATE_REJECTED = 'rejected';

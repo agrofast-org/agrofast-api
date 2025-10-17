@@ -10,7 +10,6 @@ use App\Services\Google\Contracts\DistanceMatrixClientInterface;
 use App\Services\Google\Contracts\PlacesClientInterface;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class TransportRequestService
 {
@@ -41,7 +40,7 @@ class TransportRequestService
                 $data['distance'] = $matrix['distance']['value'];
                 $data['estimated_time'] = $matrix['duration']['value'];
                 $data['estimated_cost'] = Request::getEstimatedCost($matrix['distance']['value']);
-                $data['state'] = Request::STATE_PAYMENT_PENDING;
+                $data['state'] = Request::STATE_WAITING_FOR_OFFER;
             } catch (\Throwable $th) {
                 $this->rejected($request, $data, $th);
             }
@@ -77,8 +76,7 @@ class TransportRequestService
                 $transportRequest->state = Request::STATE_REJECTED;
             }
         } catch (\Exception $e) {
-            Log::error("Error checking Mercado Pago payment status for request {$transportRequest->id}: ".$e->getMessage());
-            $transportRequest->state = Request::STATE_REJECTED;
+            $this->rejected($transportRequest, [], $e);
         }
 
         $transportRequest->state = Request::STATE_APPROVED; // or any other state based on payment status

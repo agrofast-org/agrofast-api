@@ -112,7 +112,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
                 Route::get('/{uuid}/update', [RequestController::class, 'updatePaymentStatus']);
                 Route::post('/', [RequestController::class, 'store']);
                 // Route::put('/', [RequestController::class, 'update']);
-                Route::delete('/', [RequestController::class, 'cancel']);
+                Route::delete('/{uuid}', [RequestController::class, 'destroy']);
             });
 
             // // Offer routes
