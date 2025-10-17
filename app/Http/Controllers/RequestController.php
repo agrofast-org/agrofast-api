@@ -53,6 +53,7 @@ class RequestController extends Controller
                 TransportRequest::STATE_PAYMENT_PENDING,
                 TransportRequest::STATE_APPROVED,
                 TransportRequest::STATE_IN_PROGRESS,
+                TransportRequest::STATE_REJECTED,
             ], 'and', true)
             ->first()
         ;
