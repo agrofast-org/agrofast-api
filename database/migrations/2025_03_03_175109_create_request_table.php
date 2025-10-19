@@ -24,8 +24,8 @@ return new class extends Migration {
             $table->string('origin_longitude')->nullable();
             $table->string('destination_place_id');
             $table->string('destination_place_name')->nullable();
-            $table->string('destination_origin_latitude')->nullable();
-            $table->string('destination_origin_longitude')->nullable();
+            $table->string('destination_latitude')->nullable();
+            $table->string('destination_longitude')->nullable();
 
             $table->integer('distance')->nullable()->comment('Distance in meters between origin and destination in meters');
             $table->integer('estimated_time')->nullable()->comment('Estimated travel time in seconds between origin and destination');

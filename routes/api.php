@@ -55,6 +55,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             Route::get('/code-length', [UserController::class, 'codeLength']);
             Route::post('/sign-in', [UserController::class, 'login']);
             Route::post('/sign-up', [UserController::class, 'store']);
+            Route::post('/google-auth', [UserController::class, 'googleAuth']);
             Route::middleware(['auth.basic'])->group(function () {
                 Route::get('/', [UserController::class, 'authenticate']);
                 Route::get('/methods', [UserController::class, 'authenticationMethods']);

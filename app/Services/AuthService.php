@@ -13,6 +13,7 @@ use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\User;
+use App\Services\Google\GoogleAuthService;
 use Carbon\Carbon;
 use Dotenv\Exception\ValidationException;
 use Illuminate\Http\Request;
@@ -20,6 +21,13 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthService
 {
+    private GoogleAuthService $googleAuthService;
+
+    public function __construct()
+    {
+        $this->googleAuthService = new GoogleAuthService();
+    }
+
     /**
      * Logs in the user.
      *
@@ -161,6 +169,33 @@ class AuthService
         return [
             'user' => UserDataResponse::withDocument($user),
             'token' => $jwt,
+        ];
+    }
+
+    public function google(Request $request)
+    {
+        $payload = $this->googleAuthService->verifyToken($request->input('credential'));
+
+        if (!$payload) {
+            return response()->json(['message' => 'Invalid Google token'], 401);
+        }
+
+        $user = User::where('email', $payload['email'])->first();
+
+        if (!$user) {
+            $data = $this->googleAuthService->createUserFromGoogle($request, $payload);
+        } else {
+            $data = $this->googleAuthService->loginFromGoogle($user, $request, $payload);
+        }
+
+        $data['session']->update([
+            'authenticated' => true,
+        ]);
+
+        return [
+            'token' => $data['token'],
+            'user' => $data['user'],
+            'auth' => UserAction::AUTHENTICATED->value,
         ];
     }
 }

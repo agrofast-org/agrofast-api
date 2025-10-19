@@ -89,6 +89,13 @@ class UserController extends Controller
         return response()->json($result, 200);
     }
 
+    public function googleAuth(Request $request)
+    {
+        $result = $this->authService->google($request);
+
+        return response()->json($result, 200);
+    }
+
     public function resendCode()
     {
         $result = $this->authService->resendCode();
