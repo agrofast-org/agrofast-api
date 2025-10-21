@@ -104,6 +104,14 @@ class Request extends Model
      */
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Relationship with Machine model.
+     */
+    public function machine()
+    {
+        return $this->has(Machinery::class, 'machine_id');
     }
 }

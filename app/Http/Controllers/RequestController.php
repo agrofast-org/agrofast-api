@@ -164,4 +164,16 @@ class RequestController extends Controller
 
         return response()->json(['message' => 'Request canceled successfully'], 200);
     }
+
+    public function listRequestsForOffer(): JsonResponse
+    {
+        $requests = TransportRequest::with(['machine', 'user'])
+            ->where('state', TransportRequest::STATE_WAITING_FOR_OFFER)
+            ->where('active', true)
+            ->orderBy('created_at', 'desc')
+            ->get()
+        ;
+
+        return response()->json($requests, 200);
+    }
 }

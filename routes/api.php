@@ -109,11 +109,13 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             // Request routes
             Route::prefix('/request')->group(function () {
                 Route::get('/', [RequestController::class, 'index']);
+                Route::get('/available', [RequestController::class, 'listRequestsForOffer']);
                 Route::get('/{uuid}', [RequestController::class, 'show']);
                 Route::get('/{uuid}/update', [RequestController::class, 'updatePaymentStatus']);
                 Route::post('/', [RequestController::class, 'store']);
                 // Route::put('/', [RequestController::class, 'update']);
                 Route::delete('/{uuid}', [RequestController::class, 'destroy']);
+
             });
 
             // // Offer routes
