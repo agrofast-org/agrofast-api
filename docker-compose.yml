@@ -14,11 +14,11 @@ services:
         networks:
             - agrofast-network
 
-    agrofast-php-fpm:
-        container_name: agrofast-php-fpm
+    agrofast-php:
+        container_name: agrofast-php
         extends:
             file: ../docker-compose.yml
-            service: agrofast-php-fpm
+            service: agrofast-php
 
     agrofast-postgres:
         container_name: agrofast-postgres
