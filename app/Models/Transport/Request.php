@@ -65,8 +65,8 @@ class Request extends Model
 
         'destination_place_id',
         'destination_place_name',
-        'destination_origin_latitude',
-        'destination_origin_longitude',
+        'destination_latitude',
+        'destination_longitude',
 
         'distance',
         'estimated_time',
@@ -112,6 +112,6 @@ class Request extends Model
      */
     public function machine()
     {
-        return $this->has(Machinery::class, 'machine_id');
+        return $this->hasOne(Machinery::class, 'id', 'machine_id');
     }
 }

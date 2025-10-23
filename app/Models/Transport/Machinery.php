@@ -105,4 +105,9 @@ class Machinery extends Model
             'file_id' => $id,
         ]);
     }
+
+    public function request()
+    {   
+        return $this->hasOne(Request::class, 'machine_id');
+    }
 }
