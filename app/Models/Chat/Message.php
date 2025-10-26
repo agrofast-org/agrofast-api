@@ -61,7 +61,7 @@ class Message extends Model
         return $this->belongsTo(Chat::class, 'chat_id', 'id');
     }
 
-    public function parentMessage()
+    public function answer_to()
     {
         return $this->belongsTo(self::class, 'answer_to', 'id');
     }

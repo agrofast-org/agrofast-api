@@ -47,8 +47,12 @@ class ChatService
         return $chat;
     }
 
-    public function sendMessage(int $chatId, int $userId, string $content, ?int $answerTo = null): Message
+    public function sendMessage(int $chatId, int $userId, string $content, int|string|null $answerTo = null): Message
     {
+        $message = ((bool) $answerTo) ? ($answerTo === null ? null : Message::where('active', true)->where([
+            (is_int($answerTo) || (is_string($answerTo) && ctype_digit($answerTo))) ? 'id' : 'uuid' => $answerTo,
+        ])->first()) : null;
+
         $chat = Chat::where('id', $chatId)->where('active', true)->first();
         if (!$chat) {
             throw new InvalidFormException('Chat não encontrado ou inativo.', [
@@ -67,13 +71,13 @@ class ChatService
             'chat_id' => $chat->id,
             'user_id' => $userId,
             'message' => $content,
-            'answer_to' => $answerTo,
+            'answer_to' => $message ? $message->id : null,
             'active' => true,
         ]);
 
         $chat->touch();
 
-        return $message;
+        return $message->load(['user', 'answer_to']);
     }
 
     public function userBelongsToChat(string $userId, string $chatId): bool

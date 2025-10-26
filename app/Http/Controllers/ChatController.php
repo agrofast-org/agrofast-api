@@ -29,7 +29,16 @@ class ChatController extends Controller
             return response()->json(['message' => 'Chat not found'], 404);
         }
 
-        $chat = Chat::where('uuid', $uuid)->with(['users', 'messages'])->first();
+        $chat = Chat::where('uuid', $uuid)
+            ->with([
+                'users',
+                'messages' => function ($query) {
+                    $query->orderBy('created_at', 'desc')->limit(40);
+                },
+                'messages.answer_to',
+            ])
+            ->first()
+        ;
 
         return response()->json($chat);
     }
