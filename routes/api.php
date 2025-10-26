@@ -8,6 +8,7 @@ use App\Http\Controllers\DebugController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\MachineryController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\OfferController;
 use App\Http\Controllers\RequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -82,10 +83,12 @@ Route::middleware(['response.error', 'lang'])->group(function () {
         Route::middleware(['auth'])->group(function () {
             // Chat routes
             Route::prefix('/chat')->group(function () {
-                Route::get('/', [ChatController::class, 'getUserchat']);
-                Route::get('/{chatUuid}', [MessageController::class, 'getMessage']); // Get message in a chat
-                Route::post('/', [MessageController::class, 'sendMessage']); // Send a message
-                Route::delete('/{id}', [MessageController::class, 'deleteMessage']); // Delete a message
+                Route::get('/', [ChatController::class, 'index']);
+                Route::get('/{uuid}', [ChatController::class, 'show']);
+                Route::prefix('/message')->group(function () {
+                    Route::post('/', [MessageController::class, 'store']);
+                    Route::delete('/{uuid}', [MessageController::class, 'destroy']);
+                });
             });
 
             // Machinery routes
@@ -109,20 +112,23 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             // Request routes
             Route::prefix('/request')->group(function () {
                 Route::get('/', [RequestController::class, 'index']);
-                Route::get('/{uuid}', [RequestController::class, 'show']);
+                Route::get('/available', [RequestController::class, 'listRequestsForOffer']);
                 Route::get('/{uuid}/update', [RequestController::class, 'updatePaymentStatus']);
+                Route::get('/{uuid}', [RequestController::class, 'show']);
                 Route::post('/', [RequestController::class, 'store']);
                 // Route::put('/', [RequestController::class, 'update']);
                 Route::delete('/{uuid}', [RequestController::class, 'destroy']);
             });
 
-            // // Offer routes
-            // Route::prefix('/offer')->group(function () {
-            //     Route::get('/', [OfferController::class, 'listOffers']);
-            //     Route::post('/create', [OfferController::class, 'makeOffer']);
-            //     Route::put('/update', [OfferController::class, 'updateOffer']);
-            //     Route::delete('/cancel', [OfferController::class, 'cancelOffer']);
-            // });
+            // Offer routes
+            Route::prefix('/offer')->group(function () {
+                Route::get('/', [OfferController::class, 'index']);
+                Route::get('/{uuid}', [OfferController::class, 'show']);
+                Route::post('/', [OfferController::class, 'store']);
+                Route::put('/{uuid}/accept', [OfferController::class, 'accept']);
+                Route::put('/{uuid}', [OfferController::class, 'update']);
+                Route::delete('/{uuid}', [OfferController::class, 'delete']);
+            });
         });
     });
     Route::middleware([])->prefix('/uploads')->group(function () {

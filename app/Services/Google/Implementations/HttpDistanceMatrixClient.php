@@ -12,8 +12,8 @@ class HttpDistanceMatrixClient implements DistanceMatrixClientInterface
         $response = Http::timeout(5)
             ->retry(2, 100)
             ->get('https://maps.googleapis.com/maps/api/distancematrix/json', [
-                'origins' => $origin,
-                'destinations' => $destination,
+                'origins' => "place_id:{$origin}",
+                'destinations' => "place_id:{$destination}",
                 'key' => config('services.google.matrix_key'),
             ])
         ;

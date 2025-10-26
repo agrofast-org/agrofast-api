@@ -27,16 +27,16 @@ class TransportRequestService
 
             try {
                 $origin = $this->placesClient->getPlaceData($request->origin_place_id);
-                $data['origin_place_name'] = $origin['formattedAddress'];
-                $data['origin_latitude'] = $origin['location']['latitude'];
-                $data['origin_longitude'] = $origin['location']['longitude'];
+                $data['origin_place_name'] = $origin->name;
+                $data['origin_latitude'] = $origin->latitude;
+                $data['origin_longitude'] = $origin->longitude;
 
                 $destination = $this->placesClient->getPlaceData($request->destination_place_id);
-                $data['destination_place_name'] = $destination['formattedAddress'];
-                $data['destination_latitude'] = $destination['location']['latitude'];
-                $data['destination_longitude'] = $destination['location']['longitude'];
+                $data['destination_place_name'] = $destination->name;
+                $data['destination_latitude'] = $destination->latitude;
+                $data['destination_longitude'] = $destination->longitude;
 
-                $matrix = $this->distanceClient->getDistance($origin['formattedAddress'], $destination['formattedAddress']);
+                $matrix = $this->distanceClient->getDistance($origin->place_id, $destination->place_id);
                 $data['distance'] = $matrix['distance']['value'];
                 $data['estimated_time'] = $matrix['duration']['value'];
                 $data['estimated_cost'] = Request::getEstimatedCost($matrix['distance']['value']);

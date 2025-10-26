@@ -75,25 +75,13 @@ class RequestController extends Controller
             ->first()
         ;
 
-        // if (!empty($transportRequest) && $transportRequest->state === TransportRequest::STATE_PAYMENT_PENDING) {
-        //     $paymentService = new PaymentService();
-        //     $pixPayment = $paymentService->makePayment(
-        //         $transportRequest->estimated_cost,
-        //         $user,
-        //     );
-
-        //     $transportRequest->update([
-        //         'payment_id' => $pixPayment->id,
-        //         'state' => TransportRequest::STATE_PAYMENT_PENDING,
-        //     ]);
-        // }
-
         return response()->json($transportRequest, 201);
     }
 
     public function show(string $uuid): JsonResponse
     {
-        $transportRequest = TransportRequest::where('uuid', $uuid)
+        $transportRequest = TransportRequest::with(['machine', 'user'])
+            ->where('uuid', $uuid)
             ->firstOrFail()
         ;
 
@@ -163,5 +151,17 @@ class RequestController extends Controller
         $transportRequest->save();
 
         return response()->json(['message' => 'Request canceled successfully'], 200);
+    }
+
+    public function listRequestsForOffer(): JsonResponse
+    {
+        $requests = TransportRequest::with(['machine', 'user'])
+            ->where('state', TransportRequest::STATE_WAITING_FOR_OFFER)
+            ->where('active', true)
+            ->orderBy('created_at', 'desc')
+            ->get()
+        ;
+
+        return response()->json($requests, 200);
     }
 }

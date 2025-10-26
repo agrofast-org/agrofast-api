@@ -4,12 +4,12 @@ namespace App\Services\Google\Contracts;
 
 use App\Models\Transport\Place;
 
-interface PlacesClientInterface
+interface DirectionClientInterface
 {
     /**
      * Busca dados de um place pelo ID.
      *
      * @throws \InvalidArgumentException|\RuntimeException
      */
-    public function getPlaceData(string $placeId): Place;
+    public function getDirections(string $originPlaceId, string $destinationPlaceId): array;
 }

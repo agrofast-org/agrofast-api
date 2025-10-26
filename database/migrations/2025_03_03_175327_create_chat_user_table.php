@@ -13,7 +13,7 @@ return new class extends Migration {
     {
         Schema::create('chat.chat_user', function (Blueprint $table) {
             $table->id()->primary();
-            $table->string('chat_id');
+            $table->foreignId('chat_id')->constrained('chat.chat')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->timestamp('joined_in')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('left_in')->nullable();
