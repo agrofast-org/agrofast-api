@@ -16,7 +16,6 @@ return new class extends Migration {
             $table->uuid();
             $table->string('name')->nullable();
             $table->string('picture')->nullable();
-            $table->boolean('is_group')->default(false);
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));

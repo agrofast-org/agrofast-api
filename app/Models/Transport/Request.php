@@ -3,6 +3,7 @@
 namespace App\Models\Transport;
 
 use App\Models\Hr\User;
+use App\Support\Traits\HasProgressState;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property float       $distance                     Distance between origin and destination.
  * @property string      $estimated_time               Estimated travel time.
  * @property string      $estimated_cost               Estimated cost of the transport.
+ * @property string      $final_cost                   Final cost of the transport.
  * @property int         $payment_id                   Identifier for the associated Pix payment.
  * @property null|string $payment_pix_url              URL for the Pix payment.
  * @property null|string $payment_pix_qr_code          QR code for the Pix payment.
@@ -41,15 +43,7 @@ use Illuminate\Database\Eloquent\Model;
 class Request extends Model
 {
     use HasFactory;
-
-    public const STATE_PENDING = 'pending';
-    public const STATE_WAITING_FOR_OFFER = 'waiting_for_offer';
-    public const STATE_PAYMENT_PENDING = 'payment_pending';
-    public const STATE_APPROVED = 'approved';
-    public const STATE_REJECTED = 'rejected';
-    public const STATE_IN_PROGRESS = 'in_progress';
-    public const STATE_CANCELED = 'canceled';
-    public const STATE_COMPLETED = 'completed';
+    use HasProgressState;
 
     protected $table = 'transport.request';
 
@@ -71,6 +65,7 @@ class Request extends Model
         'distance',
         'estimated_time',
         'estimated_cost',
+        'final_cost',
 
         'payment_id',
 

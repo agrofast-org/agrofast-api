@@ -3,12 +3,15 @@
 namespace App\Models\Hr;
 
 use App\Enums\UserError;
+use App\Models\Chat\Chat;
+use App\Models\Chat\ChatUser;
 use App\Models\DynamicQuery;
 use App\Models\LastError;
 use Carbon\Carbon;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 
@@ -186,5 +189,13 @@ class User extends DynamicQuery
     public function payment_methods(): HasMany
     {
         return $this->hasMany(PaymentMethod::class, 'user_id', 'id');
+    }
+
+    public function chats(): BelongsToMany
+    {
+        return $this->belongsToMany(Chat::class, (new ChatUser())->getTable(), 'user_id', 'chat_id')
+            ->with(['users', 'last_message'])
+            ->where((new Chat())->getTable().'.active', 1)
+        ;
     }
 }

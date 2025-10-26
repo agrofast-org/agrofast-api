@@ -107,7 +107,7 @@ class Machinery extends Model
     }
 
     public function request()
-    {   
+    {
         return $this->hasOne(Request::class, 'machine_id');
     }
 }

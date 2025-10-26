@@ -75,25 +75,13 @@ class RequestController extends Controller
             ->first()
         ;
 
-        // if (!empty($transportRequest) && $transportRequest->state === TransportRequest::STATE_PAYMENT_PENDING) {
-        //     $paymentService = new PaymentService();
-        //     $pixPayment = $paymentService->makePayment(
-        //         $transportRequest->estimated_cost,
-        //         $user,
-        //     );
-
-        //     $transportRequest->update([
-        //         'payment_id' => $pixPayment->id,
-        //         'state' => TransportRequest::STATE_PAYMENT_PENDING,
-        //     ]);
-        // }
-
         return response()->json($transportRequest, 201);
     }
 
     public function show(string $uuid): JsonResponse
     {
-        $transportRequest = TransportRequest::where('uuid', $uuid)
+        $transportRequest = TransportRequest::with(['machine', 'user'])
+            ->where('uuid', $uuid)
             ->firstOrFail()
         ;
 
