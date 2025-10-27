@@ -112,22 +112,27 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             // Request routes
             Route::prefix('/request')->group(function () {
                 Route::get('/', [RequestController::class, 'index']);
-                Route::get('/available', [RequestController::class, 'listRequestsForOffer']);
-                Route::get('/{uuid}/update', [RequestController::class, 'updatePaymentStatus']);
-                Route::get('/{uuid}', [RequestController::class, 'show']);
                 Route::post('/', [RequestController::class, 'store']);
+                Route::get('/available', [RequestController::class, 'listRequestsForOffer']);
+                Route::prefix('/{uuid}')->group(function () {
+                    Route::get('/offers', [RequestController::class, 'offers']);
+                    Route::get('/update', [RequestController::class, 'updatePaymentStatus']);
+                    Route::get('/', [RequestController::class, 'show']);
+                    Route::delete('/', [RequestController::class, 'destroy']);
+                });
                 // Route::put('/', [RequestController::class, 'update']);
-                Route::delete('/{uuid}', [RequestController::class, 'destroy']);
             });
 
             // Offer routes
             Route::prefix('/offer')->group(function () {
                 Route::get('/', [OfferController::class, 'index']);
-                Route::get('/{uuid}', [OfferController::class, 'show']);
                 Route::post('/', [OfferController::class, 'store']);
-                Route::put('/{uuid}/accept', [OfferController::class, 'accept']);
-                Route::put('/{uuid}', [OfferController::class, 'update']);
-                Route::delete('/{uuid}', [OfferController::class, 'delete']);
+                Route::prefix('/{uuid}')->group(function () {
+                    Route::put('/accept', [OfferController::class, 'accept']);
+                    Route::get('/', [OfferController::class, 'show']);
+                    Route::put('/', [OfferController::class, 'update']);
+                    Route::delete('/', [OfferController::class, 'delete']);
+                });
             });
         });
     });
