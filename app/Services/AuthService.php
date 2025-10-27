@@ -176,6 +176,18 @@ class AuthService
     {
         $payload = $this->googleAuthService->verifyToken($request->input('credential'));
 
+        return $this->loginWithGooglePayload($request, $payload);
+    }
+
+    public function googleV2(Request $request)
+    {
+        $payload = $this->googleAuthService->verifyAccessToken($request->input('access_token'));
+
+        return $this->loginWithGooglePayload($request, $payload);
+    }
+
+    protected function loginWithGooglePayload(Request $request, $payload)
+    {
         if (!$payload) {
             return response()->json(['message' => 'Invalid Google token'], 401);
         }

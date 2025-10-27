@@ -57,6 +57,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             Route::post('/sign-in', [UserController::class, 'login']);
             Route::post('/sign-up', [UserController::class, 'store']);
             Route::post('/google-auth', [UserController::class, 'googleAuth']);
+            Route::post('/google-auth/v2', [UserController::class, 'googleAuthV2']);
             Route::middleware(['auth.basic'])->group(function () {
                 Route::get('/', [UserController::class, 'authenticate']);
                 Route::get('/methods', [UserController::class, 'authenticationMethods']);
@@ -74,6 +75,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             });
             Route::middleware(['auth'])->group(function () {
                 Route::put('/', [UserController::class, 'update']);
+                Route::put('/password', [UserController::class, 'password']);
                 Route::put('/profile-type', [UserController::class, 'profileType']);
                 Route::prefix('/picture')->group(function () {
                     Route::post('/upload', [UserController::class, 'postPicture']);
