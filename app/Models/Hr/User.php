@@ -193,9 +193,22 @@ class User extends DynamicQuery
 
     public function chats(): BelongsToMany
     {
-        return $this->belongsToMany(Chat::class, (new ChatUser())->getTable(), 'user_id', 'chat_id')
+        $chatTable = (new Chat())->getTable();
+        $chatUserTable = (new ChatUser())->getTable();
+
+        return $this->belongsToMany(Chat::class, ChatUser::class, 'user_id', 'chat_id')
             ->with(['users', 'last_message'])
-            ->where((new Chat())->getTable().'.active', 1)
+            ->where($chatTable.'.active', 1)
+            ->groupBy([
+                "{$chatTable}.id",
+                "{$chatUserTable}.user_id",
+                "{$chatUserTable}.chat_id",
+            ])
+            ->orderByDesc(
+                Chat::selectRaw('MAX(created_at)')
+                    ->from('chat.message')
+                    ->whereColumn('chat.message.chat_id', "{$chatTable}.id")
+            )
         ;
     }
 }
