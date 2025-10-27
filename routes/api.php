@@ -67,6 +67,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
     Route::middleware(['db.safe', 'fingerprint'])->group(function () {
         Route::prefix('/user')->group(function () {
             Route::get('/', [UserController::class, 'index']);
+            Route::get('/search', [UserController::class, 'search']);
             Route::prefix('/info')->middleware(['auth.basic'])->group(function () {
                 Route::get('/me', [UserController::class, 'self']);
                 Route::get('/{uuid}', [UserController::class, 'info']);
@@ -84,6 +85,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             // Chat routes
             Route::prefix('/chat')->group(function () {
                 Route::get('/', [ChatController::class, 'index']);
+                Route::post('/with', [ChatController::class, 'with']);
                 Route::get('/{uuid}', [ChatController::class, 'show']);
                 Route::prefix('/message')->group(function () {
                     Route::post('/', [MessageController::class, 'store']);
