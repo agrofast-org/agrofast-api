@@ -8,20 +8,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Message.
+ * Class ChatUser.
  *
  * @property int         $id
- * @property string      $uuid
- * @property int         $user_id
  * @property string      $chat_id
- * @property string      $message
- * @property null|int    $answer_to
+ * @property int         $user_id
+ * @property Carbon      $joined_in
+ * @property null|Carbon $left_in
  * @property bool        $active
  * @property Carbon      $created_at
  * @property Carbon      $updated_at
  * @property null|Carbon $inactivated_at
  */
-class Message extends Model
+class ChatUser extends Model
 {
     use HasFactory;
 
@@ -29,46 +28,37 @@ class Message extends Model
 
     public $timestamps = true;
 
-    protected $table = 'chat.message';
+    protected $table = 'chat.chat_user';
 
     protected $primaryKey = 'id';
 
     protected $keyType = 'int';
 
     protected $fillable = [
-        'uuid',
-        'user_id',
         'chat_id',
-        'message',
-        'answer_to',
+        'user_id',
+        'joined_in',
+        'left_in',
         'active',
         'inactivated_at',
     ];
 
     protected $dates = [
+        'joined_in',
+        'left_in',
         'created_at',
         'updated_at',
         'inactivated_at',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id', 'id');
-    }
 
     public function chat()
     {
         return $this->belongsTo(Chat::class, 'chat_id', 'id');
     }
 
-    public function answer_to()
+    public function user()
     {
-        return $this->belongsTo(self::class, 'answer_to', 'id');
-    }
-
-    public function replies()
-    {
-        return $this->hasMany(self::class, 'answer_to', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public function scopeActive($query)

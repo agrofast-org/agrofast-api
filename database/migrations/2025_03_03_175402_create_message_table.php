@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->id();
             $table->uuid();
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
-            $table->string('chat_id');
+            $table->foreignId('chat_id')->constrained('chat.chat')->onDelete('cascade');
             $table->text('message');
             $table->foreignId('answer_to')->nullable()->constrained('chat.message', 'id')->onDelete('cascade');
             $table->boolean('active')->default(true);

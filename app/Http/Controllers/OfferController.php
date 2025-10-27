@@ -2,117 +2,142 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\Offer\StoreOfferRequest;
+use App\Models\Hr\User;
 use App\Models\Transport\Offer;
+use App\Models\Transport\Request as TransportRequest;
+use App\Services\Chat\ChatService;
+use App\Services\MercadoPago\PaymentService;
+use App\Services\Transport\OfferService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class OfferController extends Controller
 {
-    /**
-     * List all offers for the authenticated user.
-     */
-    public function listOffers(): JsonResponse
+    public function __construct(
+        protected PaymentService $paymentService,
+        protected ChatService $chatService,
+        protected OfferService $offerService
+    ) {}
+
+    public function index(): JsonResponse
     {
-        $user = Auth::user();
+        $user = User::auth();
+        // $offers = Offer::with(['request', 'carrier'])->where('user_id', $user->id)->get();
         $offers = Offer::where('user_id', $user->id)->get();
 
-        return response()->json(['data' => $offers], 200);
+        return response()->json($offers);
     }
 
     /**
-     * Create a new offer.
+     * Summary of show.
+     *
+     * @param string $uuid offer uuid
      */
-    public function makeOffer(Request $request): JsonResponse
+    public function show(string $uuid): JsonResponse
     {
-        $user = Auth::user();
-
-        $validated = $request->validate([
-            'request_id' => 'required|exists:transport_requests,id',
-            'carrier_id' => 'required|exists:carriers,id',
-            'float' => 'required|numeric|min:0',
-        ]);
-
-        // Ensure user doesn't have an active offer
-        $existingOffer = Offer::where('user_id', $user->id)
-            ->where('active', true)
+        $user = User::auth();
+        $offer = Offer::where('uuid', $uuid)
+            ->where('user_id', $user->id)
             ->first()
         ;
 
-        if ($existingOffer) {
-            return response()->json(['message' => 'Cannot make more than one offer at a time'], 400);
+        if (!$offer) {
+            return response()->json(['message' => 'Offer not found'], 404);
         }
 
-        try {
-            Offer::create([
-                'user_id' => $user->id,
-                'request_id' => $validated['request_id'],
-                'carrier_id' => $validated['carrier_id'],
-                'float' => $validated['float'],
-            ]);
-
-            return response()->json(['message' => 'Offer created'], 201);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to create offer', 'error' => $e->getMessage()], 500);
-        }
+        return response()->json($offer);
     }
 
     /**
-     * Update an existing offer.
+     * Summary of received.
+     *
+     * @param mixed $uuid request uuid
+     *
+     * @return JsonResponse
      */
-    public function updateOffer(Request $request): JsonResponse
+    public function received($uuid)
     {
-        $user = Auth::user();
+        $user = User::auth();
 
-        $validated = $request->validate([
-            'id' => 'required|exists:offers,id',
-            'request_id' => 'required|exists:transport_requests,id',
-            'carrier_id' => 'required|exists:carriers,id',
-            'float' => 'required|numeric|min:0',
-        ]);
+        $transportRequest = TransportRequest::where('uuid', $uuid)
+            ->where('user_id', $user->id)
+            ->first()
+        ;
+        if (!$transportRequest) {
+            return response()->json(['message' => 'Transport request not found'], 404);
+        }
+        $offers = Offer::where('request_id', $transportRequest->id)
+            ->where('active', true)
+            ->orderBy('created_at', 'desc')
+            ->get()
+        ;
 
-        $offer = Offer::where('id', $validated['id'])->where('user_id', $user->id)->first();
+        return response()->json($offers);
+    }
+
+    public function store(StoreOfferRequest $request): JsonResponse
+    {
+        [
+            'validated' => $validated,
+
+            'transporter' => $transporter,
+            'requestant' => $requestant,
+
+            'transportRequest' => $transportRequest,
+            // 'carrier' => $carrier,
+            'offer' => $offer,
+        ] = $this->offerService->makeOffer($request);
+
+        if ($this->offerService->getHasMinimumPrice($offer, $transportRequest)) {
+            [
+                'chat' => $chat,
+            ] = $this->offerService->acceptOffer($offer, $transportRequest, $requestant, $transporter, $validated['message']);
+
+            return response()->json([
+                'chat_uuid' => $chat->uuid,
+            ], 201);
+        }
+
+        return response()->json($offer, 201);
+    }
+
+    /**
+     * Summary of accept.
+     *
+     * @param mixed $uuid offer uuid
+     *
+     * @return JsonResponse
+     */
+    public function accept($uuid)
+    {
+        [
+            'offer' => $offer,
+            'transportRequest' => $transportRequest,
+            'requestant' => $requestant,
+            'transporter' => $transporter,
+        ] = $this->offerService->validateOfferAcception($uuid);
+
+        $this->offerService->acceptOffer($offer, $transportRequest, $requestant, $transporter);
+
+        return response()->json(['message' => 'Offer accepted'], 200);
+    }
+
+    /**
+     * Summary of update.
+     *
+     * @param mixed $uuid offer uuid
+     */
+    public function delete($uuid): JsonResponse
+    {
+        $user = User::auth();
+        $offer = Offer::where('uuid', $uuid)->where('user_id', $user->id)->first();
 
         if (!$offer) {
             return response()->json(['message' => 'Offer not found'], 404);
         }
 
-        try {
-            $offer->update([
-                'request_id' => $validated['request_id'],
-                'carrier_id' => $validated['carrier_id'],
-                'float' => $validated['float'],
-            ]);
+        $offer->update(['state' => Offer::STATE_CANCELED, 'active' => false]);
 
-            return response()->json(['message' => 'Offer updated'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to update offer', 'error' => $e->getMessage()], 500);
-        }
-    }
-
-    /**
-     * Cancel an offer.
-     */
-    public function cancelOffer(Request $request): JsonResponse
-    {
-        $user = Auth::user();
-
-        $validated = $request->validate([
-            'id' => 'required|exists:offers,id',
-        ]);
-
-        $offer = Offer::where('id', $validated['id'])->where('user_id', $user->id)->first();
-
-        if (!$offer) {
-            return response()->json(['message' => 'Offer not found'], 404);
-        }
-
-        try {
-            $offer->update(['active' => false]);
-
-            return response()->json(['message' => 'Offer cancelled'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Failed to cancel offer', 'error' => $e->getMessage()], 500);
-        }
+        return response()->json(['message' => 'Offer cancelled'], 200);
     }
 }

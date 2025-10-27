@@ -6,6 +6,7 @@ use App\Http\Requests\Request\StoreRequestRequest;
 use App\Models\Hr\PixPayment;
 use App\Models\Hr\User;
 use App\Models\Transport\Machinery;
+use App\Models\Transport\Offer;
 use App\Models\Transport\Request as TransportRequest;
 use App\Services\MercadoPago\PaymentService;
 use App\Services\TransportRequestService;
@@ -75,25 +76,13 @@ class RequestController extends Controller
             ->first()
         ;
 
-        // if (!empty($transportRequest) && $transportRequest->state === TransportRequest::STATE_PAYMENT_PENDING) {
-        //     $paymentService = new PaymentService();
-        //     $pixPayment = $paymentService->makePayment(
-        //         $transportRequest->estimated_cost,
-        //         $user,
-        //     );
-
-        //     $transportRequest->update([
-        //         'payment_id' => $pixPayment->id,
-        //         'state' => TransportRequest::STATE_PAYMENT_PENDING,
-        //     ]);
-        // }
-
         return response()->json($transportRequest, 201);
     }
 
     public function show(string $uuid): JsonResponse
     {
-        $transportRequest = TransportRequest::where('uuid', $uuid)
+        $transportRequest = TransportRequest::with(['machine', 'user'])
+            ->where('uuid', $uuid)
             ->firstOrFail()
         ;
 
@@ -105,6 +94,25 @@ class RequestController extends Controller
         $data['payment'] = $pixPayment;
 
         return response()->json($data, 200);
+    }
+
+    public function offers(string $uuid)
+    {
+        $user = User::auth();
+        $transportRequest = TransportRequest::where('uuid', $uuid)
+            ->where('user_id', $user->id)
+            ->firstOrFail()
+        ;
+
+        $offers = Offer::where('request_id', $transportRequest->id)
+            ->join('hr.user', 'hr.user.id', '=', 'offer.user_id')
+            ->select('offer.*', 'hr.user.name as user_name')
+            ->with(['carrier'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+        ;
+
+        return response()->json($offers, 200);
     }
 
     public function updatePaymentStatus(string $uuid): JsonResponse

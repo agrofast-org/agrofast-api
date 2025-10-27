@@ -2,52 +2,73 @@
 
 namespace App\Models\Chat;
 
-use Illuminate\Database\Eloquent\Collection;
+use App\Models\Hr\User;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Class Chat.
+ *
+ * @property int         $id
+ * @property string      $uuid
+ * @property null|string $name
+ * @property null|string $picture
+ * @property bool        $active
+ * @property Carbon      $created_at
+ * @property Carbon      $updated_at
+ * @property null|Carbon $inactivated_at
+ */
 class Chat extends Model
 {
     use HasFactory;
 
-    public $incrementing = false;
+    public $incrementing = true;
+
+    public $timestamps = true;
 
     protected $table = 'chat.chat';
 
-    protected $primaryKey = 'uuid';
+    protected $primaryKey = 'id';
 
-    protected $keyType = 'string';
+    protected $keyType = 'int';
 
     protected $fillable = [
         'uuid',
         'name',
         'picture',
-        'is_group',
+        'active',
+        'inactivated_at',
     ];
 
-    /**
-     * Get the message for the chat.
-     *
-     * @return Collection
-     */
-    public function getmessage(string $chatUuid)
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'inactivated_at',
+    ];
+
+    public function scopeActive($query)
     {
-        return $this->message()
-            ->where('uuid', $chatUuid)
-            ->orderBy('created_at', 'ASC')
-            ->take(50)
-            ->get()
-        ;
+        return $query->where('active', true);
     }
 
-    /**
-     * Define a relação com o modelo Message.
-     *
-     * @return HasMany
-     */
-    public function message()
+    public function scopeInactive($query)
     {
-        return $this->hasMany(Message::class, 'chat_uuid', 'uuid');
+        return $query->where('active', false);
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'chat.chat_user', 'chat_id', 'user_id');
+    }
+
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'chat_id', 'id');
+    }
+
+    public function last_message()
+    {
+        return $this->hasOne(Message::class, 'chat_id', 'id')->latestOfMany();
     }
 }

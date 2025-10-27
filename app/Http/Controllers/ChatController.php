@@ -2,25 +2,44 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Chat\Message;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Auth;
+use App\Models\Chat\Chat;
+use App\Models\Hr\User;
+use App\Services\Chat\ChatService;
 
 class ChatController extends Controller
 {
-    /**
-     * Retrieve chat for the authenticated user.
-     */
-    public function getUserchat(): JsonResponse
+    public function __construct(
+        protected ChatService $chatService
+    ) {}
+
+    public function index()
     {
-        // Retrieve the authenticated user
-        $user = Auth::user();
+        $user = User::auth();
+        $chats = $user->chats()->get();
 
-        // Fetch chat for the authenticated user
-        $chat = Message::getUserchat($user->id);
+        return response()->json($chats);
+    }
 
-        return response()->json([
-            'data' => $chat,
-        ], 200);
+    public function show(string $uuid)
+    {
+        $user = User::auth();
+        $chat = Chat::where('uuid', $uuid)->first();
+
+        if (!$this->chatService->userBelongsToChat($user->id, $chat->id)) {
+            return response()->json(['message' => 'Chat not found'], 404);
+        }
+
+        $chat = Chat::where('uuid', $uuid)
+            ->with([
+                'users',
+                'messages' => function ($query) {
+                    $query->orderBy('created_at', 'desc')->limit(40);
+                },
+                'messages.answer_to',
+            ])
+            ->first()
+        ;
+
+        return response()->json($chat);
     }
 }
