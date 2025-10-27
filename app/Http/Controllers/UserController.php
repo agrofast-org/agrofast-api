@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\User\UserLoginRequest;
+use App\Http\Requests\User\UserPasswordUpdateRequest;
 use App\Http\Requests\User\UserProfileTypeRequest;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
@@ -15,6 +16,7 @@ use App\Services\UserDocumentService;
 use App\Services\UserQueryService;
 use App\Services\UserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -97,6 +99,22 @@ class UserController extends Controller
         return response()->json(UserDataResponse::withDocument($user), 200);
     }
 
+    public function password(UserPasswordUpdateRequest $request)
+    {
+        $data = $request->validated();
+        $user = User::auth();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->update([
+            'password' => Hash::make($data['password']),
+        ]);
+
+        return response()->json(UserDataResponse::withDocument($user), 200);
+    }
+
     public function login(UserLoginRequest $request)
     {
         $credentials = $request->validated();
@@ -109,6 +127,13 @@ class UserController extends Controller
     public function googleAuth(Request $request)
     {
         $result = $this->authService->google($request);
+
+        return response()->json($result, 200);
+    }
+
+    public function googleAuthV2(Request $request)
+    {
+        $result = $this->authService->googleV2($request);
 
         return response()->json($result, 200);
     }
@@ -161,6 +186,7 @@ class UserController extends Controller
         return response()->json([
             ...UserDataResponse::withDocument($user),
             'authenticated' => $session->authenticated,
+            'has_password' => !empty($user->password),
         ]);
     }
 

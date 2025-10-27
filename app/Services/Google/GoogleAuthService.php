@@ -8,17 +8,22 @@ use App\Factories\TokenFactory;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\Session;
 use App\Models\Hr\User;
+use Google\Auth\AccessToken;
+use Google\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class GoogleAuthService
 {
     protected $client;
+    protected $accessToken;
 
     public function __construct()
     {
-        $this->client = new \Google_Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+        $this->client = new Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+        $this->accessToken = new AccessToken();
     }
 
     /**
@@ -41,6 +46,20 @@ class GoogleAuthService
         return $payload;
     }
 
+    public function verifyAccessToken($accessToken)
+    {
+        $response = Http::get('https://www.googleapis.com/oauth2/v2/userinfo', [
+            'alt' => 'json',
+            'access_token' => $accessToken,
+        ]);
+
+        if ($response->failed()) {
+            throw new InvalidRequestException('Invalid Google token', [], Response::HTTP_UNAUTHORIZED);
+        }
+
+        return $response->json();
+    }
+
     /**
      * Summary of createUserFromGoogle.
      *
@@ -53,7 +72,7 @@ class GoogleAuthService
         $user = User::create([
             'uuid' => Str::uuid()->toString(),
             'email' => $payload['email'],
-            'email_verified' => $payload['email_verified'],
+            'email_verified' => $payload['email_verified'] ?? $payload['verified_email'] ?? false,
             'password' => '',
             'name' => $payload['given_name'],
             'surname' => $payload['family_name'] ?? '',
@@ -85,7 +104,7 @@ class GoogleAuthService
 
         $user->update([
             'profile_picture' => $user->profile_picture ?? $payload['picture'],
-            'email_verified' => $payload['email_verified'],
+            'email_verified' => $payload['email_verified'] ?? $payload['verified_email'] ?? false,
         ]);
 
         return [
