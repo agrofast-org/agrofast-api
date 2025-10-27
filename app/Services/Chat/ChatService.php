@@ -12,10 +12,15 @@ class ChatService
 {
     public function createPrivateChat(int $userA, int $userB, ?string $firstMessage = null): Chat
     {
+        if ($userA === $userB) {
+            throw new InvalidFormException('Não é possível criar um chat privado consigo mesmo.', [
+                'user_uuid' => ['O usuário especificado é inválido.'],
+            ]);
+        }
         $existingChat = Chat::whereHas('users', function ($q) use ($userA, $userB) {
             $q->whereIn('user_id', [$userA, $userB]);
         })
-            ->whereHas('users', fn ($q) => $q->groupBy(['chat_id', 'chat_user.id'])->havingRaw('count(distinct user_id) = 2'))
+            ->whereHas('users', fn ($q) => $q->groupBy(['chat_id', 'chat_user.id', 'user.id'])->havingRaw('count(distinct user_id) = 2'))
             ->first()
         ;
 

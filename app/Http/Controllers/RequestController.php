@@ -6,6 +6,7 @@ use App\Http\Requests\Request\StoreRequestRequest;
 use App\Models\Hr\PixPayment;
 use App\Models\Hr\User;
 use App\Models\Transport\Machinery;
+use App\Models\Transport\Offer;
 use App\Models\Transport\Request as TransportRequest;
 use App\Services\MercadoPago\PaymentService;
 use App\Services\TransportRequestService;
@@ -93,6 +94,25 @@ class RequestController extends Controller
         $data['payment'] = $pixPayment;
 
         return response()->json($data, 200);
+    }
+
+    public function offers(string $uuid)
+    {
+        $user = User::auth();
+        $transportRequest = TransportRequest::where('uuid', $uuid)
+            ->where('user_id', $user->id)
+            ->firstOrFail()
+        ;
+
+        $offers = Offer::where('request_id', $transportRequest->id)
+            ->join('hr.user', 'hr.user.id', '=', 'offer.user_id')
+            ->select('offer.*', 'hr.user.name as user_name')
+            ->with(['carrier'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+        ;
+
+        return response()->json($offers, 200);
     }
 
     public function updatePaymentStatus(string $uuid): JsonResponse

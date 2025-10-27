@@ -53,6 +53,23 @@ class UserController extends Controller
         return response()->json(['message' => 'User not found'], 404);
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->only(['q', 'limit', 'offset']);
+
+        return User::where('name', 'like', '%'.($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED').'%')
+            ->orWhere('surname', 'like', '%'.($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED').'%')
+            ->orWhere('email', 'like', '%'.($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED').'%')
+            ->limit($query['limit'] ?? 10)->offset($query['offset'] ?? 0)
+            ->get([
+                'uuid as value',
+                'name as label',
+                'email as description',
+                'profile_picture as image',
+            ])
+        ;
+    }
+
     public function store(UserStoreRequest $request)
     {
         $data = $request->validated();

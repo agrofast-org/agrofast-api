@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Chat\Chat;
 use App\Models\Hr\User;
 use App\Services\Chat\ChatService;
+use Illuminate\Http\Request;
 
 class ChatController extends Controller
 {
@@ -39,6 +40,21 @@ class ChatController extends Controller
             ])
             ->first()
         ;
+
+        return response()->json($chat);
+    }
+
+    public function with(Request $request)
+    {
+        $user = User::auth();
+        $otherUserUuid = $request->input('user_uuid');
+        $otherUser = User::where('uuid', $otherUserUuid)->first();
+
+        if (!$otherUser) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $chat = $this->chatService->createPrivateChat($user->id, $otherUser->id);
 
         return response()->json($chat);
     }
