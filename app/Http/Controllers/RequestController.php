@@ -165,10 +165,11 @@ class RequestController extends Controller
             return response()->json(['message' => 'Cannot cancel request in this state'], 400);
         }
 
-        $transportRequest->state = TransportRequest::STATE_CANCELED;
-        $transportRequest->active = false;
-        $transportRequest->inactivated_at = now();
-        $transportRequest->save();
+        $transportRequest->update([
+            'state' => TransportRequest::STATE_CANCELED,
+            'active' => false,
+            'inactivated_at' => now(),
+        ]);
 
         return response()->json(['message' => 'Request canceled successfully'], 200);
     }

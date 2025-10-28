@@ -19,8 +19,10 @@ class ChatService
         }
         $existingChat = Chat::whereHas('users', function ($q) use ($userA, $userB) {
             $q->whereIn('user_id', [$userA, $userB]);
-        })
-            ->whereHas('users', fn ($q) => $q->groupBy(['chat_id', 'chat_user.id', 'user.id'])->havingRaw('count(distinct user_id) = 2'))
+        }, '=', 2)
+            ->whereDoesntHave('users', function ($q) use ($userA, $userB) {
+                $q->whereNotIn('user_id', [$userA, $userB]);
+            })
             ->first()
         ;
 

@@ -90,8 +90,8 @@ class Request extends Model
 
     public static function getEstimatedCost($distance)
     {
-        // Assuming cost is $2.5 per km
-        return number_format($distance / 1000 * 2.5, 2);
+        // Assuming cost is $9.5 per km
+        return round(($distance / 1000) * 9.5, 2);
     }
 
     /**
