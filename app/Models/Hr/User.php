@@ -109,7 +109,7 @@ class User extends DynamicQuery
 
         $token = request()->bearerToken();
         if (empty($token)) {
-            self::setLastError(UserError::MISSING_TOKEN);
+            self::setLastError(UserError::MISSING_TOKEN->value);
 
             return false;
         }

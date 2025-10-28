@@ -3,6 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Offer\StoreOfferRequest;
+use App\Jobs\SendMail;
+use App\Mail\Offer\OfferAcceptedMail;
+use App\Mail\Offer\OfferCanceledMail;
+use App\Mail\Offer\OfferInstantAcceptedMail;
+use App\Mail\Offer\OfferReceivedAcceptedMail;
+use App\Mail\Offer\OfferReceivedMail;
 use App\Models\Hr\User;
 use App\Models\Transport\Offer;
 use App\Models\Transport\Request as TransportRequest;
@@ -22,8 +28,7 @@ class OfferController extends Controller
     public function index(): JsonResponse
     {
         $user = User::auth();
-        // $offers = Offer::with(['request', 'carrier'])->where('user_id', $user->id)->get();
-        $offers = Offer::where('user_id', $user->id)->get();
+        $offers = Offer::with(['request', 'carrier'])->where('user_id', $user->id)->get();
 
         return response()->json($offers);
     }
@@ -93,10 +98,28 @@ class OfferController extends Controller
                 'chat' => $chat,
             ] = $this->offerService->acceptOffer($offer, $transportRequest, $requestant, $transporter, $validated['message']);
 
+            SendMail::dispatch($requestant->email, OfferReceivedAcceptedMail::class, [
+                'user_id' => $requestant->id,
+                'request_id' => $transportRequest->id,
+                'offer_id' => $offer->id,
+            ]);
+
+            SendMail::dispatch($transporter->email, OfferInstantAcceptedMail::class, [
+                'user_id' => $transporter->id,
+                'request_id' => $transportRequest->id,
+                'offer_id' => $offer->id,
+            ]);
+
             return response()->json([
                 'chat_uuid' => $chat->uuid,
             ], 201);
         }
+
+        SendMail::dispatch($requestant->email, OfferReceivedMail::class, [
+            'user_id' => $requestant->id,
+            'request_id' => $transportRequest->id,
+            'offer_id' => $offer->id,
+        ]);
 
         return response()->json($offer, 201);
     }
@@ -119,6 +142,18 @@ class OfferController extends Controller
 
         $this->offerService->acceptOffer($offer, $transportRequest, $requestant, $transporter);
 
+        SendMail::dispatch($requestant->email, OfferReceivedMail::class, [
+            'user_id' => $requestant->id,
+            'request_id' => $transportRequest->id,
+            'offer_id' => $offer->id,
+        ]);
+
+        SendMail::dispatch($transporter->email, OfferAcceptedMail::class, [
+            'user_id' => $transporter->id,
+            'request_id' => $transportRequest->id,
+            'offer_id' => $offer->id,
+        ]);
+
         return response()->json(['message' => 'Offer accepted'], 200);
     }
 
@@ -137,6 +172,12 @@ class OfferController extends Controller
         }
 
         $offer->update(['state' => Offer::STATE_CANCELED, 'active' => false]);
+
+        SendMail::dispatch($user->email, OfferCanceledMail::class, [
+            'user_id' => $user->id,
+            'request_id' => $offer->request_id,
+            'offer_id' => $offer->id,
+        ]);
 
         return response()->json(['message' => 'Offer cancelled'], 200);
     }

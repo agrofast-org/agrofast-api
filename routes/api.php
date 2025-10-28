@@ -43,7 +43,9 @@ Route::middleware(['response.error', 'lang'])->group(function () {
     });
 
     Route::middleware([])->prefix('/webhook')->group(function () {
-        Route::prefix('/mercado-pago')->group(function () {});
+        Route::prefix('/mercado-pago')->group(function () {
+            Route::post('/pix-payment', [RequestController::class, 'handlePixPaymentWebhook']);
+        });
     });
 
     Route::middleware([])->prefix('/auth')->group(function () {
