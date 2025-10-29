@@ -23,7 +23,8 @@ class RequestController extends Controller
     public function index(): JsonResponse
     {
         $user = User::auth();
-        $requests = TransportRequest::where('user_id', $user->id)
+        $requests = TransportRequest::with(['pix_payment'])
+            ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
             ->get()
         ;

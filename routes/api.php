@@ -6,6 +6,7 @@ use App\Http\Controllers\CarrierController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\Integrations\MercadoPagoController;
 use App\Http\Controllers\MachineryController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\OfferController;
@@ -43,9 +44,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
     });
 
     Route::middleware([])->prefix('/webhook')->group(function () {
-        Route::prefix('/mercado-pago')->group(function () {
-            Route::post('/pix-payment', [RequestController::class, 'handlePixPaymentWebhook']);
-        });
+        Route::post('/mercado-pago', [MercadoPagoController::class, 'webhook']);
     });
 
     Route::middleware([])->prefix('/auth')->group(function () {

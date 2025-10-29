@@ -2,6 +2,7 @@
 
 namespace App\Models\Transport;
 
+use App\Models\Hr\PixPayment;
 use App\Models\Hr\User;
 use App\Support\Traits\HasProgressState;
 use Carbon\Carbon;
@@ -108,5 +109,10 @@ class Request extends Model
     public function machine()
     {
         return $this->hasOne(Machinery::class, 'id', 'machine_id');
+    }
+
+    public function pix_payment()
+    {
+        return $this->hasMany(PixPayment::class, 'id', 'payment_id');
     }
 }

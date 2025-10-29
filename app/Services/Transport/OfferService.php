@@ -98,10 +98,10 @@ class OfferService
 
     public function acceptOffer(Offer $offer, TransportRequest $transportRequest, User $requestant, User $user, ?string $message = null)
     {
-        // $pixPayment = $this->paymentService->makePayment(
-        //     $offer->price,
-        //     $requestant,
-        // );
+        $pixPayment = $this->paymentService->makePayment(
+            $offer->price,
+            $requestant,
+        );
 
         $offer->update([
             'state' => Offer::STATE_APPROVED,
@@ -109,7 +109,7 @@ class OfferService
 
         $transportRequest->update([
             'final_cost' => $offer->price,
-            // 'payment_id' => $pixPayment->id,
+            'payment_id' => $pixPayment->id,
             'state' => TransportRequest::STATE_PAYMENT_PENDING,
         ]);
 
