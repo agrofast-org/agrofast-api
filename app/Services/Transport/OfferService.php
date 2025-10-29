@@ -5,8 +5,6 @@ namespace App\Services\Transport;
 use App\Exception\InvalidFormException;
 use App\Exception\InvalidRequestException;
 use App\Http\Requests\Offer\StoreOfferRequest;
-use App\Jobs\SendMail;
-use App\Mail\Offer\OfferReceivedMail;
 use App\Models\Hr\User;
 use App\Models\Transport\Carrier;
 use App\Models\Transport\Offer;

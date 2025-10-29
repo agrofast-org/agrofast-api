@@ -46,6 +46,14 @@ Route::middleware(['response.error', 'lang'])->group(function () {
     Route::middleware([])->prefix('/webhook')->group(function () {
         Route::post('/mercado-pago', [MercadoPagoController::class, 'webhook']);
     });
+    Route::middleware([])->prefix('/integrations')->group(function () {
+        Route::prefix('/mercado-pago')->group(function () {
+            Route::middleware(['auth'])->group(function () {
+                Route::get('/connect', [MercadoPagoController::class, 'connect']);
+                Route::get('/callback', [MercadoPagoController::class, 'callback']);
+            });
+        });
+    });
 
     Route::middleware([])->prefix('/auth')->group(function () {
         Route::prefix('fingerprint')->group(function () {
@@ -129,7 +137,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             });
 
             // Offer routes
-            Route::prefix('/offer')->group(function () {
+            Route::middleware(['auth.mercado_pago'])->prefix('/offer')->group(function () {
                 Route::get('/', [OfferController::class, 'index']);
                 Route::post('/', [OfferController::class, 'store']);
                 Route::prefix('/{uuid}')->group(function () {

@@ -16,7 +16,7 @@ class MercadoPagoController extends Controller
      * Summary of webhook.
      *
      * TODO: documentar melhor o funcionamento deste webhook
-     * 
+     *
      * @return JsonResponse
      */
     public function webhook(Request $request, PaymentService $paymentService)

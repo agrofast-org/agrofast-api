@@ -54,7 +54,7 @@ class ChatService
         return $chat;
     }
 
-    public function sendMessage(int $chatId, int $userId, string $content, int|string|null $answerTo = null): Message
+    public function sendMessage(int $chatId, int $userId, string $content, null|int|string $answerTo = null): Message
     {
         $message = ((bool) $answerTo) ? ($answerTo === null ? null : Message::where('active', true)->where([
             (is_int($answerTo) || (is_string($answerTo) && ctype_digit($answerTo))) ? 'id' : 'uuid' => $answerTo,

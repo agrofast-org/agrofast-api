@@ -211,4 +211,9 @@ class User extends DynamicQuery
             )
         ;
     }
+
+    public function user_mercado_pago()
+    {
+        return $this->hasOne(UserMercadoPago::class, 'user_id', 'id');
+    }
 }
