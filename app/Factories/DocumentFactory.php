@@ -3,6 +3,7 @@
 namespace App\Factories;
 
 use App\Models\Hr\Document;
+use App\Models\Hr\DocumentType;
 use App\Models\Hr\User;
 use Illuminate\Support\Str;
 
@@ -19,11 +20,13 @@ class DocumentFactory
             return $registeredDocument;
         }
 
+        $documentType = DocumentType::where('key', $document['type'])->first();
+
         return Document::create([
             'uuid' => Str::uuid(),
             'user_id' => $user->id,
             'emission_date' => $document['emission_date'],
-            'document_type' => $document['document_type'],
+            'document_type' => $documentType->id,
             'number' => $document['number'],
         ]);
     }

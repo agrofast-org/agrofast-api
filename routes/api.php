@@ -5,6 +5,7 @@ use App\Http\Controllers\BrowserAgentController;
 use App\Http\Controllers\CarrierController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DebugController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\IndexController;
 use App\Http\Controllers\Integrations\MercadoPagoController;
 use App\Http\Controllers\MachineryController;
@@ -39,7 +40,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             // Route::get('/sms', [DebugController::class, 'sendSms']);
         });
         Route::middleware(['dev.env'])->group(function () {
-            include __DIR__.'/testing/email.php';
+            include __DIR__ . '/testing/email.php';
         });
     });
 
@@ -86,6 +87,14 @@ Route::middleware(['response.error', 'lang'])->group(function () {
                 Route::put('/', [UserController::class, 'update']);
                 Route::put('/password', [UserController::class, 'password']);
                 Route::put('/profile-type', [UserController::class, 'profileType']);
+                Route::prefix('/document')->group(function () {
+                    Route::get('/', [DocumentController::class, 'index']);
+                    Route::get('/{uuid}', [DocumentController::class, 'show']);
+                    Route::post('/', [DocumentController::class, 'store']);
+                    Route::put('/{uuid}', [DocumentController::class, 'update']);
+                    Route::delete('/{uuid}', [DocumentController::class, 'delete']);
+                });
+
                 Route::prefix('/picture')->group(function () {
                     Route::post('/upload', [UserController::class, 'postPicture']);
                 });
