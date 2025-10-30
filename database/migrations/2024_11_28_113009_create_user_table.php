@@ -28,6 +28,7 @@ return new class extends Migration {
             $table->boolean('number_verified')->default(false);
             $table->timestamp('number_verified_at')->nullable();
             $table->string('profile_picture')->nullable();
+            $table->string('pix_key')->nullable();
             $table->rememberToken();
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

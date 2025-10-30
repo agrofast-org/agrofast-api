@@ -91,11 +91,6 @@ class UserController extends Controller
 
         $user->update($data);
 
-        $documents = $request->input('documents', []);
-        if (!empty($documents)) {
-            $this->userDocumentService->handleList(null, $documents);
-        }
-
         return response()->json(UserDataResponse::withDocument($user), 200);
     }
 

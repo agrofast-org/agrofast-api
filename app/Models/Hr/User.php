@@ -35,6 +35,7 @@ use Illuminate\Notifications\Notifiable;
  * @property bool        $number_two_factor_auth
  * @property bool        $number_verified
  * @property null|Carbon $number_verified_at
+ * @property null|string $pix_key
  * @property bool        $active
  * @property null|string $profile_picture
  * @property null|string $remember_token
@@ -75,6 +76,7 @@ class User extends DynamicQuery
         'number_verified_at',
         'updated_at',
         'inactivated_at',
+        'pix_key',
         'active',
         'profile_picture',
         'remember_token',
@@ -198,7 +200,7 @@ class User extends DynamicQuery
 
         return $this->belongsToMany(Chat::class, ChatUser::class, 'user_id', 'chat_id')
             ->with(['users', 'last_message'])
-            ->where($chatTable.'.active', 1)
+            ->where($chatTable . '.active', 1)
             ->groupBy([
                 "{$chatTable}.id",
                 "{$chatUserTable}.user_id",
