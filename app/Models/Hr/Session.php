@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int                         $browser_agent_id
  * @property null|int                    $auth_code_id
  * @property bool                        $authenticated
+ * @property null|string                 $payload
  * @property bool                        $active
  * @property null|Carbon                 $last_activity
  * @property Carbon                      $created_at
@@ -65,6 +66,25 @@ class Session extends Model
         'updated_at',
         'inactivated_at',
     ];
+
+    public function storage_get($key)
+    {
+        $payload = $this->payload ? json_decode($this->payload, true) : [];
+
+        return $payload[$key] ?? null;
+    }
+
+    public function storage_set(string|array $key, $value = null)
+    {
+        $payload = $this->payload ? json_decode($this->payload, true) : [];
+        if (is_array($key)) {
+            $payload = array_merge($payload, $key);
+        } else {
+            $payload[$key] = $value;
+        }
+        $this->payload = json_encode($payload);
+        $this->save();
+    }
 
     /**
      * Get the user that owns the session.

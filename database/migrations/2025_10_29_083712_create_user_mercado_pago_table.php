@@ -9,19 +9,17 @@ return new class extends Migration {
     {
         Schema::create('hr.user_mercado_pago', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('hr.user')->cascadeOnDelete();
-
-            $table->string('full_name'); // nome completo
-            $table->string('cpf', 11)->unique(); // formato 00000000000
-            $table->string('email')->nullable(); // email usado na conta MP
-            $table->string('phone')->nullable(); // telefone do titular
+            $table->foreignId('user_id')->unique()->constrained('hr.user')->cascadeOnDelete();
 
             $table->string('mp_user_id')->nullable();
-            $table->string('mp_access_token', 255)->nullable();
-            $table->string('mp_refresh_token', 255)->nullable();
-            $table->timestamp('mp_token_expires_at')->nullable();
+            $table->string('public_key')->nullable();
+            $table->text('access_token')->nullable();
+            $table->text('refresh_token')->nullable();
+            $table->string('token_type')->nullable();
+            $table->text('scope')->nullable();
+            $table->boolean('live_mode')->default(false);
+            $table->integer('expires_in')->nullable();
 
-            $table->enum('status', ['pending', 'connected', 'disconnected'])->default('pending');
             $table->timestamps();
             $table->softDeletes();
         });

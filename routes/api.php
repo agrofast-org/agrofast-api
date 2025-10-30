@@ -7,6 +7,7 @@ use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DebugController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\Integrations\MercadoPagoAuthController;
 use App\Http\Controllers\Integrations\MercadoPagoController;
 use App\Http\Controllers\MachineryController;
 use App\Http\Controllers\MessageController;
@@ -50,8 +51,8 @@ Route::middleware(['response.error', 'lang'])->group(function () {
     Route::middleware([])->prefix('/integrations')->group(function () {
         Route::prefix('/mercado-pago')->group(function () {
             Route::middleware(['auth'])->group(function () {
-                Route::get('/connect', [MercadoPagoController::class, 'connect']);
-                Route::get('/callback', [MercadoPagoController::class, 'callback']);
+                Route::get('/connect', [MercadoPagoAuthController::class, 'connect']);
+                Route::get('/callback', [MercadoPagoAuthController::class, 'callback']);
             });
         });
     });
