@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Queue;
 
 class HealthCheckController extends Controller
 {
-    public function checkApi()
+    public function api()
     {
         return response()->json([
             'message' => 'OK',
@@ -18,7 +18,7 @@ class HealthCheckController extends Controller
         ]);
     }
 
-    public function checkDatabase()
+    public function database()
     {
         try {
             DB::connection()->getPdo();
@@ -42,7 +42,7 @@ class HealthCheckController extends Controller
         }
     }
 
-    public function checkCache()
+    public function cache()
     {
         try {
             $cache = cache()->get('health_check', 'OK');
@@ -66,7 +66,7 @@ class HealthCheckController extends Controller
         }
     }
 
-    public function checkQueue()
+    public function queue()
     {
         try {
             $queue = Queue::getDefaultDriver();

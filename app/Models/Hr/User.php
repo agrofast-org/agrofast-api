@@ -214,6 +214,11 @@ class User extends DynamicQuery
         ;
     }
 
+    public function cashOuts(): HasMany
+    {
+        return $this->hasMany(CashOut::class, 'user_id', 'id');
+    }
+    
     public function user_mercado_pago()
     {
         return $this->hasOne(UserMercadoPago::class, 'user_id', 'id');

@@ -117,6 +117,15 @@ class OfferService
             $message,
         );
 
+        Offer::where('request_id', $transportRequest->id)
+            ->where('state', Offer::STATE_PENDING)
+            ->where('id', '!=', $offer->id)
+            ->update([
+                'state' => Offer::STATE_REJECTED,
+                'active' => false,
+            ])
+        ;
+
         return [
             'offer' => $offer,
             'transportRequest' => $transportRequest,

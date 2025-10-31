@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Transport;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Offer\StoreOfferRequest;
 use App\Jobs\SendMail;
 use App\Mail\Offer\OfferAcceptedMail;
@@ -28,7 +29,11 @@ class OfferController extends Controller
     public function index(): JsonResponse
     {
         $user = User::auth();
-        $offers = Offer::with(['request', 'carrier'])->where('user_id', $user->id)->get();
+        $offers = Offer::with(['request', 'carrier'])
+            ->where('user_id', $user->id)
+            ->orderByDesc('updated_at')
+            ->get()
+        ;
 
         return response()->json($offers);
     }
@@ -155,6 +160,57 @@ class OfferController extends Controller
         ]);
 
         return response()->json(['message' => 'Offer accepted'], 200);
+    }
+
+    public function start($uuid)
+    {
+        $user = User::auth();
+        $offer = Offer::where('uuid', $uuid)->where('user_id', $user->id)->first();
+
+        if (!$offer) {
+            return response()->json(['message' => 'Oferta não encontrada'], 404);
+        }
+
+        $hasOthersInProgress = Offer::where('request_id', $offer->request_id)
+            ->where('state', Offer::STATE_IN_PROGRESS)
+            ->where('id', '!=', $offer->id)
+            ->exists()
+        ;
+
+        if ($hasOthersInProgress) {
+            return response()->json(['message' => 'Outra oferta já está em andamento para esta solicitação'], 400);
+        }
+
+        $request = TransportRequest::find($offer->request_id);
+        if ($request->state !== TransportRequest::STATE_APPROVED) {
+            return response()->json(['message' => 'A solicitação associada não está aprovada'], 400);
+        }
+
+        $request->update(['state' => TransportRequest::STATE_IN_PROGRESS]);
+        $request->touch();
+
+        $offer->update(['state' => Offer::STATE_IN_PROGRESS]);
+        $offer->touch();
+
+        return response()->json(['message' => 'Oferta iniciada'], 200);
+    }
+
+    public function complete($uuid)
+    {
+        $user = User::auth();
+        $offer = Offer::where('uuid', $uuid)->where('user_id', $user->id)->first();
+
+        if (!$offer) {
+            return response()->json(['message' => 'Oferta não encontrada'], 404);
+        }
+
+        if ($offer->state !== Offer::STATE_IN_PROGRESS) {
+            return response()->json(['message' => 'Oferta não está em andamento'], 400);
+        }
+
+        $offer->update(['state' => Offer::STATE_COMPLETED]);
+
+        return response()->json(['message' => 'Oferta concluída'], 200);
     }
 
     /**

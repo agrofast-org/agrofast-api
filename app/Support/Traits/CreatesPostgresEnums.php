@@ -12,7 +12,21 @@ trait CreatesPostgresEnums
 
         $reflection = new \ReflectionEnum($enumClass);
         $values = collect($reflection->getCases())
-            ->map(fn ($case) => "'{$case->getValue()}'")
+            ->map(function ($case) {
+                if (method_exists($case, 'getValue')) {
+                    $val = $case->getValue();
+                    if (is_scalar($val)) {
+                        return "'{$val}'";
+                    }
+                    if (is_object($val) && isset($val->name)) {
+                        return "'{$val->name}'";
+                    }
+
+                    return "'{$case->getName()}'";
+                }
+
+                return "'{$case->getName()}'";
+            })
             ->join(', ')
         ;
 
