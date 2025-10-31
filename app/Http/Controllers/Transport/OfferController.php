@@ -24,7 +24,8 @@ class OfferController extends Controller
         protected PaymentService $paymentService,
         protected ChatService $chatService,
         protected OfferService $offerService
-    ) {}
+    ) {
+    }
 
     public function index(): JsonResponse
     {

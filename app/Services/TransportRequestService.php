@@ -16,7 +16,8 @@ class TransportRequestService
     public function __construct(
         protected PlacesClientInterface $placesClient,
         protected DistanceMatrixClientInterface $distanceClient,
-    ) {}
+    ) {
+    }
 
     public function validateTransportRequest(int $requestId): void
     {
@@ -58,7 +59,7 @@ class TransportRequestService
         try {
             $response = $client->get("https://api.mercadopago.com/v1/payments/{$transportRequest->pix_payment_id}", [
                 'headers' => [
-                    'Authorization' => 'Bearer '.config('services.mercadopago.access_token'),
+                    'Authorization' => 'Bearer ' . config('services.mercadopago.access_token'),
                 ],
             ]);
 

@@ -41,10 +41,10 @@ class SmsService
             if ($messageResponse->getStatus() == 0) {
                 Log::info("Message successfully sent to {$phoneNumber}");
             } else {
-                Log::error("Failed to send message to {$phoneNumber}: ".$messageResponse->getStatus());
+                Log::error("Failed to send message to {$phoneNumber}: " . $messageResponse->getStatus());
             }
         } catch (\Exception $e) {
-            Log::error('Exception while sending SMS: '.$e->getMessage());
+            Log::error('Exception while sending SMS: ' . $e->getMessage());
         }
     }
 }

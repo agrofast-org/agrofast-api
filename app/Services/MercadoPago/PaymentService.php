@@ -4,7 +4,6 @@ namespace App\Services\MercadoPago;
 
 use App\Models\Hr\PixPayment;
 use App\Models\Hr\User;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use MercadoPago\Client\Common\RequestOptions;
 use MercadoPago\Client\Payment\PaymentClient;
@@ -14,12 +13,14 @@ class PaymentService
 {
     protected string $baseUrl;
     protected string $accessToken;
+    protected PaymentClient $client;
 
     public function __construct()
     {
         MercadoPagoConfig::setAccessToken(config('services.mercadopago.access_token'));
         $this->baseUrl = config('services.mercadopago.base_url', 'https://api.mercadopago.com');
         $this->accessToken = config('services.mercadopago.access_token');
+        $this->client = new PaymentClient();
     }
 
     public function makePayment(string $amount, User $user, $paymentMethod = 'pix')
@@ -35,11 +36,10 @@ class PaymentService
 
         $paymentUuid = Str::uuid()->toString();
 
-        $client = new PaymentClient();
         $request_options = new RequestOptions();
-        $request_options->setCustomHeaders(['X-Idempotency-Key: '.$paymentUuid]);
+        $request_options->setCustomHeaders(['X-Idempotency-Key: ' . $paymentUuid]);
 
-        $paymentResponse = $client->create([
+        $paymentResponse = $this->client->create([
             'transaction_amount' => (float) $amount,
             'payment_method_id' => $paymentMethod,
             'payer' => [
@@ -67,29 +67,22 @@ class PaymentService
     /**
      * Consulta o status de um pagamento por ID usando a API REST do Mercado Pago.
      *
-     * @return array status: string, status_detail: null|string, raw: array}
+     * @return array{status: string, status_detail: ?string, raw: \MercadoPago\Resources\Payment}
      *
      * @throws \RuntimeException
      */
     public function getPaymentStatus(int $paymentId): array
     {
-        $url = "{$this->baseUrl}/v1/payments/{$paymentId}";
+        $payment = $this->client->get($paymentId);
 
-        $response = Http::withToken($this->accessToken)
-            ->timeout(5)
-            ->get($url)
-        ;
-
-        if ($response->failed()) {
-            throw new \RuntimeException("Falha ao consultar pagamento MP: HTTP {$response->status()}");
+        if (!$payment) {
+            throw new \RuntimeException("Falha ao consultar pagamento MP");
         }
 
-        $data = $response->json();
-
         return [
-            'status' => $data['status'] ?? 'unknown',
-            'status_detail' => $data['status_detail'] ?? null,
-            'raw' => $data,
+            'status' => $payment->status ?? 'unknown',
+            'status_detail' => $payment->status_detail ?? null,
+            'raw' => $payment,
         ];
     }
 }

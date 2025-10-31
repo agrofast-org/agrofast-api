@@ -42,7 +42,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             // Route::get('/sms', [DebugController::class, 'sendSms']);
         });
         Route::middleware(['dev.env'])->group(function () {
-            include __DIR__.'/testing/email.php';
+            include __DIR__ . '/testing/email.php';
         });
     });
 
@@ -166,6 +166,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
 
             Route::prefix('/cash-out')->group(function () {
                 Route::get('/', [CashOutController::class, 'index']);
+                Route::get('/funds', [CashOutController::class, 'funds']);
                 Route::post('/', [CashOutController::class, 'store']);
             });
         });

@@ -19,7 +19,7 @@ class DynamicQuery extends Model
 
         $query->where(function ($query) use ($search, $fillable, $modelInstance, $whereJoin) {
             foreach ($fillable as $column) {
-                $query->orWhere($modelInstance->getTable().'.'.$column, 'ilike', "%{$search}%");
+                $query->orWhere($modelInstance->getTable() . '.' . $column, 'ilike', "%{$search}%");
             }
 
             foreach ($whereJoin as $value) {

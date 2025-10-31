@@ -59,9 +59,9 @@ class UserController extends Controller
     {
         $query = $request->only(['q', 'limit', 'offset']);
 
-        return User::where('name', 'like', '%'.($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED').'%')
-            ->orWhere('surname', 'like', '%'.($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED').'%')
-            ->orWhere('email', 'like', '%'.($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED').'%')
+        return User::where('name', 'like', '%' . ($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED') . '%')
+            ->orWhere('surname', 'like', '%' . ($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED') . '%')
+            ->orWhere('email', 'like', '%' . ($query['q'] ?? 'CHARACTER COMBINATION THAT SHOULD NEVER BE USED') . '%')
             ->limit($query['limit'] ?? 10)->offset($query['offset'] ?? 0)
             ->get([
                 'uuid as value',

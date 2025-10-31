@@ -18,7 +18,7 @@ class UserProfileTypeRequest extends FormRequest
         $cases = Utils::enumValues(UserProfileType::class);
 
         return [
-            'profile_type' => 'required|string|in:'.implode(',', $cases),
+            'profile_type' => 'required|string|in:' . implode(',', $cases),
         ];
     }
 }

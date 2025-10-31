@@ -19,7 +19,10 @@ use Illuminate\Support\Carbon;
  * @property int         $request_id
  * @property int         $carrier_id
  * @property string      $price          Decimal (10,2) stored as string
+ * @property string      $gain           Decimal (10,2) stored as string
  * @property string      $state
+ * @property int         $rate
+ * @property string|null $comment
  * @property bool        $active
  * @property null|Carbon $created_at
  * @property null|Carbon $updated_at
@@ -38,7 +41,10 @@ class Offer extends Model
         'request_id',
         'carrier_id',
         'price',
+        'gain',
         'state',
+        'rate',
+        'comment',
         'active',
     ];
 

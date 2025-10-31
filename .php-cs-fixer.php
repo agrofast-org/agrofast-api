@@ -4,17 +4,15 @@ use PhpCsFixer\Config;
 use PhpCsFixer\Finder;
 
 $rules = [
-    '@PhpCsFixer' => true,
+    '@PSR12' => true,
     'ordered_imports' => true,
     'no_unused_imports' => true,
     'no_mixed_echo_print' => ['use' => 'print'],
-    'echo_tag_syntax' => ['format' => 'short'],
     'increment_style' => ['style' => 'post'],
     'yoda_style' => false,
-    'concat_space' => true,
+    'concat_space' => ['spacing' => 'one'],
     'method_chaining_indentation' => true,
     'php_unit_test_class_requires_covers' => false,
-    'indentation_type' => true,
     'array_indentation' => true,
 ];
 
@@ -36,6 +34,6 @@ $finder = Finder::create()
 return (new Config())
     ->setFinder($finder)
     ->setRules($rules)
-    ->setRiskyAllowed(true)
+    ->setRiskyAllowed(false)
     ->setUsingCache(true)
 ;

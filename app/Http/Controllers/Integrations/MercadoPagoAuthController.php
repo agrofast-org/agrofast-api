@@ -67,7 +67,7 @@ class MercadoPagoAuthController extends Controller
             return response()->json(['error' => 'Invalid request'], 400);
         }
         $webUrl = Utils::isProduction() ? env('WEB_URL') : 'https://agrofast.mesf.app';
-        $redirectUri = $webUrl.config('services.mercadopago.redirect_uri');
+        $redirectUri = $webUrl . config('services.mercadopago.redirect_uri');
 
         $payload = [
             'grant_type' => 'authorization_code',

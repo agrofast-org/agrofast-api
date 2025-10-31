@@ -14,7 +14,8 @@ class MercadoPagoController extends Controller
 {
     public function __construct(
         private PaymentService $paymentService
-    ) {}
+    ) {
+    }
 
     /**
      * Summary of webhook.
@@ -65,7 +66,7 @@ class MercadoPagoController extends Controller
                 Log::warning("[MP] Pagamento não encontrado: {$paymentId}");
             }
         } catch (\Throwable $e) {
-            Log::error('[MP] Erro ao processar webhook: '.$e->getMessage(), [
+            Log::error('[MP] Erro ao processar webhook: ' . $e->getMessage(), [
                 'payment_id' => $paymentId,
                 'payload' => $payload,
             ]);

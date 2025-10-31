@@ -50,7 +50,7 @@ class Kernel extends HttpKernel
             SubstituteBindings::class,
         ],
         'api' => [
-            ThrottleRequests::class.':api',
+            ThrottleRequests::class . ':api',
             SubstituteBindings::class,
         ],
     ];

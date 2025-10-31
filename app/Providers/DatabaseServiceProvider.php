@@ -2,9 +2,9 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\ServiceProvider;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
@@ -12,7 +12,7 @@ class DatabaseServiceProvider extends ServiceProvider
     {
         Blueprint::macro('postgresEnum', function (string $column, string $enumClass) {
             $typeName = strtolower(class_basename($enumClass)) . '_enum';
-            $values = array_map(fn($case) => $case->value, $enumClass::cases());
+            $values = array_map(fn ($case) => $case->value, $enumClass::cases());
 
             $valuesSql = implode("', '", $values);
             DB::statement("DO $$
@@ -23,7 +23,7 @@ class DatabaseServiceProvider extends ServiceProvider
                 END
             $$;");
 
-            DB::statement("ALTER TABLE " . $this->table . " ADD COLUMN {$column} {$typeName}");
+            DB::statement('ALTER TABLE ' . $this->table . " ADD COLUMN {$column} {$typeName}");
         });
     }
 }

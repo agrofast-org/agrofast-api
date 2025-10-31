@@ -6,7 +6,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->foreignId('carrier_id')->constrained('transport.carrier')->onDelete('cascade');
 
             $table->decimal('price', 10, 2);
+            $table->decimal('gain', 10, 2);
             $table->enum('state', [
                 Offer::STATE_PENDING,
                 Offer::STATE_WAITING_FOR_OFFER,
@@ -31,6 +32,7 @@ return new class extends Migration {
                 Offer::STATE_COMPLETED,
             ])->default('pending');
             $table->integer('rate')->nullable();
+            $table->text('comment')->nullable();
 
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));

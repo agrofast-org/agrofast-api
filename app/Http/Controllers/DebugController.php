@@ -139,7 +139,7 @@ class DebugController extends Controller
                 continue;
             }
 
-            $path = $directory.DIRECTORY_SEPARATOR.$item;
+            $path = $directory . DIRECTORY_SEPARATOR . $item;
             $items[] = [
                 'name' => $item,
                 'type' => is_dir($path) ? 'directory' : 'file',

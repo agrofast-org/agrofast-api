@@ -18,7 +18,8 @@ class OfferService
     public function __construct(
         protected PaymentService $paymentService,
         protected ChatService $chatService,
-    ) {}
+    ) {
+    }
 
     public function makeOffer(StoreOfferRequest $request)
     {
@@ -59,6 +60,12 @@ class OfferService
             'offer' => $offer,
         ];
     }
+
+    public static function getPayment($paymentId): void
+    {
+        
+    }
+    
 
     public function validateOfferAcception(string $uuid)
     {

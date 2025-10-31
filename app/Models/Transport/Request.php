@@ -35,6 +35,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property null|string $payment_pix_qr_code          QR code for the Pix payment.
  * @property Carbon      $desired_date                 Desired date and time for the transport.
  * @property string      $state                        Current state of the request (e.g., 'pending').
+ * @property int         $rate
+ * @property string|null $comment
  * @property bool        $active                       Indicates if the request is active.
  * @property null|Carbon $inactivated_at               Timestamp when the request was deactivated, if applicable.
  * @property Carbon      $created_at                   Timestamp when the request was created.
@@ -72,6 +74,8 @@ class Request extends Model
 
         'desired_date',
         'state',
+        'rate',
+        'comment',
         'active',
         'inactivated_at',
     ];

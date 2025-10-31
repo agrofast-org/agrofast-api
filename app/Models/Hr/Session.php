@@ -74,7 +74,7 @@ class Session extends Model
         return $payload[$key] ?? null;
     }
 
-    public function storage_set(string|array $key, $value = null)
+    public function storage_set(array|string $key, $value = null)
     {
         $payload = $this->payload ? json_decode($this->payload, true) : [];
         if (is_array($key)) {

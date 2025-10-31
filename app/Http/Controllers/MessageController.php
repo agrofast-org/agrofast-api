@@ -11,7 +11,8 @@ class MessageController extends Controller
 {
     public function __construct(
         protected ChatService $chatService
-    ) {}
+    ) {
+    }
 
     public function store(MessageStoreRequest $request)
     {

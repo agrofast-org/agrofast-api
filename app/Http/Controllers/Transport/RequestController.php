@@ -19,7 +19,8 @@ class RequestController extends Controller
     public function __construct(
         protected TransportRequestService $transportService,
         protected PaymentService $pixClient,
-    ) {}
+    ) {
+    }
 
     public function index(): JsonResponse
     {
@@ -168,11 +169,18 @@ class RequestController extends Controller
             ->where('state', Offer::STATE_IN_PROGRESS)
             ->first()
         ;
-
+        
         if ($offer->state !== Offer::STATE_COMPLETED) {
             return response()->json(['message' => 'Aguarde até que o transportador marque a oferta como concluída.'], 404);
         }
 
+        [
+            "raw" => $payment
+        ] = $this->pixClient->getPaymentStatus($transportRequest->payment_id);
+
+        $offer->update([
+            'gain' => $payment->transaction_amount * 0.95,
+        ]);
         $transportRequest->update(['state' => TransportRequest::STATE_COMPLETED]);
 
         return response()->json(['message' => 'Chamado concluído.'], 200);

@@ -13,7 +13,9 @@ class SystemMessageNotification extends Mailable
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public array $data) {}
+    public function __construct(public array $data)
+    {
+    }
 
     public function envelope(): Envelope
     {

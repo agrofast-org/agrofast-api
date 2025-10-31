@@ -12,7 +12,7 @@ class FileFactory
     {
         $uuid = Str::uuid();
 
-        $fileName = $uuid.'.'.$file->getClientOriginalExtension();
+        $fileName = $uuid . '.' . $file->getClientOriginalExtension();
         $disk = env('FILESYSTEM_DISK', 's3');
 
         $path = $file->storeAs("/uploads/{$type}", $fileName, $disk);

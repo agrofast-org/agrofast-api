@@ -2,13 +2,12 @@
 
 namespace App\Models\Hr;
 
-use App\Enums\UserError;
 use App\Models\Chat\Chat;
 use App\Models\Chat\ChatUser;
 use App\Models\DynamicQuery;
 use App\Models\LastError;
+use App\Support\Traits\HasAuthUser;
 use Carbon\Carbon;
-use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -48,12 +47,7 @@ class User extends DynamicQuery
     use HasFactory;
     use Notifiable;
     use LastError;
-
-    protected static User $user;
-
-    protected static Session $session;
-
-    protected static \stdClass $decodedToken;
+    use HasAuthUser;
 
     protected $table = 'hr.user';
 
@@ -103,86 +97,6 @@ class User extends DynamicQuery
         'remember_token',
     ];
 
-    public static function getDecodedToken(): false|\stdClass
-    {
-        if (!empty(self::$decodedToken)) {
-            return self::$decodedToken;
-        }
-
-        $token = request()->bearerToken();
-        if (empty($token)) {
-            self::setLastError(UserError::MISSING_TOKEN->value);
-
-            return false;
-        }
-
-        $decoded = JWT::decode($token, new Key(env('APP_KEY'), 'HS256'));
-        self::$decodedToken = $decoded;
-
-        return $decoded;
-    }
-
-    /**
-     * Authenticates the user based on the provided token.
-     */
-    public static function auth(): false|self
-    {
-        if (!empty(self::$user)) {
-            return self::$user;
-        }
-
-        try {
-            $decoded = self::getDecodedToken();
-
-            if (gettype($decoded) === 'enum') {
-                self::setLastError($decoded);
-
-                return false;
-            }
-
-            if (!isset($decoded->sub)) {
-                self::setLastError(UserError::INVALID_TOKEN);
-
-                return false;
-            }
-            $user = self::where('id', $decoded->sub)->first();
-            if (!$user) {
-                self::setLastError(UserError::USER_NOT_FOUND);
-
-                return false;
-            }
-            self::$user = $user;
-
-            return $user;
-        } catch (\Throwable) {
-            self::setLastError(UserError::INVALID_TOKEN);
-
-            return false;
-        }
-    }
-
-    public static function session(): false|Session
-    {
-        if (!empty(self::$session)) {
-            return self::$session;
-        }
-        $decoded = self::getDecodedToken();
-
-        if (gettype($decoded) === 'enum') {
-            return $decoded;
-        }
-
-        $session = Session::where('id', $decoded->sid)->first();
-        if (!$session) {
-            self::setLastError(UserError::SESSION_NOT_FOUND);
-
-            return false;
-        }
-        self::$session = $session;
-
-        return $session;
-    }
-
     public function documents(): HasMany
     {
         return $this->hasMany(Document::class, 'user_id', 'id');
@@ -218,7 +132,7 @@ class User extends DynamicQuery
     {
         return $this->hasMany(CashOut::class, 'user_id', 'id');
     }
-    
+
     public function user_mercado_pago()
     {
         return $this->hasOne(UserMercadoPago::class, 'user_id', 'id');

@@ -3,8 +3,9 @@
 namespace App\Models\Hr;
 
 use App\Enums\CashOutStatus;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\File\File;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class CashOut extends Model
 {
@@ -21,7 +22,7 @@ class CashOut extends Model
     ];
 
     protected $casts = [
-        'status' => CashOutStatus::class,
+        // 'status' => CashOutStatus::class,
         'amount' => 'decimal:2',
     ];
 
@@ -32,9 +33,8 @@ class CashOut extends Model
 
     public function paymentProof()
     {
-        return $this->belongsTo(\App\Models\File\File::class, 'payment_proof_id');
+        return $this->belongsTo(File::class, 'payment_proof_id');
     }
-
 
     public function scopePending($query)
     {
@@ -50,7 +50,6 @@ class CashOut extends Model
     {
         return $query->where('status', CashOutStatus::Rejected);
     }
-
 
     public function approve(): void
     {

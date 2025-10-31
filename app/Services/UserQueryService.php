@@ -22,7 +22,7 @@ class UserQueryService
         } elseif (!empty($query['telephone'])) {
             $userQuery->where('number', $query['telephone']);
         } elseif (!empty($query['name'])) {
-            $userQuery->where('name', 'like', '%'.$query['name'].'%');
+            $userQuery->where('name', 'like', '%' . $query['name'] . '%');
         }
 
         return $userQuery->first();
