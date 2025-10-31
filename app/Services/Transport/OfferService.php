@@ -63,9 +63,9 @@ class OfferService
 
     public static function getPayment($paymentId): void
     {
-        
+
     }
-    
+
 
     public function validateOfferAcception(string $uuid)
     {

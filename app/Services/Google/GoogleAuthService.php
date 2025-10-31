@@ -19,12 +19,14 @@ use Symfony\Component\HttpFoundation\Response;
 class GoogleAuthService
 {
     protected $client;
+    protected $chatService;
+    protected $accessToken;
 
-    public function __construct(
-        protected ChatService $chatService,
-        protected AccessToken $accessToken,
-    ) {
+    public function __construct()
+    {
         $this->client = new Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
+        $this->chatService = new ChatService();
+        $this->accessToken = new AccessToken();
     }
 
     /**

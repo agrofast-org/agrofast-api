@@ -169,7 +169,7 @@ class RequestController extends Controller
             ->where('state', Offer::STATE_IN_PROGRESS)
             ->first()
         ;
-        
+
         if ($offer->state !== Offer::STATE_COMPLETED) {
             return response()->json(['message' => 'Aguarde até que o transportador marque a oferta como concluída.'], 404);
         }
