@@ -41,14 +41,10 @@ class UserDataResponse
 
     public static function withDocument(User $user): array
     {
-        $user = self::format($user);
-        $documents = Document::where(['user_id' => $user['id'], 'active' => true])->get();
+        $user->load('documents');
 
         return [
-            'user' => [
-                ...$user,
-                'documents' => UserDocumentDataResponse::list($documents->all()),
-            ],
+            'user' => $user,
         ];
     }
 }

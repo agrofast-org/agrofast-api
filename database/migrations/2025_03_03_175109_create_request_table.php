@@ -45,6 +45,8 @@ return new class extends Migration {
                 Request::STATE_CANCELED,
                 Request::STATE_COMPLETED,
             ])->default('pending');
+            $table->integer('rate')->nullable();
+
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));

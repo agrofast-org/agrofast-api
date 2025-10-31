@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Transport;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Request\StoreRequestRequest;
 use App\Models\Hr\PixPayment;
 use App\Models\Hr\User;
@@ -25,7 +26,7 @@ class RequestController extends Controller
         $user = User::auth();
         $requests = TransportRequest::with(['pix_payment'])
             ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
+            ->orderByDesc('updated_at')
             ->get()
         ;
 
@@ -148,6 +149,33 @@ class RequestController extends Controller
             'message' => 'request_payment_status_updated',
             'data' => $transportRequest,
         ]);
+    }
+
+    public function complete($uuid)
+    {
+        $user = User::auth();
+        $transportRequest = TransportRequest::where('uuid', $uuid)->where('user_id', $user->id)->first();
+
+        if (!$transportRequest) {
+            return response()->json(['message' => 'Chamado não encontrado.'], 404);
+        }
+
+        if ($transportRequest->state !== TransportRequest::STATE_IN_PROGRESS) {
+            return response()->json(['message' => 'Chamado não está em andamento.'], 400);
+        }
+
+        $offer = Offer::where('request_id', $transportRequest->id)
+            ->where('state', Offer::STATE_IN_PROGRESS)
+            ->first()
+        ;
+
+        if ($offer->state !== Offer::STATE_COMPLETED) {
+            return response()->json(['message' => 'Aguarde até que o transportador marque a oferta como concluída.'], 404);
+        }
+
+        $transportRequest->update(['state' => TransportRequest::STATE_COMPLETED]);
+
+        return response()->json(['message' => 'Chamado concluído.'], 200);
     }
 
     public function destroy(string $uuid): JsonResponse

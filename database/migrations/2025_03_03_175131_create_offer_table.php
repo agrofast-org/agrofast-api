@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->foreignId('request_id')->constrained('transport.request')->onDelete('cascade');
             $table->foreignId('carrier_id')->constrained('transport.carrier')->onDelete('cascade');
+
             $table->decimal('price', 10, 2);
             $table->enum('state', [
                 Offer::STATE_PENDING,
@@ -29,6 +30,8 @@ return new class extends Migration {
                 Offer::STATE_CANCELED,
                 Offer::STATE_COMPLETED,
             ])->default('pending');
+            $table->integer('rate')->nullable();
+
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));

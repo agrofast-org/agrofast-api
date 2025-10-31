@@ -5,8 +5,6 @@ namespace App\Services\Transport;
 use App\Exception\InvalidFormException;
 use App\Exception\InvalidRequestException;
 use App\Http\Requests\Offer\StoreOfferRequest;
-use App\Jobs\SendMail;
-use App\Mail\Offer\OfferReceivedMail;
 use App\Models\Hr\User;
 use App\Models\Transport\Carrier;
 use App\Models\Transport\Offer;
@@ -118,6 +116,15 @@ class OfferService
             $requestant->id,
             $message,
         );
+
+        Offer::where('request_id', $transportRequest->id)
+            ->where('state', Offer::STATE_PENDING)
+            ->where('id', '!=', $offer->id)
+            ->update([
+                'state' => Offer::STATE_REJECTED,
+                'active' => false,
+            ])
+        ;
 
         return [
             'offer' => $offer,

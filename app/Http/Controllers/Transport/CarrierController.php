@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Transport;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Carrier\StoreCarrierRequest;
 use App\Http\Requests\Carrier\UpdateCarrierRequest;
 use App\Models\File\File;

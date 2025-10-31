@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Transport;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Machinery\StoreMachineryRequest;
 use App\Http\Requests\Machinery\UpdateMachineryRequest;
 use App\Models\File\File;

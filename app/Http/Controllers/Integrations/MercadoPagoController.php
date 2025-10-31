@@ -12,16 +12,21 @@ use Illuminate\Support\Facades\Log;
 
 class MercadoPagoController extends Controller
 {
+    public function __construct(
+        private PaymentService $paymentService
+    ) {}
+
     /**
      * Summary of webhook.
      *
      * TODO: documentar melhor o funcionamento deste webhook
-     * 
+     *
      * @return JsonResponse
      */
     public function webhook(Request $request, PaymentService $paymentService)
     {
         $payload = $request->all();
+
         Log::info('[MP] Webhook recebido', $payload);
 
         if (

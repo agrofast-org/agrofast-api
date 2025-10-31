@@ -91,11 +91,6 @@ class UserController extends Controller
 
         $user->update($data);
 
-        $documents = $request->input('documents', []);
-        if (!empty($documents)) {
-            $this->userDocumentService->handleList(null, $documents);
-        }
-
         return response()->json(UserDataResponse::withDocument($user), 200);
     }
 
@@ -158,7 +153,7 @@ class UserController extends Controller
 
         $user->update(['profile_type' => $request->input('profile_type')]);
 
-        return response()->json(UserDataResponse::withDocument($user), 200);
+        return response()->json($user->load(['documents']), 200);
     }
 
     public function authenticationMethods()
@@ -184,7 +179,7 @@ class UserController extends Controller
         $session = User::session();
 
         return response()->json([
-            ...UserDataResponse::withDocument($user),
+            'user' => $user->load(['documents', 'user_mercado_pago']),
             'authenticated' => $session->authenticated,
             'has_password' => !empty($user->password),
         ]);

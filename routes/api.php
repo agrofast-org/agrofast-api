@@ -2,15 +2,18 @@
 
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\BrowserAgentController;
-use App\Http\Controllers\CarrierController;
+use App\Http\Controllers\CashOutController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\DebugController;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\IndexController;
+use App\Http\Controllers\Integrations\MercadoPagoAuthController;
 use App\Http\Controllers\Integrations\MercadoPagoController;
-use App\Http\Controllers\MachineryController;
 use App\Http\Controllers\MessageController;
-use App\Http\Controllers\OfferController;
-use App\Http\Controllers\RequestController;
+use App\Http\Controllers\Transport\CarrierController;
+use App\Http\Controllers\Transport\MachineryController;
+use App\Http\Controllers\Transport\OfferController;
+use App\Http\Controllers\Transport\RequestController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -46,6 +49,14 @@ Route::middleware(['response.error', 'lang'])->group(function () {
     Route::middleware([])->prefix('/webhook')->group(function () {
         Route::post('/mercado-pago', [MercadoPagoController::class, 'webhook']);
     });
+    Route::middleware([])->prefix('/integrations')->group(function () {
+        Route::prefix('/mercado-pago')->group(function () {
+            Route::middleware(['auth'])->group(function () {
+                Route::get('/connect', [MercadoPagoAuthController::class, 'connect']);
+                Route::get('/callback', [MercadoPagoAuthController::class, 'callback']);
+            });
+        });
+    });
 
     Route::middleware([])->prefix('/auth')->group(function () {
         Route::prefix('fingerprint')->group(function () {
@@ -78,6 +89,14 @@ Route::middleware(['response.error', 'lang'])->group(function () {
                 Route::put('/', [UserController::class, 'update']);
                 Route::put('/password', [UserController::class, 'password']);
                 Route::put('/profile-type', [UserController::class, 'profileType']);
+                Route::prefix('/document')->group(function () {
+                    Route::get('/', [DocumentController::class, 'index']);
+                    Route::get('/{uuid}', [DocumentController::class, 'show']);
+                    Route::post('/', [DocumentController::class, 'store']);
+                    Route::put('/{uuid}', [DocumentController::class, 'update']);
+                    Route::delete('/{uuid}', [DocumentController::class, 'delete']);
+                });
+
                 Route::prefix('/picture')->group(function () {
                     Route::post('/upload', [UserController::class, 'postPicture']);
                 });
@@ -119,9 +138,11 @@ Route::middleware(['response.error', 'lang'])->group(function () {
                 Route::get('/', [RequestController::class, 'index']);
                 Route::post('/', [RequestController::class, 'store']);
                 Route::get('/available', [RequestController::class, 'listRequestsForOffer']);
+                Route::put('/rate', [RequestController::class, 'rate']);
                 Route::prefix('/{uuid}')->group(function () {
                     Route::get('/offers', [RequestController::class, 'offers']);
                     Route::get('/update', [RequestController::class, 'updatePaymentStatus']);
+                    Route::put('/complete', [RequestController::class, 'complete']);
                     Route::get('/', [RequestController::class, 'show']);
                     Route::delete('/', [RequestController::class, 'destroy']);
                 });
@@ -132,12 +153,20 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             Route::prefix('/offer')->group(function () {
                 Route::get('/', [OfferController::class, 'index']);
                 Route::post('/', [OfferController::class, 'store']);
+                Route::put('/rate', [OfferController::class, 'rate']);
                 Route::prefix('/{uuid}')->group(function () {
                     Route::put('/accept', [OfferController::class, 'accept']);
+                    Route::put('/start', [OfferController::class, 'start']);
+                    Route::put('/complete', [OfferController::class, 'complete']);
                     Route::get('/', [OfferController::class, 'show']);
                     Route::put('/', [OfferController::class, 'update']);
                     Route::delete('/', [OfferController::class, 'delete']);
                 });
+            });
+
+            Route::prefix('/cash-out')->group(function () {
+                Route::get('/', [CashOutController::class, 'index']);
+                Route::post('/', [CashOutController::class, 'store']);
             });
         });
     });

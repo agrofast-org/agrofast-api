@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Factories\DocumentFactory;
-use App\Http\Requests\User\DocumentStoreRequest;
-use App\Http\Requests\User\DocumentUpdateRequest;
+use App\Http\Requests\Document\DocumentStoreRequest;
+use App\Http\Requests\Document\DocumentUpdateRequest;
 use App\Models\Hr\Document;
 use App\Models\Hr\User;
 use App\Services\UserDocumentService;
@@ -21,14 +21,13 @@ class DocumentController extends Controller
 
     public function index()
     {
-        $user = User::auth();
+        $user = User::auth()->load('documents');
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
         }
-        $documents = Document::where('user_id', $user['id'])->get();
 
-        return response()->json($documents, 200);
+        return response()->json($user->documents, 200);
     }
 
     public function store(DocumentStoreRequest $request)

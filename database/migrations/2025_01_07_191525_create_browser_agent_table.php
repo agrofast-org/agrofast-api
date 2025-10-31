@@ -30,6 +30,7 @@ return new class extends Migration {
             $table->foreignId('auth_code_id')->nullable()->constrained('hr.auth_code')->onDelete('cascade');
             $table->boolean('authenticated')->default(false);
             $table->timestamp('last_activity')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->longText('payload')->nullable();
             $table->boolean('active')->default(true);
             $table->timestamp('created_at')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
