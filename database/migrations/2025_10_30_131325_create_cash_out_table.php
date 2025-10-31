@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 return new class () extends Migration {
     public function up(): void
     {
-        Schema::create('cash_out', function (Blueprint $table) {
+        Schema::create('hr.cash_out', function (Blueprint $table) {
             $table->id()->unique()->primary();
             $table->uuid()->unique();
 
@@ -24,6 +24,6 @@ return new class () extends Migration {
 
     public function down(): void
     {
-        Schema::dropIfExists('cash_out');
+        Schema::dropIfExists('hr.cash_out');
     }
 };

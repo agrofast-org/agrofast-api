@@ -11,7 +11,7 @@ class CashOut extends Model
 {
     use HasFactory;
 
-    protected $table = 'cash_out';
+    protected $table = 'hr.cash_out';
 
     protected $fillable = [
         'user_id',
