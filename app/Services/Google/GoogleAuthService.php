@@ -8,6 +8,7 @@ use App\Factories\TokenFactory;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\Session;
 use App\Models\Hr\User;
+use App\Services\Chat\ChatService;
 use Google\Auth\AccessToken;
 use Google\Client;
 use Illuminate\Http\Request;
@@ -18,12 +19,12 @@ use Symfony\Component\HttpFoundation\Response;
 class GoogleAuthService
 {
     protected $client;
-    protected $accessToken;
 
-    public function __construct()
-    {
+    public function __construct(
+        protected ChatService $chatService,
+        protected AccessToken $accessToken,
+    ) {
         $this->client = new Client(['client_id' => env('GOOGLE_CLIENT_ID')]);
-        $this->accessToken = new AccessToken();
     }
 
     /**
@@ -81,6 +82,10 @@ class GoogleAuthService
         $browserAgent = BrowserAgent::where('fingerprint', $request->header('Browser-Agent'))->first();
         $session = SessionFactory::create($user, $request, $browserAgent, null);
         $jwt = TokenFactory::create($user, $session);
+
+        $chat = $this->chatService->createChatWithSupport($user->id);
+        $supportUser = User::where('email', 'contact.agrofast@gmail.com')->first();
+        $this->chatService->sendMessage($chat->id, $supportUser->id, 'Olá, bem-vindo ao Terramov! Se precisar de ajuda, estamos à disposição.');
 
         return [
             'token' => $jwt,

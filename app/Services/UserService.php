@@ -12,12 +12,19 @@ use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
 use App\Models\Hr\User;
+use App\Services\Chat\ChatService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class UserService
 {
+    private ChatService $chatService;
+    public function __construct()
+    {
+        $this->chatService = new ChatService();
+    }
+
     /**
      * Creates a new user and starts a session.
      *
@@ -42,6 +49,10 @@ class UserService
         $browserAgent = BrowserAgent::where('fingerprint', $request->header('Browser-Agent'))->first();
 
         $session = SessionFactory::create($user, $request, $browserAgent, $authCode);
+
+        $chat = $this->chatService->createChatWithSupport($user->id);
+        $supportUser = User::where('email', 'contact.agrofast@gmail.com')->first();
+        $this->chatService->sendMessage($chat->id, $supportUser->id, 'Olá, bem-vindo ao Terramov! Se precisar de ajuda, estamos à disposição.');
 
         if (!empty($data['remember']) && $data['remember'] === 'true') {
             RememberBrowser::create([
