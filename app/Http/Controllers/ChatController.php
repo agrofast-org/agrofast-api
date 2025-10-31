@@ -25,13 +25,18 @@ class ChatController extends Controller
     public function show(string $uuid)
     {
         $user = User::auth();
-        $chat = Chat::where('uuid', $uuid)->first();
+
+        if ($uuid === "support") {
+            $chat = $this->chatService->createChatWithSupport($user->id);
+        } else {
+            $chat = Chat::where('uuid', $uuid)->first();
+        }
 
         if (!$this->chatService->userBelongsToChat($user->id, $chat->id)) {
             return response()->json(['message' => 'Chat not found'], 404);
         }
 
-        $chat = Chat::where('uuid', $uuid)
+        $chat = Chat::where('uuid', $chat->uuid)
             ->with([
                 'users',
                 'messages' => function ($query) {

@@ -10,6 +10,7 @@ use App\Http\Controllers\IndexController;
 use App\Http\Controllers\Integrations\MercadoPagoAuthController;
 use App\Http\Controllers\Integrations\MercadoPagoController;
 use App\Http\Controllers\MessageController;
+use App\Http\Controllers\SupportController;
 use App\Http\Controllers\Transport\CarrierController;
 use App\Http\Controllers\Transport\MachineryController;
 use App\Http\Controllers\Transport\OfferController;
@@ -104,6 +105,10 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             Route::get('/exists', [UserController::class, 'exists']);
         });
         Route::middleware(['auth'])->group(function () {
+            Route::prefix('/support')->group(function () {
+                Route::post('/request', [SupportController::class, 'store']);
+            });
+
             // Chat routes
             Route::prefix('/chat')->group(function () {
                 Route::get('/', [ChatController::class, 'index']);

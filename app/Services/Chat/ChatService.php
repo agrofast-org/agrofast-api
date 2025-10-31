@@ -6,6 +6,7 @@ use App\Exception\InvalidFormException;
 use App\Models\Chat\Chat;
 use App\Models\Chat\ChatUser;
 use App\Models\Chat\Message;
+use App\Models\Hr\User;
 use Illuminate\Support\Str;
 
 class ChatService
@@ -95,5 +96,17 @@ class ChatService
         }
 
         return $chat->users()->where('user_id', $userId)->exists();
+    }
+
+    public function createChatWithSupport($forUserId)
+    {
+        $supportUser = User::where('email', 'contact.agrofast@gmail.com')->first();
+        if (!$supportUser) {
+            throw new InvalidFormException('Usuário de suporte não encontrado.', [
+                'user_uuid' => ['O usuário de suporte não existe.'],
+            ]);
+        }
+
+        return $this->createPrivateChat($supportUser->id, $forUserId);
     }
 }
