@@ -24,7 +24,7 @@ class UserStoreRequest extends FormRequest
                 'required',
                 'string',
                 'min:8',
-                'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/',
+                // 'regex:/^(?=.*[A-Za-z])(?=.*\d).+$/',
             ],
             'password_confirm' => 'required|same:password',
             'terms_and_privacy_agreement' => 'required|accepted',
