@@ -21,7 +21,7 @@ class StoreMachineryRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'model' => ['required', 'string', 'max:255'],
-            'plate' => ['required', 'string', 'max:255'],
+            'plate' => ['string', 'max:255'],
             'type' => ['required', 'string', 'max:255'],
             'manufacturer' => ['required', 'string', 'max:255'],
             'manufacturer_date' => ['required', 'date', "before_or_equal:{$currentYear}-12-31"],

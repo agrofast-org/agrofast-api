@@ -62,7 +62,7 @@ class AuthService
             $session->update(['authenticated' => true]);
         }
 
-        if (!empty($credentials['remember']) && $credentials['remember'] === 'true' && !$remember) {
+        if (isset($credentials['remember']) && $credentials['remember'] === 'true' && !$remember) {
             RememberBrowser::create([
                 'user_id' => $user->id,
                 'browser_agent_id' => $browserAgent->id,

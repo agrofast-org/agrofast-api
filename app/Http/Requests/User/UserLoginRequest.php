@@ -16,6 +16,7 @@ class UserLoginRequest extends FormRequest
         return [
             'email' => 'required|email|exists:pgsql.hr.user',
             'password' => 'required|string|min:8',
+            'remember' => 'nullable|string',
         ];
     }
 

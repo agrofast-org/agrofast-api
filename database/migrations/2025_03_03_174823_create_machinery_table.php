@@ -17,7 +17,7 @@ return new class () extends Migration {
             $table->foreignId('user_id')->constrained('hr.user')->onDelete('cascade');
             $table->string('name');
             $table->string('model');
-            $table->string('plate')->unique();
+            $table->string('plate')->nullable();
             $table->string('type');
             $table->string('manufacturer');
             $table->date('manufacturer_date');
