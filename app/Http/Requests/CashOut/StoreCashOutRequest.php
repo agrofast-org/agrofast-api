@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Machinery;
+namespace App\Http\Requests\CashOut;
 
 use Illuminate\Foundation\Http\FormRequest;
 
