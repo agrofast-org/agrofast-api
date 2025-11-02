@@ -2,20 +2,28 @@
 
 namespace App\Mail;
 
+use App\Models\Hr\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class RecoverPasswordMail extends Mailable
+class ResetPasswordMail extends Mailable
 {
     use Queueable;
     use SerializesModels;
+    public array $data;
 
-    public function __construct(public array $user)
+    public function __construct(array $data)
     {
+        $this->data = [
+            'user' => User::find($data['user_id']),
+            'code' => $data['code'],
+        ];
     }
+
+
 
     public function envelope(): Envelope
     {
@@ -27,9 +35,10 @@ class RecoverPasswordMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.recover-password',
+            view: 'emails.reset-password-password',
             with: [
-                'user' => $this->user,
+                'user' => $this->data['user'],
+                'code' => $this->data['code'],
             ],
         );
     }

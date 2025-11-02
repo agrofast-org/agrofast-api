@@ -20,7 +20,7 @@ return new class () extends Migration {
             $table->foreignId('carrier_id')->constrained('transport.carrier')->onDelete('cascade');
 
             $table->decimal('price', 10, 2);
-            $table->decimal('gain', 10, 2);
+            $table->decimal('gain', 10, 2)->nullable();
             $table->enum('state', [
                 Offer::STATE_PENDING,
                 Offer::STATE_WAITING_FOR_OFFER,

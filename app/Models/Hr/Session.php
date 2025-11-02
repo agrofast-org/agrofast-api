@@ -86,6 +86,16 @@ class Session extends Model
         $this->save();
     }
 
+    public function storage_unset($key)
+    {
+        $payload = $this->payload ? json_decode($this->payload, true) : [];
+        if (array_key_exists($key, $payload)) {
+            unset($payload[$key]);
+            $this->payload = json_encode($payload);
+            $this->save();
+        }
+    }
+
     /**
      * Get the user that owns the session.
      */

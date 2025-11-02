@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exception\InvalidFormException;
 use App\Http\Requests\User\UserLoginRequest;
+use App\Http\Requests\User\UserPasswordCreateRequest;
 use App\Http\Requests\User\UserPasswordUpdateRequest;
 use App\Http\Requests\User\UserProfileTypeRequest;
+use App\Http\Requests\User\UserResetPasswordRequest;
 use App\Http\Requests\User\UserStoreRequest;
 use App\Http\Requests\User\UserUpdateRequest;
 use App\Http\Responses\User\UserDataResponse;
@@ -103,6 +106,30 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
+        if (!Hash::check($data['current_password'], $user->password)) {
+            throw new InvalidFormException(__('validation.current_password'), ['current_password' => __('validation.current_password')]);
+        }
+
+        $user->update([
+            'password' => Hash::make($data['password']),
+        ]);
+
+        return response()->json(UserDataResponse::withDocument($user), 200);
+    }
+
+    public function passwordCreate(UserPasswordCreateRequest $request)
+    {
+        $data = $request->validated();
+        $user = User::auth();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        if ($user->password !== '') {
+            throw new InvalidFormException("Senha já está definida", ['current_password' => "Senha já está definida"]);
+        }
+
         $user->update([
             'password' => Hash::make($data['password']),
         ]);
@@ -115,6 +142,13 @@ class UserController extends Controller
         $credentials = $request->validated();
 
         $result = $this->authService->login($credentials, $request);
+
+        return response()->json($result, 200);
+    }
+
+    public function resetPassword(UserResetPasswordRequest $request)
+    {
+        $result = $this->authService->resetPassword($request);
 
         return response()->json($result, 200);
     }

@@ -67,6 +67,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
         // Route::post('/logout', [UserController::class, 'logout']);
         Route::middleware(['db.safe', 'fingerprint'])->group(function () {
             Route::get('/code-length', [UserController::class, 'codeLength']);
+            Route::post('/reset-password', [UserController::class, 'resetPassword']);
             Route::post('/sign-in', [UserController::class, 'login']);
             Route::post('/sign-up', [UserController::class, 'store']);
             Route::post('/google-auth', [UserController::class, 'googleAuth']);
@@ -89,6 +90,7 @@ Route::middleware(['response.error', 'lang'])->group(function () {
             Route::middleware(['auth'])->group(function () {
                 Route::put('/', [UserController::class, 'update']);
                 Route::put('/password', [UserController::class, 'password']);
+                Route::post('/password', [UserController::class, 'passwordCreate']);
                 Route::put('/profile-type', [UserController::class, 'profileType']);
                 Route::prefix('/document')->group(function () {
                     Route::get('/', [DocumentController::class, 'index']);

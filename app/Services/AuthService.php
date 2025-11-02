@@ -8,7 +8,10 @@ use App\Exception\InvalidRequestException;
 use App\Factories\SessionFactory;
 use App\Factories\TokenFactory;
 use App\Http\Requests\User\UserLoginRequest;
+use App\Http\Requests\User\UserResetPasswordRequest;
 use App\Http\Responses\User\UserDataResponse;
+use App\Jobs\SendMail;
+use App\Mail\ResetPasswordMail;
 use App\Models\Hr\AuthCode;
 use App\Models\Hr\BrowserAgent;
 use App\Models\Hr\RememberBrowser;
@@ -164,11 +167,66 @@ class AuthService
             $user->update(['number_verified' => true, 'number_verified_at' => Carbon::now()]);
         }
 
+        if ($session->storage_get('reset_password')) {
+            $session->storage_unset('reset_password');
+            $user->update([
+                'password' => '',
+            ]);
+        }
+
         $jwt = TokenFactory::create($user, $session);
 
         return [
             'user' => UserDataResponse::withDocument($user),
             'token' => $jwt,
+        ];
+    }
+
+    public function resetPassword(UserResetPasswordRequest $request)
+    {
+        $data = $request->validated();
+
+        $user = User::where('email', $data['email'])->first();
+
+        if (!$user) {
+            throw new ValidationException('user_not_found');
+        }
+
+        $browserFingerprint = $request->header('Browser-Agent');
+        $browserAgent = BrowserAgent::where('fingerprint', $browserFingerprint)->first();
+
+        $remember = RememberBrowser::where('user_id', $user->id)
+            ->where('browser_agent_id', $browserAgent->id)
+            ->where('created_at', '>=', Carbon::now()->subDays(30))
+            ->first()
+        ;
+
+        $authCode = AuthCode::createCode($user->id, AuthCode::EMAIL);
+
+        $session = SessionFactory::create($user, $request, $browserAgent, $authCode);
+
+        if (isset($data['remember']) && $data['remember'] === 'true' && !$remember) {
+            RememberBrowser::create([
+                'user_id' => $user->id,
+                'browser_agent_id' => $browserAgent->id,
+            ]);
+        }
+
+        SendMail::dispatch($user->email, ResetPasswordMail::class, [
+            'user_id' => $user->id,
+            'code' => $authCode->code,
+        ]);
+
+        $session->storage_set([
+            'reset_password' => true,
+        ]);
+
+        $jwt = TokenFactory::create($user, $session);
+
+        return [
+            'user' => UserDataResponse::withDocument($user),
+            'token' => $jwt,
+            'auth' => UserAction::AUTHENTICATE->value,
         ];
     }
 
