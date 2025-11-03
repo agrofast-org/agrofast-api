@@ -7,6 +7,7 @@ use App\Http\Requests\CashOut\StoreCashOutRequest;
 use App\Models\Hr\User;
 use App\Models\Transport\Offer;
 use App\Models\Transport\Request as TransportRequest;
+use Illuminate\Support\Str;
 
 class CashOutController extends Controller
 {
@@ -45,6 +46,7 @@ class CashOutController extends Controller
         }
 
         $cashOut = $user->cashOuts()->create([
+            'uuid' => Str::uuid()->toString(),
             'amount' => $data['amount'],
             'status' => 'pending',
         ]);
