@@ -20,7 +20,7 @@ class StoreRequestRequest extends FormRequest
             'origin_place_id' => 'required|string',
             'destination_place_id' => 'required|string',
             'machine_uuid' => 'required|uuid|exists:pgsql.transport.machinery,uuid',
-            'desired_date' => 'required|date_format:Y-m-d',
+            'desired_date' => 'nullable|date_format:Y-m-d',
         ];
     }
 }
