@@ -166,7 +166,6 @@ class RequestController extends Controller
         }
 
         $offer = Offer::where('request_id', $transportRequest->id)
-            ->where('state', Offer::STATE_IN_PROGRESS)
             ->first()
         ;
 
@@ -174,9 +173,12 @@ class RequestController extends Controller
             return response()->json(['message' => 'Aguarde até que o transportador marque a oferta como concluída.'], 404);
         }
 
+        $pixPayment = PixPayment::where('id', $transportRequest->payment_id)
+            ->first();
+
         [
             "raw" => $payment
-        ] = $this->pixClient->getPaymentStatus($transportRequest->payment_id);
+        ] = $this->pixClient->getPaymentStatus($pixPayment->payment_id);
 
         $offer->update([
             'gain' => $payment->transaction_amount * 0.95,
