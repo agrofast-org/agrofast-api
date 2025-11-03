@@ -55,9 +55,9 @@ class MercadoPagoController extends Controller
                 $transportRequest = TransportRequest::where('payment_id', $pixPayment->id)->first();
                 if ($transportRequest) {
                     if ($mpPayment['status'] === 'approved') {
-                        $transportRequest->state = TransportRequest::STATE_APPROVED;
+                        $transportRequest->update(['state' => TransportRequest::STATE_APPROVED]);
                     } elseif (in_array($mpPayment['status'], ['cancelled', 'rejected', 'refunded'], true)) {
-                        // $transportRequest->state = TransportRequest::STATE_REJECTED;
+                        // $transportRequest->update(['state' => TransportRequest::STATE_REJECTED]);
                     }
                 }
 
