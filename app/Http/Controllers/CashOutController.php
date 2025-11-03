@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Exception\InvalidFormException;
 use App\Http\Requests\CashOut\StoreCashOutRequest;
+use App\Models\Hr\CashOut;
 use App\Models\Hr\User;
 use App\Models\Transport\Offer;
 use App\Models\Transport\Request as TransportRequest;
@@ -45,8 +46,9 @@ class CashOutController extends Controller
             ]);
         }
 
-        $cashOut = $user->cashOuts()->create([
+        $cashOut = CashOut::create([
             'uuid' => Str::uuid()->toString(),
+            'user_id' => $user->id,
             'amount' => $data['amount'],
             'status' => 'pending',
         ]);

@@ -14,6 +14,7 @@ class CashOut extends Model
     protected $table = 'hr.cash_out';
 
     protected $fillable = [
+        'uuid',
         'user_id',
         'amount',
         'status',
